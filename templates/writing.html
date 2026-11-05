@@ -42,10 +42,10 @@
   <h2 class="h2 small">{{4.4}}</h2>
   <p class="sub" style="margin:6px auto 22px">{{4.41}}</p>
   <div class="shelf">
-    {{#each 4.42}}<button type="button" class="spine s{{n}}" data-book="{{n}}" aria-pressed="false" aria-label="{{plain:.}}">{{.}}</button>{{/each}}
+    {{#each 4.42 depth=2}}<button type="button" class="spine s{{n}}" data-book="{{n}}" aria-pressed="false" aria-label="{{plain:.}}">{{.}}</button>{{/each}}
   </div>
   <div class="bookpanels">
-    {{#each 4.42}}<div class="bookpanel" data-book="{{n}}"><h3 class="h3"><em>{{.}}</em></h3><p class="who">{{.1}}</p><p>{{.2}}</p></div>{{/each}}
+    {{#each 4.42 depth=2}}<div class="bookpanel" data-book="{{n}}"><h3 class="h3"><em>{{.}}</em></h3><p class="who">{{.1}}</p><p>{{.2}}</p></div>{{/each}}
   </div>
   <div class="tools" data-share data-comment-at="4.4"></div>
 </section>

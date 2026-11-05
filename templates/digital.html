@@ -14,11 +14,11 @@
   {{#each 5.22 depth=2}}<article class="room"><p class="when">{{.}}</p><div><h3 class="h3">{{.1}}</h3><p>{{.2}}</p></div></article>{{/each}}
 </section>
 
-<section class="sec" style="text-align:center">
+{{#if 5.31}}<section class="sec" style="text-align:center">
   <div class="quotes">
     {{#each 5.3}}<blockquote><p>{{.}}</p><footer>{{.1}}</footer></blockquote>{{/each}}
   </div>
-</section>
+</section>{{/if}}
 
 <section class="sec">
   <h2 class="h2 small" style="margin-bottom:16px">{{5.4}}</h2>
