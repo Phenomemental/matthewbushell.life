@@ -149,7 +149,7 @@ class EveryPage(Base):
         door = json.loads(re.search(r'window\.DOOR=(.*?);</script>', h).group(1))
         self.assertTrue(door['proved'])
         self.assertEqual(door['home'], 'https://phenomemental.github.io/matthewbushell.life/')
-        self.assertIn('<!-- visit counting goes here -->', h)
+        self.assertIn('data-goatcounter="https://matthewbushell.goatcounter.com/count"', h)
         hello = self.page('/hello')
         self.assertIn('data-tool="note"', hello)
         self.assertIn('data-tool="door"', hello)
@@ -443,6 +443,35 @@ class Guards(Base):
         self.assertEqual(rep['published'], ALL)
         self.assertIn('<meta name="robots" content="noindex">', self.page('/story'))
         self.assertTrue(any('a preview carries on' in n for n in rep['notes']))
+
+
+class VisitCounting(Base):
+    SCRIPT = ('<script data-goatcounter="https://matthewbushell.goatcounter.com/count" async '
+              'src="https://gc.zgo.at/count.v4.js" crossorigin="anonymous" '
+              'integrity="sha384-nRw6qfbWyJha9LhsOtSb2YJDyZdKvvCFh0fJYlkquSFjUxp9FVNugbfy8q1jdxI+"></script>')
+
+    def test_every_page_is_counted_with_its_own_path(self):
+        rep = self.run_with(blocks())
+        self.assertEqual(rep['published'], ALL)  # the script's long hash doesn't hold a page
+        for path in ALL:
+            h = self.page(path)
+            self.assertIn(self.SCRIPT, h, path)
+            self.assertIn('<noscript><img class="counted" src="https://matthewbushell.goatcounter.com/count?p=%s" alt=""></noscript>' % path, h)
+            foot = re.search(r'<footer class="foot">(.*?)</footer>', h, re.S).group(1)
+            self.assertIn('Visits are counted with <a href="https://www.goatcounter.com">GoatCounter</a>, without cookies.', foot)
+            self.assertTrue(foot.strip().endswith('<p class="made">Made by Matthew Bushell, Northampton</p>'))
+
+    def test_the_holding_page_is_not_counted(self):
+        self.run_with(blocks(yes=[]))
+        self.assertNotIn('goatcounter', self.all_text())
+
+    def test_a_preview_is_never_counted(self):
+        self.run_with(blocks(yes=[]), extra=['--preview'])
+        for path in ALL:
+            h = self.page(path)
+            self.assertNotIn('data-goatcounter', h)
+            self.assertNotIn('goatcounter.com/count', h)
+            self.assertIn('without cookies', h)
 
 
 if __name__ == '__main__':

@@ -195,3 +195,5 @@ html:not(.js) .tools,html:not(.js) [data-tool]{display:none}
 .door-sheet .door-field input,.door-sheet .door-go.door-quiet{border-color:var(--edge)}
 .btn[disabled]{opacity:.55;cursor:default}
 @media (prefers-reduced-motion:reduce){.share,.btn{transition:none}}
+/* The counting pixel, seen only with script off, takes no room. */
+.counted{position:absolute;width:1px;height:1px;border:0;opacity:0}

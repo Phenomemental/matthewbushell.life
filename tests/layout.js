@@ -45,7 +45,7 @@ function serve(folder, root) {
 }
 
 async function stub(context, writes) {
-  await context.route(/beach\.happyseaurchin\.com|happyseaurchin\.com\/api|mirror\.onen\.ai|goatcounter/, route => {
+  await context.route(/beach\.happyseaurchin\.com|happyseaurchin\.com\/api|mirror\.onen\.ai|goatcounter|zgo\.at/, route => {
     const req = route.request();
     if (req.method() !== 'GET' && req.method() !== 'HEAD') { writes.push(req.method() + ' ' + req.url()); return route.abort(); }
     const u = req.url();
