@@ -1,0 +1,70 @@
+/* www.matthewbushell.life's copy of door.css, taken unchanged from Phenomemental/happyseaurchin-beach
+   (v=2026-10-26a) on 5 November 2026. site.css loads after it and gives fields their stronger edge. */
+/* door.css — the way in (door.js), wearing the page's own look.
+   It reads the page's tokens and falls back to Matthew's (look:Phenomemental):
+   --ground, --ink, --muted, --panel, --line, --accent, --serif. */
+
+body.door-up { overflow: hidden; }
+.door-veil { position: fixed; inset: 0; z-index: 40; background: rgba(22, 19, 15, 0.55); }
+.door-sheet {
+  position: fixed; z-index: 41; left: 0; right: 0; bottom: 0;
+  max-height: 92vh; max-height: 92dvh; overflow-y: auto; overscroll-behavior: contain;
+  background: var(--panel, #f6f1e6); color: var(--ink, #1d1a17);
+  border-top: 1px solid var(--line, #b9ad9a); border-radius: 2px 2px 0 0;
+  padding: 1.4rem max(16px, env(safe-area-inset-right, 0px)) calc(1.4rem + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  font-family: var(--serif, "Cormorant Garamond", Georgia, serif); font-size: 1.15rem; line-height: 1.45;
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.18);
+}
+@media (min-width: 40rem) {
+  .door-sheet { left: 50%; right: auto; top: 50%; bottom: auto; width: min(30rem, calc(100vw - 32px)); transform: translate(-50%, -50%); border: 1px solid var(--line, #b9ad9a); border-radius: 2px; padding: 1.6rem 1.6rem 1.4rem; }
+}
+.door-sheet > div { max-width: 30rem; margin: 0 auto; }
+.door-shut { position: absolute; top: 0.35rem; right: 0.5rem; font: inherit; font-size: 1.7rem; line-height: 1; border: 0; background: none; color: var(--muted, #5a5147); cursor: pointer; padding: 0.25rem 0.5rem; }
+.door-head { font-weight: 500; font-size: 1.6rem; line-height: 1.1; margin: 0 2rem 0.9rem 0; }
+.door-form { display: flex; flex-direction: column; gap: 0.45rem; }
+.door-field { display: flex; flex-direction: column; gap: 0.25rem; }
+.door-field label, .door-label { font-size: 1rem; font-weight: 600; margin: 0.3rem 0 0; }
+.door-field input {
+  font: inherit; font-size: 1.15rem; color: var(--ink, #1d1a17); background: var(--ground, #eee7d5);
+  border: 1px solid var(--line, #b9ad9a); border-radius: 2px; padding: 0.45rem 0.6rem; width: 100%; box-sizing: border-box;
+}
+.door-words { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; margin: 0.1rem 0 0.2rem; }
+.door-words span { border: 1px solid var(--accent, #c21d4e); color: var(--accent, #c21d4e); border-radius: 2px; padding: 0.15rem 0.6rem; font-size: 1.2rem; font-weight: 500; }
+.door-small { color: var(--muted, #5a5147); font-size: 0.98rem; margin: 0.1rem 0 0.3rem; }
+.door-small a { color: var(--accent, #c21d4e); }
+.door-tick { display: flex; gap: 0.55rem; align-items: center; margin: 0.15rem 0; }
+.door-tick input { width: 1.2rem; height: 1.2rem; flex: none; margin: 0; accent-color: var(--accent, #c21d4e); }
+.door-tick label { font-size: 1.05rem; }
+.door-go {
+  font: inherit; font-size: 1.1rem; cursor: pointer; margin-top: 0.4rem; padding: 0.4rem 1rem; border-radius: 2px;
+  background: var(--ink, #1d1a17); color: var(--ground, #eee7d5); border: 1px solid var(--ink, #1d1a17);
+}
+.door-go:disabled { opacity: 0.55; cursor: default; }
+.door-go.door-quiet { background: transparent; color: var(--ink, #1d1a17); border-color: var(--line, #b9ad9a); }
+.door-go.door-quiet:hover { border-color: var(--ink, #1d1a17); }
+.door-link { font: inherit; border: 0; background: none; padding: 0; margin: 0; color: var(--accent, #c21d4e); text-decoration: underline; text-underline-offset: 0.15em; cursor: pointer; }
+.door-alt { text-align: center; margin: 1rem 0 0; font-size: 1.02rem; color: var(--muted, #5a5147); }
+.door-status { min-height: 1.3em; margin: 0.2rem 0 0; font-size: 1rem; color: var(--accent, #c21d4e); }
+.door-status:empty { min-height: 0; }
+.door-keep { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.door-keep .door-go { flex: 1 1 12rem; }
+img.door-card { display: block; width: 100%; height: auto; border: 1px solid var(--line, #b9ad9a); border-radius: 2px; margin: 0.6rem 0 0.4rem; }
+.door-sheet button:focus-visible, .door-sheet a:focus-visible, .door-sheet input:focus-visible,
+.door-link:focus-visible { outline: 2px solid var(--accent, #c21d4e); outline-offset: 2px; }
+/* the out-of-sight form that lets a browser offer to save the words */
+form.door-pw { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; opacity: 0; }
+
+/* the microphone beside a box (beach.js addMic) */
+.mic-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.7rem; margin: 0.35rem 0 0; }
+button.mic {
+  display: inline-flex; align-items: center; gap: 0.35rem; font: inherit; font-size: 1rem; cursor: pointer;
+  background: transparent; color: var(--ink, #1d1a17); border: 1px solid var(--line, #b9ad9a); border-radius: 2px; padding: 0.2rem 0.7rem;
+}
+button.mic svg { width: 1.05rem; height: 1.05rem; }
+button.mic.listening { border-color: var(--accent, #c21d4e); color: var(--accent, #c21d4e); }
+button.mic.listening svg { animation: door-listen 1.4s ease-in-out infinite; }
+@keyframes door-listen { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+@media (prefers-reduced-motion: reduce) { button.mic.listening svg { animation: none; } }
+button.mic:focus-visible { outline: 2px solid var(--accent, #c21d4e); outline-offset: 2px; }
+.mic-note { flex: 1 1 12rem; margin: 0; font-size: 0.92rem; color: var(--muted, #5a5147); font-style: italic; }
+.mic-note:empty { display: none; }
