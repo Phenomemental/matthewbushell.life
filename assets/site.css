@@ -117,17 +117,17 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 .legend span+span::before{content:" · ";color:var(--muted)}
 .legend .tone4,.legend .tone5{color:var(--ink)}
 .shelf{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-end;gap:3px;border-bottom:4px solid var(--ink);padding:0 4px;max-width:680px;margin:0 auto}
-.spine{writing-mode:vertical-rl;transition:transform .2s;padding:10px 2px;box-sizing:border-box;border:1px solid #1d1a17;border-bottom:0;border-radius:2px 2px 0 0;font-family:inherit;font-size:15px;font-style:italic;font-weight:500;line-height:1.05;cursor:pointer;text-align:left;overflow:hidden}
+.spine{writing-mode:vertical-rl;transition:transform .2s;padding:10px 2px;box-sizing:border-box;border:1px solid var(--spine-edge);border-bottom:0;border-radius:2px 2px 0 0;font-family:inherit;font-size:15px;font-style:italic;font-weight:500;line-height:1.05;cursor:pointer;text-align:left;overflow:hidden}
 .spine[aria-pressed="true"]{transform:translateY(-10px)}
-.s1{background:#efe7d8;color:#1d1a17;height:214px;width:clamp(29px,5vw,40px)}
-.s2{background:#c21d4e;color:#fbf7ee;height:248px;width:clamp(29px,5vw,46px)}
-.s3{background:#6a6158;color:#fbf7ee;height:232px;width:clamp(29px,5vw,36px)}
-.s4{background:#1d1a17;color:#f6f0e4;height:200px;width:clamp(29px,5vw,38px)}
-.s5{background:#f0e6a6;color:#1d1a17;height:226px;width:clamp(29px,5vw,42px)}
-.s6{background:#efe7d8;color:#c21d4e;height:292px;width:clamp(29px,5vw,34px)}
-.s7{background:#1d1a17;color:#f0e6a6;height:262px;width:clamp(29px,5vw,48px)}
-.s8{background:#a3977f;color:#1d1a17;height:240px;width:clamp(29px,5vw,40px)}
-.s9{background:#f6f0e4;color:#1d1a17;height:218px;width:clamp(29px,5vw,36px)}
+.s1{background:var(--b1);color:var(--b1i);height:214px;width:clamp(29px,5vw,40px)}
+.s2{background:var(--b2);color:var(--b2i);height:248px;width:clamp(29px,5vw,46px)}
+.s3{background:var(--b3);color:var(--b3i);height:232px;width:clamp(29px,5vw,36px)}
+.s4{background:var(--b4);color:var(--b4i);height:200px;width:clamp(29px,5vw,38px)}
+.s5{background:var(--b5);color:var(--b5i);height:226px;width:clamp(29px,5vw,42px)}
+.s6{background:var(--b6);color:var(--b6i);height:292px;width:clamp(29px,5vw,34px)}
+.s7{background:var(--b7);color:var(--b7i);height:262px;width:clamp(29px,5vw,48px)}
+.s8{background:var(--b8);color:var(--b8i);height:240px;width:clamp(29px,5vw,40px)}
+.s9{background:var(--b9);color:var(--b9i);height:218px;width:clamp(29px,5vw,36px)}
 .bookpanels{max-width:560px;margin:20px auto 0;text-align:center;min-height:130px}
 .bookpanel{margin-bottom:20px}
 .js .bookpanel{display:none;margin:0}
@@ -154,3 +154,44 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 .bird{animation:drift 7s ease-in-out infinite}
 @media (prefers-reduced-motion:reduce){.breathe,.ink,.bird{animation:none}.placeword,.placedot,.spine,.glow{transition:none}}
 
+
+/* ── Added by Claude Code, 5 November 2026 ─────────────────────────────────────────────── */
+/* The bookshelf in tokens, so it answers to dark as every drawing does (spine:life-work 8.61). */
+:root{--serif:'Cormorant Garamond',Garamond,'Times New Roman',serif;--spine-edge:#1d1a17;--b1:#efe7d8;--b1i:#1d1a17;--b2:#c21d4e;--b2i:#fbf7ee;--b3:#6a6158;--b3i:#fbf7ee;--b4:#1d1a17;--b4i:#f6f0e4;--b5:#f0e6a6;--b5i:#1d1a17;--b6:#efe7d8;--b6i:#c21d4e;--b7:#1d1a17;--b7i:#f0e6a6;--b8:#a3977f;--b8i:#1d1a17;--b9:#f6f0e4;--b9i:#1d1a17}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--spine-edge:#8f8474;--b1:#2b261f;--b1i:#ede4d3;--b2:#ef5d85;--b2i:#16130f;--b3:#5d554b;--b3i:#f6f0e4;--b4:#ede4d3;--b4i:#16130f;--b5:#a88c34;--b5i:#16130f;--b6:#2b261f;--b6i:#ef5d85;--b7:#ede4d3;--b7i:#6b4f12;--b8:#7d7364;--b8i:#16130f;--b9:#3a332b;--b9i:#ede4d3}}
+:root[data-theme="dark"]{--spine-edge:#8f8474;--b1:#2b261f;--b1i:#ede4d3;--b2:#ef5d85;--b2i:#16130f;--b3:#5d554b;--b3i:#f6f0e4;--b4:#ede4d3;--b4i:#16130f;--b5:#a88c34;--b5i:#16130f;--b6:#2b261f;--b6i:#ef5d85;--b7:#ede4d3;--b7i:#6b4f12;--b8:#7d7364;--b8i:#16130f;--b9:#3a332b;--b9i:#ede4d3}
+
+/* The reader tools. They need script, so with script off they aren't there at all. */
+html:not(.js) .tools,html:not(.js) [data-tool]{display:none}
+.tools-row{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:6px 18px}
+.voices{flex:1 1 260px;min-width:0}
+.say summary{display:inline-flex;align-items:center;min-height:44px;cursor:pointer;font-style:italic;color:var(--accent);list-style:none}
+.say summary::-webkit-details-marker{display:none}
+.say summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.say-count{margin-left:.3em;color:var(--muted)}
+.say-form{margin:6px 0 4px}
+.say-row{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 14px;margin-top:8px}
+.say-as{font-size:.86em;font-style:italic;color:var(--muted)}
+.say-status{margin:8px 0 0;font-size:.9em;font-style:italic;color:var(--muted)}
+.say-status:empty{display:none}
+.said{list-style:none;margin:12px 0 0;padding:0}
+.said li{margin:0 0 10px;padding:2px 0 2px 12px;border-left:2px solid var(--line);font-size:.94em;line-height:1.45;overflow-wrap:anywhere}
+.said .you{color:var(--muted);font-style:italic}
+.share-wrap{display:inline-flex;align-items:center;gap:8px;margin-left:auto}
+.share{min-height:44px;padding:0 2px;border:0;background:none;font:inherit;font-style:italic;color:var(--accent);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.share:hover{color:var(--ink)}
+.share-note{font-size:.86em;font-style:italic;color:var(--muted)}
+.notes{max-width:620px;margin-left:auto;margin-right:auto}
+/* The way in, in the template's own look, with what the door adds beneath the boxes. */
+.door-inline{display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin:0 0 18px}
+.door-inline .door-tick{display:flex;align-items:center;gap:8px;min-height:32px;font-size:.94em}
+.door-inline .door-tick input{width:20px;height:20px;margin:0;accent-color:var(--accent)}
+.door-note{margin:0;font-size:.86em;font-style:italic;color:var(--muted)}
+.door-who{margin:0 0 14px;text-align:center}
+.door-keep{display:flex;flex-wrap:wrap;gap:8px}
+.door-link{min-height:44px;padding:0 2px;border:0;background:none;font:inherit;font-style:italic;color:var(--accent);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.field[readonly]{background:var(--panel)}
+/* Field and button edges stronger than the look's line, which is too faint for them (8.61). */
+.door-sheet .door-field input,.door-sheet .door-go.door-quiet{border-color:var(--edge)}
+.btn[disabled]{opacity:.55;cursor:default}
+@media (prefers-reduced-motion:reduce){.share,.btn{transition:none}}

@@ -1,0 +1,116 @@
+<div class="book">
+  <div class="leaf"><img class="frontis" src="{{root}}/pictures/{{plain:7.211}}" alt="{{plain:7.2112}}"></div>
+  <div class="leaf" style="padding-top:clamp(8px,2vw,10px)">
+    <svg class="mark" viewBox="0 0 390 340" role="img" aria-label="{{plain:7.2912}}" style="width:clamp(130px,17vw,178px);margin:0 auto 10px"><use href="{{root}}/assets/mark.svg#m"></use></svg>
+    <h1 class="h1" style="font-size:clamp(44px,6.2vw,64px)">{{1.1}}</h1>
+    <p class="sub" style="margin-top:8px">{{1.11}}</p>
+    <hr class="rule">
+    <p class="clock" data-clock>In Northampton, on UK time.</p>
+    <p class="imprint">{{1.12}}</p>
+  </div>
+</div>
+
+<div class="spread">
+  <div><p class="drop">{{1.21}}</p></div>
+  <p class="note"><span class="hand">{{1.22}}</span>{{1.221}}</p>
+  <div><p>{{1.23}}</p></div>
+  <p class="note">{{1.24}}</p>
+  <div><p>{{1.25}}</p></div>
+  <div></div>
+</div>
+
+<div class="flyleaf"><span class="hand">{{1.26}}</span></div>
+<p class="cap">{{1.261}}</p>
+
+<p class="house">{{1.31}}</p>
+<h2 class="comein">{{1.32}}</h2>
+
+<div class="read">
+  <p>{{1.33}}</p>
+  <p>{{1.34}}</p>
+  <p>{{1.35}}</p>
+</div>
+<div class="buttons">
+  <a class="btn solid" href="{{root}}/story">{{1.36}}</a>
+  <a class="btn" href="{{root}}/hello">{{1.37}}</a>
+</div>
+
+<section id="places" class="sec">
+  <h2 class="h2" style="position:relative;z-index:1">{{1.4}}</h2>
+  <p class="sub" style="margin-top:8px;margin-bottom:26px;position:relative;z-index:1">{{1.41}}</p>
+  <div style="display:flex;flex-wrap:wrap;gap:clamp(20px,4vw,44px);align-items:flex-start;justify-content:center">
+    <div style="flex:0 1 440px;min-width:0;position:relative;z-index:0">
+      <svg viewBox="-30 -24 452 412" role="img" aria-label="{{plain:7.2922}}" style="width:100%;max-width:460px;display:block;margin:0 auto;overflow:visible;color:var(--ink)">
+        <defs><radialGradient id="light"><stop offset="0%" style="stop-color:var(--glow);stop-opacity:.95"></stop><stop offset="55%" style="stop-color:var(--glow);stop-opacity:.62"></stop><stop offset="100%" style="stop-color:var(--glow);stop-opacity:0"></stop></radialGradient></defs>
+        <g class="breathe"><circle class="glow" cx="250" cy="138" r="350" fill="url(#light)"></circle></g>
+        <use href="{{root}}/assets/mark.svg#m" x="0" y="0" width="390" height="340"></use>
+        <circle class="placedot" data-place="home" cx="179" cy="180" r="6"></circle>
+        <text class="placeword" data-place="home" data-pick="home" x="167" y="170" text-anchor="end">home</text>
+        <circle data-pick="home" cx="179" cy="180" r="19" fill="transparent" style="cursor:pointer"></circle>
+        <circle class="placedot" data-place="work" cx="157" cy="222" r="6"></circle>
+        <text class="placeword" data-place="work" data-pick="work" x="171" y="228" text-anchor="start">work</text>
+        <circle data-pick="work" cx="157" cy="222" r="19" fill="transparent" style="cursor:pointer"></circle>
+        <circle class="placedot" data-place="community" cx="114" cy="283" r="6"></circle>
+        <text class="placeword" data-place="community" data-pick="community" x="129" y="300" text-anchor="start">community</text>
+        <circle data-pick="community" cx="114" cy="283" r="19" fill="transparent" style="cursor:pointer"></circle>
+        <circle class="placedot" data-place="cyberspace" cx="54" cy="328" r="6"></circle>
+        <text class="placeword" data-place="cyberspace" data-pick="cyberspace" x="71" y="353" text-anchor="start">cyberspace</text>
+        <circle data-pick="cyberspace" cx="54" cy="328" r="19" fill="transparent" style="cursor:pointer"></circle>
+        <text class="within" data-pick="fifth" x="250" y="145" text-anchor="middle">within</text>
+      </svg>
+    </div>
+    <div style="flex:999 1 400px;min-width:0;position:relative;z-index:1">
+      <div class="tabs" role="group" aria-label="Choose a place">
+        {{#each 3 to=5}}<button type="button" class="tab" data-place="{{plain:.8}}" aria-pressed="false">{{.32|.}}</button>{{/each}}
+      </div>
+      {{#each 3 to=5}}
+      <div class="panel" data-place="{{plain:.8}}">
+        <h3 class="h2 small panel-name">{{.32|.}}</h3>
+        <p class="panel-line">{{.33|.2}}</p>
+        <div class="grid2">
+          {{#refs .7}}<article class="g"><h3 class="h3">{{.21|.}}</h3><p>{{.2|.1}}</p></article>{{/refs}}
+        </div>
+        <p class="panel-more"><a href="{{url:.31}}">{{.3}} →</a></p>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+  <div class="tools" data-share data-comment-at="3"></div>
+</section>
+
+<section aria-label="Photographs" class="sec photos">
+  <figure class="fig"><img src="{{root}}/pictures/{{plain:7.212}}" alt="{{plain:7.2122}}"><figcaption>{{7.2121}}</figcaption></figure>
+  <figure class="fig"><img src="{{root}}/pictures/{{plain:7.213}}" alt="{{plain:7.2132}}"><figcaption>{{7.2131}}</figcaption></figure>
+  <figure class="fig"><img src="{{root}}/pictures/{{plain:7.214}}" alt="{{plain:7.2142}}"><figcaption>{{7.2141}}</figcaption></figure>
+</section>
+
+<section aria-labelledby="now" class="sec">
+  <h2 id="now" class="h2 mid" style="margin-bottom:16px">{{1.5}}</h2>
+  <ul class="nowlist">
+    {{#refs 3.73}}<li><a href="{{url:.38}}">{{.3}}</a> <span>{{.35}}</span></li>{{/refs}}
+  </ul>
+  <p class="golink"><a href="{{root}}/now">{{1.51}} →</a></p>
+</section>
+
+<section aria-labelledby="say" class="sec" style="text-align:center">
+  <h2 id="say" class="h2 mid" style="margin-bottom:18px">{{1.6}}</h2>
+  <div class="quotes">
+    {{#each 1.6}}<blockquote><p>{{.}}</p><footer>{{.1}}</footer></blockquote>{{/each}}
+  </div>
+</section>
+
+<section id="writing" class="sec">
+  <h2 class="h2" style="margin-bottom:20px">{{4.24}}</h2>
+  <div class="read" style="text-align:center">
+    <p style="font-size:1.28em;font-style:italic;line-height:1.4;margin-bottom:.6em">{{4.231}}</p>
+    <p>{{4.241}}</p>
+    <p style="margin:0;font-style:italic"><a href="{{root}}/writing">{{4.242}} →</a></p>
+  </div>
+</section>
+
+<section id="hello" class="sec" style="text-align:center">
+  <h2 class="h2" style="margin-bottom:12px">{{6.16}}</h2>
+  <p style="margin:0 auto 18px;max-width:600px">{{6.161}}</p>
+  <p style="margin:0"><a class="btn" href="{{root}}/hello">{{6.162}}</a></p>
+</section>
+

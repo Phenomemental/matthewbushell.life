@@ -1,0 +1,26 @@
+<header style="margin-bottom:clamp(24px,4vw,40px)">
+  <h1 class="h1">{{3.6}}</h1>
+  <p class="sub">{{3.61}}</p>
+</header>
+<div class="spread" style="margin-bottom:10px">
+  <div>
+    <p class="drop">{{3.62}}</p>
+    <p>{{3.63}}</p>
+    <p>{{3.64}}</p>
+  </div>
+  <figure class="fig"><img src="{{root}}/pictures/{{plain:7.241}}" alt="{{plain:7.2412}}"><figcaption>{{7.2411}}</figcaption></figure>
+</div>
+{{#each 3 to=5}}
+<section id="{{plain:.8}}" class="sec">
+  <p class="ordinal">{{.1}}</p>
+  <h2 class="h2" style="margin-top:2px">{{.}}</h2>
+  <p class="sub" style="margin:6px auto 22px">{{.2}}</p>
+  {{#if .6}}{{#refs .6}}<figure class="fig" style="max-width:420px;margin:0 auto 22px"><img src="{{root}}/pictures/{{plain:.}}" alt="{{plain:.2}}"><figcaption>{{.1}}</figcaption></figure>{{/refs}}{{/if}}
+  <div class="grid2">
+    {{#each .4}}{{#if .1}}<article class="g"><h3 class="h3">{{.}}</h3><p>{{.1}}</p>{{#if .5}}<p class="more"><a href="{{url:.6}}">{{.5}} →</a></p>{{/if}}</article>{{/if}}{{/each}}
+  </div>
+  {{#if .5}}<div class="before"><h4>{{3.65}}</h4><ul>{{#each .5 depth=2}}<li><em>{{.}}</em>{{.1}}</li>{{/each}}</ul></div>{{/if}}
+</section>
+{{/each}}
+<div class="tools" data-share data-comment-at="3.6"></div>
+
