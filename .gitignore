@@ -1,0 +1,15 @@
+# A private preview is made outside this repository. If one is ever made inside it,
+# it goes here, and git never takes it.
+preview/
+
+# Real words never come into this repository. These names are kept out in case a
+# words file is ever put down here by mistake.
+words/
+*.words.json
+words.json
+
+# What a run leaves behind for the workflow, never kept.
+report.json
+__pycache__/
+*.pyc
+node_modules/
