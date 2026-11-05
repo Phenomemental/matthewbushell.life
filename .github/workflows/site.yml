@@ -1,0 +1,100 @@
+# The site: made from the beach and published, hourly and on the Run workflow button.
+#
+# Each run tests the generator, reads spine:life-work and function:life-work over the beach's
+# public wire with no key, writes the pages into site/, commits them for the record when anything
+# changed, and deploys site/ with GitHub Pages. If the beach can't be read, or a read looks wrong,
+# the run stops before deploying, so the last good pages stay up, and an issue says so.
+# A page held for a pin, a sealed line or a big change opens its own issue, once.
+#
+# Until the domain moves, the site sits at phenomemental.github.io/matthewbushell.life/, and the
+# generator takes that path from Pages itself (base_path), so nothing here changes when it moves.
+# This workflow holds no secrets.
+
+name: site
+
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['templates/**', 'assets/**', 'tools/**', 'tests/**', 'pictures/**', '.github/workflows/site.yml']
+
+permissions: {}
+
+concurrency:
+  group: site
+  cancel-in-progress: false
+
+jobs:
+  site:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write   # the commit for the record
+      pages: write      # the deploy
+      id-token: write   # the deploy
+      issues: write     # an issue for a held page or a failed run
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Test the generator
+        run: python3 -m unittest discover -s tests
+
+      - name: Where the site sits
+        id: pages
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+
+      - name: Make the site from the beach
+        run: >-
+          python3 tools/generate.py
+          --site "${{ steps.pages.outputs.base_url }}"
+          --root "${{ steps.pages.outputs.base_path }}"
+          --report report.json
+
+      - name: Commit for the record
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add site record
+          if git diff --cached --quiet; then echo 'Nothing changed.'; exit 0; fi
+          git commit -m 'The site, as the beach has it at this run'
+          git pull --rebase origin main
+          git push origin HEAD:main
+
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: site
+
+      - name: Deploy
+        id: deploy
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+
+      - name: An issue for each page held
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 tools/issues.py report.json
+
+      - name: An issue if the run failed
+        if: failure()
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 tools/issues.py --failed "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+  keep-alive:
+    # GitHub stops a public repository's schedule after 60 days without activity. Turning the
+    # workflow on again through the API keeps it going, with no empty commits.
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: write
+    steps:
+      - name: Keep the schedule on
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method PUT "repos/${{ github.repository }}/actions/workflows/site.yml/enable"
