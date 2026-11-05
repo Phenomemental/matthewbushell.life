@@ -378,6 +378,13 @@ def visible_words(page_html):
     return html.unescape(body).split()
 
 
+def uncounted(page_html):
+    """A private preview is never counted: GoatCounter's script and its pixel come out."""
+    page_html = re.sub(r'<!-- visit counting[^>]*-->\n?', '', page_html)
+    page_html = re.sub(r'<script\b[^>]*\bdata-goatcounter=[^>]*></script>\n?', '', page_html)
+    return re.sub(r'<noscript><img\b[^>]*goatcounter[^>]*></noscript>\n?', '', page_html)
+
+
 def checks(page_html):
     """What would make a page wrong to publish, in plain words."""
     problems = []
@@ -386,7 +393,7 @@ def checks(page_html):
     pieces = [' '.join(visible_words(page_html))]
     for tag in re.findall(r'<[^>]+>', DROP.sub(' ', page_html)):
         for k, v in ATTR.findall(tag):
-            if k not in ('href', 'src', 'd', 'viewBox', 'points', 'transform', 'style'):
+            if k not in ('href', 'src', 'd', 'viewBox', 'points', 'transform', 'style', 'integrity'):
                 pieces.append(html.unescape(v))
     for piece in pieces:
         for run in BASE64_RUN.findall(piece):
@@ -629,6 +636,8 @@ def generate(source, out, site=SITE, root='', pictures=None, record_path=None, p
                 continue
             page_html = unlink(page_html, root, live)
             page_html = version_assets(page_html, root)
+            if preview:
+                page_html = uncounted(page_html)
             problems = checks(page_html)
             mailtos = set(re.findall(r'href="(mailto:[^"]+)"', page_html))
             if len(mailtos) > 1:
