@@ -58,7 +58,7 @@ POOL = 'pool:life-work'
 ROOM = 'https://mirror.onen.ai/?pool=life-work'
 SITE = 'https://www.matthewbushell.life'
 
-ASSETS = ['site.css', 'site.js', 'mark.svg', 'favicon.svg', 'beach.js', 'door.js', 'door.css', 'tools.js']
+ASSETS = ['site.css', 'site.js', 'mark.svg', 'mark-email.png', 'favicon.svg', 'beach.js', 'door.js', 'door.css', 'tools.js']
 BASE64_RUN = re.compile(r'[A-Za-z0-9+/=_-]{32,}')
 HALF = 0.5
 
