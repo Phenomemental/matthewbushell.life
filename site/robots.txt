@@ -1,2 +1,3 @@
 User-agent: *
 Allow: /
+Sitemap: http://www.matthewbushell.life/sitemap.xml

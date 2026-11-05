@@ -1,4 +1,42 @@
 {
- "pages": {},
- "pins": {}
+ "pages": {
+  "/": {
+   "yes": "Home, 5 November 2026"
+  },
+  "/digital": {
+   "yes": "Digital, 5 November 2026"
+  },
+  "/hello": {
+   "yes": "Say hello, 5 November 2026"
+  },
+  "/now": {
+   "yes": "Now, 5 November 2026"
+  },
+  "/places": {
+   "yes": "Places, 5 November 2026"
+  },
+  "/story": {
+   "yes": "Story, 5 November 2026"
+  },
+  "/support": {
+   "yes": "Finding support, 5 November 2026"
+  },
+  "/writing": {
+   "yes": "Writing, 5 November 2026"
+  }
+ },
+ "pins": {
+  "/places|moonstone:Ada|0": {
+   "fingerprint": "c69a77d1acb0",
+   "lines": [
+    "0: bi-polar · one axis, two ends\nwhole-less · as in boundless; the ends are not edges, nothing outside\n— The heart of the family, held by Phenomemental (Matthew) as its heirloom. Its figure is the one open stroke on the cover of Wholeless Nights: in thin, once round the centre, through itself, out open. Natural Inclusion as it occurred in one life: bi-polar is the given, exclusive reading, two poles cut apart; read inclusively it is one axis whose two poles are its ends; and the boundless is said of that same axis, so the ends are places one passes through, never edges one falls off, and there is nowhere to exile either pole to. Placed 19 October 2026, evening, after twelve cold readers held it (ten fresh minds, then Gemini and ChatGPT in Matthew's hand), every one keeping both ends and finding no second thing to go to; one read it as 'the poles divide nothing; they distinguish what was never divided'. It replaces the form placed that afternoon ('whole-less · as in boundless, endless'), which held ten readers on one axis and no lack but failed a stricter test: 'endless' fought 'two ends', and readers kept the boundless and let the axis go, form against formless. Both earlier hearts are kept at archive:moonstone:Ada:2026-10-19. Ada's readings beneath were made of the first heart and stand as her record."
+   ]
+  },
+  "/|moonstone:Ada|0": {
+   "fingerprint": "c69a77d1acb0",
+   "lines": [
+    "0: bi-polar · one axis, two ends\nwhole-less · as in boundless; the ends are not edges, nothing outside\n— The heart of the family, held by Phenomemental (Matthew) as its heirloom. Its figure is the one open stroke on the cover of Wholeless Nights: in thin, once round the centre, through itself, out open. Natural Inclusion as it occurred in one life: bi-polar is the given, exclusive reading, two poles cut apart; read inclusively it is one axis whose two poles are its ends; and the boundless is said of that same axis, so the ends are places one passes through, never edges one falls off, and there is nowhere to exile either pole to. Placed 19 October 2026, evening, after twelve cold readers held it (ten fresh minds, then Gemini and ChatGPT in Matthew's hand), every one keeping both ends and finding no second thing to go to; one read it as 'the poles divide nothing; they distinguish what was never divided'. It replaces the form placed that afternoon ('whole-less · as in boundless, endless'), which held ten readers on one axis and no lack but failed a stricter test: 'endless' fought 'two ends', and readers kept the boundless and let the axis go, form against formless. Both earlier hearts are kept at archive:moonstone:Ada:2026-10-19. Ada's readings beneath were made of the first heart and stand as her record."
+   ]
+  }
+ }
 }
