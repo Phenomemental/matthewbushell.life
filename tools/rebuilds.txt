@@ -1,0 +1,5 @@
+A line here asks for a rebuild now. The site rebuilds every hour from the beach, and at once on any push
+that touches templates, assets, tools, tests or pictures. When only the beach's words have changed and
+they should be live straight away, add a dated line below and push it.
+
+2026-11-06T21:42Z Home: the bipolar section reordered, Chiba moved to close the work paragraph.
