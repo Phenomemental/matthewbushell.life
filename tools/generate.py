@@ -349,6 +349,53 @@ def tool_ids(page_html):
 ANCHOR = re.compile(r'<a\b([^>]*?)\bhref="([^"]*)"([^>]*)>(.*?)</a>', re.S)
 
 
+def picture_size(path):
+    """A JPEG's or PNG's width and height, read from its header; None for anything else."""
+    try:
+        with open(path, 'rb') as f:
+            head = f.read(26)
+            if head[:8] == b'\x89PNG\r\n\x1a\n':
+                return int.from_bytes(head[16:20], 'big'), int.from_bytes(head[20:24], 'big')
+            if head[:2] != b'\xff\xd8':
+                return None
+            f.seek(2)
+            while True:
+                marker = f.read(2)
+                if len(marker) < 2 or marker[0] != 0xFF:
+                    return None
+                if marker[1] in (0xD8, 0x01) or 0xD0 <= marker[1] <= 0xD7:
+                    continue
+                length = int.from_bytes(f.read(2), 'big')
+                if marker[1] in (0xC0, 0xC1, 0xC2, 0xC3, 0xC5, 0xC6, 0xC7, 0xC9, 0xCA, 0xCB, 0xCD, 0xCE, 0xCF):
+                    data = f.read(5)
+                    return int.from_bytes(data[3:5], 'big'), int.from_bytes(data[1:3], 'big')
+                f.seek(length - 2, 1)
+    except (OSError, ValueError):
+        return None
+
+
+def ease_pictures(page_html, root, pictures):
+    """Each picture carries its size, so the page keeps its shape while pictures arrive, and every
+    picture after the first loads only as the reader reaches it."""
+    seen = []
+
+    def sub(m):
+        tag = m.group(0)
+        if ' width=' in tag or ' loading=' in tag:
+            return tag
+        name = m.group(1)
+        extra = ''
+        size = picture_size(os.path.join(pictures, name)) if pictures else None
+        if size:
+            extra += ' width="%d" height="%d"' % size
+        if seen:
+            extra += ' loading="lazy" decoding="async"'
+        seen.append(name)
+        return tag[:-1] + extra + '>'
+    pat = re.compile(r'<img [^>]*src="%s/pictures/([^"?#]*)"[^>]*>' % re.escape(root))
+    return pat.sub(sub, page_html)
+
+
 def unlink(page_html, root, live_paths):
     """A link to a page of this site that isn't up prints as plain words."""
     def sub(m):
@@ -636,6 +683,7 @@ def generate(source, out, site=SITE, root='', pictures=None, record_path=None, p
                 continue
             page_html = unlink(page_html, root, live)
             page_html = version_assets(page_html, root)
+            page_html = ease_pictures(page_html, root, pictures)
             if preview:
                 page_html = uncounted(page_html)
             problems = checks(page_html)
