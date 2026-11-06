@@ -14,7 +14,7 @@
     <p class="when">{{.}}</p>
     <h2>{{.1}}</h2>
     <p>{{.2}}</p>
-    {{#if .3}}{{#refs .3}}<figure class="fig{{#if .3}} wide{{/if}}"><img src="{{root}}/pictures/{{plain:.}}" alt="{{plain:.2}}"><figcaption>{{.1}}</figcaption></figure>{{/refs}}{{/if}}
+    {{#if .3}}<div class="figs">{{#refs .3}}<figure class="fig{{#if .3}} wide{{/if}}"><img src="{{root}}/pictures/{{plain:.}}" alt="{{plain:.2}}"><figcaption>{{.1}}</figcaption></figure>{{/refs}}</div>{{/if}}
   </article>
   {{/each}}
 </div>

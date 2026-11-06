@@ -95,17 +95,20 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 .moment .when{margin:0;font-size:clamp(25px,3.8vw,33px);line-height:1.15;color:var(--accent);font-style:italic}
 .moment h2{margin:3px 0 4px;font-size:1.14em;font-weight:600;line-height:1.25}
 .moment p{margin:0}
-.moment .fig{display:inline-block;vertical-align:top;width:calc(50% - 8px);max-width:300px;margin-top:14px}
-.moment .fig:nth-of-type(odd){margin-right:14px}
-.moment .fig:only-of-type,.moment .fig.wide{display:block;width:auto;margin-right:0}
-.moment .fig.wide{max-width:100%}
-@media (max-width:560px){.moment .fig,.moment .fig:nth-of-type(odd){display:block;width:auto;margin-right:0}}
+.moment .figs{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:14px;margin-top:16px}
+.moment .figs .fig{flex:1 1 220px;max-width:300px}
+.moment .figs .fig.wide{flex-basis:100%;max-width:100%}
 .role{padding:22px 0;border-top:1px solid var(--line-soft)}
 .role .where{margin:0;font-size:.86em;font-style:italic;color:var(--accent)}
 .role h2{margin:2px 0 0;font-size:clamp(26px,3.6vw,31px);font-weight:500;line-height:1.2}
 .role .org{margin:2px 0 8px;font-style:italic;color:var(--muted)}
 .role p{margin:0}
-.role .fig{max-width:300px;margin-top:14px}
+.role .fig{max-width:300px;margin:16px auto 0}
+.secfigs{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:16px;margin:0 auto 22px}
+.secfigs .fig{flex:0 0 auto;max-width:100%}
+.secfigs .fig img{height:300px;width:auto;max-width:100%;object-fit:contain}
+.secfigs .fig figcaption{contain:inline-size}
+@media (max-width:640px){.secfigs .fig{flex:1 1 100%}.secfigs .fig img{height:auto;width:100%}}
 .figpair{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;max-width:900px;margin:22px auto 0}
 .figpair .fig{flex:1 1 200px;max-width:290px}
 .role .more{margin:8px 0 0;font-style:italic}
