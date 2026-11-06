@@ -17,6 +17,7 @@
     <h2>{{.3}}</h2>
     <p class="org">{{.31}}</p>
     <p>{{.32}}</p>
+    {{#if .39}}{{#refs .39}}<figure class="fig"><img src="{{root}}/pictures/{{plain:.}}" alt="{{plain:.2}}"><figcaption>{{.1}}</figcaption></figure>{{/refs}}{{/if}}
     {{#if .33}}<p class="more"><a href="{{url:.34}}">{{.33}} →</a></p>{{/if}}
   </article>
   {{/refs}}

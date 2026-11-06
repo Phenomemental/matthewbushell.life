@@ -47,6 +47,7 @@
   <div class="bookpanels">
     {{#each 4.42 depth=2}}<div class="bookpanel" data-book="{{n}}"><h3 class="h3"><em>{{.}}</em></h3><p class="who">{{.1}}</p><p>{{.2}}</p></div>{{/each}}
   </div>
+  {{#if 4.43}}<div class="figpair">{{#refs 4.43}}<figure class="fig"><img src="{{root}}/pictures/{{plain:.}}" alt="{{plain:.2}}"><figcaption>{{.1}}</figcaption></figure>{{/refs}}</div>{{/if}}
   <div class="tools" data-share data-comment-at="4.4"></div>
 </section>
 
