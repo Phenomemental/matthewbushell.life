@@ -213,3 +213,4 @@ html:not(.js) .tools,html:not(.js) [data-tool]{display:none}
 /* The counting pixel, seen only with script off, takes no room. */
 .counted{position:absolute;width:1px;height:1px;border:0;opacity:0}
 section[id]{scroll-margin-top:24px}
+.fig figcaption{text-wrap:balance}
