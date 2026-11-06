@@ -36,47 +36,10 @@
   <a class="btn" href="{{root}}/hello">{{1.37}}</a>
 </div>
 
-<section id="places" class="sec">
-  <h2 class="h2" style="position:relative;z-index:1">{{1.4}}</h2>
-  <p class="sub" style="margin-top:8px;margin-bottom:26px;position:relative;z-index:1">{{1.41}}</p>
-  <div style="display:flex;flex-wrap:wrap;gap:clamp(20px,4vw,44px);align-items:flex-start;justify-content:center">
-    <div style="flex:0 1 440px;min-width:0;position:relative;z-index:0">
-      <svg viewBox="-30 -24 452 412" role="img" aria-label="{{plain:7.2922}}" style="width:100%;max-width:460px;display:block;margin:0 auto;overflow:visible;color:var(--ink)">
-        <defs><radialGradient id="light"><stop offset="0%" style="stop-color:var(--glow);stop-opacity:.95"></stop><stop offset="55%" style="stop-color:var(--glow);stop-opacity:.62"></stop><stop offset="100%" style="stop-color:var(--glow);stop-opacity:0"></stop></radialGradient></defs>
-        <g class="breathe"><circle class="glow" cx="250" cy="138" r="350" fill="url(#light)"></circle></g>
-        <use href="{{root}}/assets/mark.svg#m" x="0" y="0" width="390" height="340"></use>
-        <circle class="placedot" data-place="home" cx="179" cy="180" r="6"></circle>
-        <text class="placeword" data-place="home" data-pick="home" x="167" y="170" text-anchor="end">home</text>
-        <circle data-pick="home" cx="179" cy="180" r="19" fill="transparent" style="cursor:pointer"></circle>
-        <circle class="placedot" data-place="work" cx="157" cy="222" r="6"></circle>
-        <text class="placeword" data-place="work" data-pick="work" x="171" y="228" text-anchor="start">work</text>
-        <circle data-pick="work" cx="157" cy="222" r="19" fill="transparent" style="cursor:pointer"></circle>
-        <circle class="placedot" data-place="community" cx="114" cy="283" r="6"></circle>
-        <text class="placeword" data-place="community" data-pick="community" x="129" y="300" text-anchor="start">community</text>
-        <circle data-pick="community" cx="114" cy="283" r="19" fill="transparent" style="cursor:pointer"></circle>
-        <circle class="placedot" data-place="cyberspace" cx="54" cy="328" r="6"></circle>
-        <text class="placeword" data-place="cyberspace" data-pick="cyberspace" x="71" y="353" text-anchor="start">cyberspace</text>
-        <circle data-pick="cyberspace" cx="54" cy="328" r="19" fill="transparent" style="cursor:pointer"></circle>
-        <text class="within" data-pick="fifth" x="250" y="145" text-anchor="middle">within</text>
-      </svg>
-    </div>
-    <div style="flex:999 1 400px;min-width:0;position:relative;z-index:1">
-      <div class="tabs" role="group" aria-label="Choose a place">
-        {{#each 3 to=5}}<button type="button" class="tab" data-place="{{plain:.8}}" aria-pressed="false">{{.32|.}}</button>{{/each}}
-      </div>
-      {{#each 3 to=5}}
-      <div class="panel" data-place="{{plain:.8}}">
-        <h3 class="h2 small panel-name">{{.32|.}}</h3>
-        <p class="panel-line">{{.33|.2}}</p>
-        <div class="grid2">
-          {{#refs .7}}<article class="g"><h3 class="h3">{{.21|.}}</h3><p>{{.2|.1}}</p></article>{{/refs}}
-        </div>
-        <p class="panel-more"><a href="{{url:.31}}">{{.3}} →</a></p>
-      </div>
-      {{/each}}
-    </div>
-  </div>
-  <div class="tools" data-share data-comment-at="3"></div>
+<section id="places" class="sec" style="text-align:center">
+  <h2 class="h2">{{1.4}}</h2>
+  <p class="sub" style="margin-top:8px;margin-bottom:16px">{{1.41}}</p>
+  <p class="golink"><a href="{{root}}/places">{{3.61}} →</a></p>
 </section>
 
 <section aria-label="Photographs" class="sec photos">

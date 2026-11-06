@@ -10,15 +10,16 @@ document.documentElement.classList.add('js');
   clock(); setInterval(clock, 20000);
 
   var reach = { home: 115, work: 160, community: 235, cyberspace: 300, fifth: 300 };
-  function pickPlace(id) {
+  function pickPlace(id, go) {
     document.querySelectorAll('.tab').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.place === id ? 'true' : 'false'); });
     document.querySelectorAll('.panel').forEach(function (p) { p.classList.toggle('on', p.dataset.place === id); });
     document.querySelectorAll('.placedot,.placeword').forEach(function (n) { n.classList.toggle('on', id === 'fifth' || n.dataset.place === id); });
     var g = document.querySelector('.glow');
     if (g) g.style.transform = 'scale(' + (reach[id] / 350) + ')';
+    if (go && !document.querySelector('.panel')) { var s = document.getElementById(id); if (s) s.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
   }
-  document.querySelectorAll('[data-pick]').forEach(function (n) { n.addEventListener('click', function () { pickPlace(n.dataset.pick); }); });
-  document.querySelectorAll('.tab').forEach(function (n) { n.addEventListener('click', function () { pickPlace(n.dataset.place); }); });
+  document.querySelectorAll('[data-pick]').forEach(function (n) { n.addEventListener('click', function () { pickPlace(n.dataset.pick, true); }); });
+  document.querySelectorAll('.tab').forEach(function (n) { n.addEventListener('click', function () { pickPlace(n.dataset.place, true); }); });
   if (document.querySelector('.tab')) pickPlace('fifth');
 
   function pickBook(n) {
