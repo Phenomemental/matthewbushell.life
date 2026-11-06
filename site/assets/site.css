@@ -26,6 +26,9 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 .drop::first-letter{float:left;font-size:4.3em;line-height:.8;padding:.07em .09em 0 0;color:var(--accent);font-weight:500}
 .spread{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,230px);gap:0 clamp(26px,4vw,48px);max-width:900px;margin:0 auto}
 .spread p{margin:0 0 1em}
+.fig.aside{align-self:start;margin:0 0 1em}
+.fig.aside figcaption{text-wrap:balance}
+@media (max-width:760px){.fig.aside{max-width:380px;margin:.2em auto 1.4em}}
 .note{align-self:start;font-size:.84em;line-height:1.35;color:var(--muted);font-style:italic;border-left:1px solid var(--line);padding-left:14px;margin:0 0 1em}
 .hand{font-family:'La Belle Aurore','Homemade Apple',cursive;font-style:normal;color:var(--hand);font-size:1.34em;line-height:1.3;display:block;margin-bottom:6px;font-weight:400}
 @media (max-width:760px){.spread{grid-template-columns:minmax(0,1fr)}.note{margin:.2em 0 1.2em}}
