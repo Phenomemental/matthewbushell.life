@@ -96,8 +96,13 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 .moment h2{margin:3px 0 4px;font-size:1.14em;font-weight:600;line-height:1.25}
 .moment p{margin:0}
 .moment .figs{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:14px;margin-top:16px}
-.moment .figs .fig{flex:1 1 220px;max-width:300px}
-.moment .figs .fig.wide{flex-basis:100%;max-width:100%}
+.moment .figs .fig{flex:0 0 auto;max-width:100%}
+.moment .figs .fig img{height:220px;width:auto;max-width:100%;object-fit:contain}
+.moment .figs .fig figcaption{contain:inline-size}
+.moment .figs .fig:only-child{flex:0 1 300px}
+.moment .figs .fig:only-child img,.moment .figs .fig.wide img{height:auto;width:100%}
+.moment .figs .fig.wide{flex-basis:100%}
+@media (max-width:640px){.moment .figs .fig{flex:1 1 100%}.moment .figs .fig img{height:auto;width:100%}}
 .role{padding:22px 0;border-top:1px solid var(--line-soft)}
 .role .where{margin:0;font-size:.86em;font-style:italic;color:var(--accent)}
 .role h2{margin:2px 0 0;font-size:clamp(26px,3.6vw,31px);font-weight:500;line-height:1.2}
