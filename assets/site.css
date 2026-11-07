@@ -47,6 +47,7 @@ img[width][height]{height:auto}
 .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:20px 32px}
 .g p{margin:0;font-size:.96em;line-height:1.45}
 .g .more{margin-top:5px;font-style:italic}
+.g .fig{max-width:300px;margin:14px 0 0}
 .fig{margin:0}
 .fig img{display:block;width:100%;height:auto;border:1px solid var(--line)}
 .fig figcaption{margin-top:7px;font-size:.84em;font-style:italic;color:var(--muted);line-height:1.35}
