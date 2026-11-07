@@ -42,6 +42,7 @@ jobs:
           rm -rf "$RUNNER_TEMP/branch" && mkdir -p "$RUNNER_TEMP/branch"
           cp -r "$RUNNER_TEMP/preview/." "$RUNNER_TEMP/branch/"
           cp "$RUNNER_TEMP/report.json" "$RUNNER_TEMP/branch/report.json"
+          python3 -c "import sys,json; sys.path.insert(0,'tools'); import generate; b=generate.Beach(); json.dump({k: b.get(k) for k in ('spine:life-work','function:life-work','spine:wholeless-nights')}, open(sys.argv[1],'w'), ensure_ascii=False, indent=1)" "$RUNNER_TEMP/branch/words.json"
           cd "$RUNNER_TEMP/branch"
           git init -q -b preview
           git config user.name 'github-actions[bot]'
