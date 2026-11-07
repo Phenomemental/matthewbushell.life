@@ -286,3 +286,7 @@ section[id]{scroll-margin-top:24px}
 
 .foot-doors{margin:clamp(30px,5vw,48px) 0 0;flex-wrap:wrap;gap:8px}
 .tab.here{opacity:.55;cursor:default}
+.room .figs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:12px 0 4px}
+.room .figs .fig{margin:0;max-width:none}
+.room .figs img{aspect-ratio:4/3;object-fit:cover;width:100%}
+.room .figs figcaption{font-size:.85em}
