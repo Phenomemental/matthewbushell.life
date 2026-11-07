@@ -700,10 +700,21 @@ def generate(source, out, site=SITE, root='', pictures=None, record_path=None, p
                     href = root + (p.path if p.path != '/' else '/')
                     here = ' class="here" aria-current="page"' if p.path == page.path else ''
                     nav.append('<a href="%s"%s>%s</a>' % (html.escape(href), here, html.escape(p.name)))
+            # the doors to the other places, at the foot of every page but the hall, which has its own
+            places = ('/within', '/home', '/work', '/community', '/cyberspace')
+            doors = []
+            if page.path != '/':
+                for p in pages:
+                    if p.path in places and p.path in live:
+                        if p.path == page.path:
+                            doors.append('<span class="tab here" aria-current="page">%s</span>' % html.escape(p.name))
+                        else:
+                            doors.append('<a class="tab" href="%s">%s</a>' % (html.escape(root + p.path), html.escape(p.name)))
+            doors_html = ('<div class="tabs doors foot-doors" role="group" aria-label="The places">%s</div>' % ''.join(doors)) if doors else ''
             item = raw_at(seven, '5%d' % page.index)
             try:
                 extra = {
-                    'content': value, 'nav': '\n'.join(nav), 'site': site, 'path': page.path,
+                    'content': value, 'nav': '\n'.join(nav), 'doors': doors_html, 'site': site, 'path': page.path,
                     'tools': tools_html(root, site, spine, aside),
                     'robots': '<meta name="robots" content="noindex">' if preview else '',
                 }
