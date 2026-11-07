@@ -283,3 +283,6 @@ section[id]{scroll-margin-top:24px}
 
 .brand{text-align:center;margin:0 0 4px;font-size:.95em;letter-spacing:.14em;text-transform:uppercase}
 .brand a{color:var(--ink-soft,inherit);text-decoration:none}
+
+.foot-doors{margin:clamp(30px,5vw,48px) 0 0;flex-wrap:wrap;gap:8px}
+.tab.here{opacity:.55;cursor:default}
