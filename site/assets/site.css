@@ -221,6 +221,6 @@ html:not(.js) .tools,html:not(.js) [data-tool]{display:none}
 .counted{position:absolute;width:1px;height:1px;border:0;opacity:0}
 section[id]{scroll-margin-top:24px}
 .fig figcaption{text-wrap:balance}
-.secfigs:has(> :nth-child(3)) .fig img{height:210px}
-.figpair:has(> :nth-child(3)) .fig img{height:210px}
+.secfigs:has(> :nth-child(3)) .fig img{height:200px}
+.figpair:has(> :nth-child(3)) .fig img{height:200px}
 @media (max-width:640px){.secfigs:has(> :nth-child(3)) .fig img,.figpair:has(> :nth-child(3)) .fig img{height:auto}}
