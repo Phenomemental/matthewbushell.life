@@ -15,8 +15,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fixture  # noqa: E402
 from fixture import GRAY, PAGES, blocks, generate  # noqa: E402
 
-ALL = ['/within', '/', '/work', '/community', '/cyberspace', '/book', '/hello', '/support']
-FILES = {'/within': 'within.html', '/': 'index.html', '/work': 'work.html', '/community': 'community.html',
+ALL = ['/within', '/', '/home', '/work', '/community', '/cyberspace', '/book', '/hello', '/support']
+FILES = {'/within': 'within.html', '/': 'index.html', '/home': 'home.html', '/work': 'work.html', '/community': 'community.html',
          '/cyberspace': 'cyberspace.html', '/book': 'book.html', '/hello': 'hello.html', '/support': 'support.html'}
 ROOT = '/matthewbushell.life'
 
@@ -130,7 +130,7 @@ class EveryPage(Base):
         self.assertEqual(first, second)
 
     def test_sitemap_and_robots(self):
-        self.run_with(blocks(yes=['Home', 'Work']))
+        self.run_with(blocks(yes=['Matthew Bushell', 'Home', 'Work']))
         sitemap = self.read('sitemap.xml')
         self.assertIn('<loc>https://phenomemental.github.io/matthewbushell.life/</loc>', sitemap)
         self.assertIn('<loc>https://phenomemental.github.io/matthewbushell.life/work</loc>', sitemap)
@@ -139,7 +139,7 @@ class EveryPage(Base):
 
     def test_the_tools_are_wired(self):
         self.run_with(blocks())
-        h = self.page('/')
+        h = self.page('/home')
         self.assertIn('<div class="tools" data-share data-comment-at="2" id="at-2">', h)
         self.assertIn('<template id="tool-words"><p class="boxline">', h)
         self.assertRegex(h, r'<script src="%s/assets/door\.js\?v=[0-9a-f]{8}"></script>' % ROOT)
@@ -181,10 +181,10 @@ class TheYes(Base):
         data = blocks(yes=[p[0] for p in PAGES if p[0] not in ('Work', 'The Book', 'Finding support')])
         data['spine:life-work']['1']['3']['3'] = 'Read [the whole story](/work) and [the shelf](/book#shelf) here.'
         self.run_with(data)
-        h = self.page('/')
+        h = self.page('/home')
         self.assertNotRegex(h, r'href="%s/(work|book|support)' % ROOT)
         self.assertIn('Read <span>the whole story</span> and <span>the shelf</span> here.', h)
-        self.assertIn('<span>Work</span>', h)  # the door to a room with no yes is just its name
+        self.assertIn('<span>Work</span>', self.page('/'))  # the door to a room with no yes is just its name
         self.assertIn('<p><span>Finding support</span></p>', h)
         self.assertRegex(h, r'href="%s/hello"' % ROOT)
 
@@ -215,8 +215,8 @@ class Sealed(Base):
         data = blocks()
         data['spine:life-work']['2']['1']['2'] = GRAY
         rep = self.run_with(data)
-        self.assertNotIn('/', rep['published'])
-        self.assertIn('This house is still being built.', self.read('index.html'))
+        self.assertNotIn('/home', rep['published'])
+        self.assertIsNone(self.read('home.html'))
         held = {h['page']: h['why'] for h in rep['held']}
         self.assertIn('sealed', held['Home'])
         self.assertIn('Home is held', [i['title'] for i in rep['issues']])
@@ -264,18 +264,17 @@ class Pins(Base):
         held = {h['page']: h['why'] for h in rep['held']}
         self.assertEqual(sorted(held), ['Home', 'The Book', 'Within'])
         self.assertIn('no pin for it', held['Home'])
-        self.assertIn('This house is still being built.', self.read('index.html'))
+        self.assertIsNone(self.read('home.html'))
         self.assertIsNone(self.read('within.html'))
         self.assertNotRegex(self.page('/work'), r'href="%s/within' % ROOT)
-        self.assertNotRegex(self.page('/work'), r'href="%s/"' % ROOT)
 
     def test_a_changed_pin_holds_the_last_good_page_and_opens_an_issue(self):
         self.run_with(blocks())
-        home_before = self.page('/')
+        home_before = self.page('/home')
         within_before = self.page('/within')
         rep = self.run_with(blocks(heart='Lorem ipsum heart, changed in the night.'))
-        self.assertNotIn('/', rep['published'])
-        self.assertEqual(self.page('/'), home_before)
+        self.assertNotIn('/home', rep['published'])
+        self.assertEqual(self.page('/home'), home_before)
         self.assertEqual(self.page('/within'), within_before)
         titles = [i['title'] for i in rep['issues']]
         self.assertIn('Home is held: the pin for moonstone:Ada 0 has changed', titles)
@@ -283,29 +282,29 @@ class Pins(Base):
         self.assertIn('0: ' + fixture.HEART, body)
         self.assertIn('0: Lorem ipsum heart, changed in the night.', body)
         self.assertIn('moonstone:Ada; 0; %s; <the date of your yes>' % generate.fingerprint('Lorem ipsum heart, changed in the night.'), body)
-        self.assertNotIn('Lorem ipsum heart', self.page('/'))  # the heart is a guard and prints nothing
+        self.assertNotIn('Lorem ipsum heart', self.page('/home'))  # the heart is a guard and prints nothing
 
     def test_a_changed_pin_with_no_page_before_keeps_it_down(self):
         rep = self.run_with(blocks(heart='Something else entirely.'))
         self.assertIsNone(self.read('within.html'))
-        self.assertIn('This house is still being built.', self.read('index.html'))
+        self.assertIsNone(self.read('home.html'))
         self.assertIn('(not kept', [i for i in rep['issues'] if i['title'].startswith('Within is held')][0]['body'])
 
     def test_a_pin_marked_follows_lets_the_line_flow(self):
         data = blocks(heart='A new heart.')
-        for i in ('1', '2'):
+        for i in ('1', '3'):
             data['function:life-work']['4']['2'][i]['1'] = fixture.pin_line('moonstone:Ada', '0', fixture.HEART, follows=True)
         rep = self.run_with(data)
-        self.assertIn('/', rep['published'])
+        self.assertIn('/home', rep['published'])
         self.assertIn('/within', rep['published'])
 
     def test_a_fresh_pin_lets_the_page_back_up(self):
         self.run_with(blocks())
         data = blocks(heart='A new heart.')
-        for i in ('1', '2'):
+        for i in ('1', '3'):
             data['function:life-work']['4']['2'][i]['1'] = fixture.pin_line('moonstone:Ada', '0', 'A new heart.', date='6 November 2026')
         rep = self.run_with(data)
-        self.assertIn('/', rep['published'])
+        self.assertIn('/home', rep['published'])
 
 
 class Guards(Base):
@@ -313,7 +312,7 @@ class Guards(Base):
         data = blocks()
         data['spine:life-work']['2']['1']['2'] = 'Lorem <script>alert(1)</script> & "ipsum".'
         self.run_with(data)
-        h = self.page('/')
+        h = self.page('/home')
         self.assertNotIn('<script>alert(1)</script>', h)
         self.assertIn('Lorem &lt;script&gt;alert(1)&lt;/script&gt; &amp; "ipsum".', h)
 
@@ -372,7 +371,7 @@ class Guards(Base):
 
     def test_a_missing_picture_holds_the_page(self):
         data = blocks(yes=['Home'])
-        data['spine:life-work']['7']['5']['2']['2'] = 'not-there.jpg'
+        data['spine:life-work']['7']['5']['3']['2'] = 'not-there.jpg'
         rep = self.run_with(data)
         self.assertEqual(rep['published'], [])
         self.assertIn('not-there.jpg', rep['held'][0]['why'])

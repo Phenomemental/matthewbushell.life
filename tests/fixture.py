@@ -18,7 +18,7 @@ import generate  # noqa: E402
 
 PAGES = [
     ('Within', '/within', '3; moonstone:Ada'),
-    ('Matthew Bushell', '/', '1; 3; moonstone:Ada'),
+    ('Matthew Bushell', '/', '1'),
     ('Home', '/home', '1; 2; 3; 6; moonstone:Ada'),
     ('Work', '/work', '3; 6'),
     ('Community', '/community', '3; 6'),
