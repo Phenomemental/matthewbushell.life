@@ -168,7 +168,7 @@ MOUNT = re.compile(r'^(?P<block>\S+)\s+as\s+(?P<at>[0-9])$')
 class Page:
     def __init__(self, index, name, path, reads):
         self.index, self.name, self.path, self.reads = index, name, path, reads
-        self.slug = 'home' if path == '/' else path.strip('/').replace('/', '-')
+        self.slug = 'hall' if path == '/' else path.strip('/').replace('/', '-')
         self.file = 'index.html' if path == '/' else path.strip('/') + '.html'
 
     @property
@@ -696,7 +696,7 @@ def generate(source, out, site=SITE, root='', pictures=None, record_path=None, p
                 continue
             nav = []
             for p in pages:
-                if p.path in live and p.path != '/support':
+                if p.path in live and p.path not in ('/support', '/'):
                     href = root + (p.path if p.path != '/' else '/')
                     here = ' class="here" aria-current="page"' if p.path == page.path else ''
                     nav.append('<a href="%s"%s>%s</a>' % (html.escape(href), here, html.escape(p.name)))

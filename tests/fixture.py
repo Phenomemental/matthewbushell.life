@@ -18,7 +18,8 @@ import generate  # noqa: E402
 
 PAGES = [
     ('Within', '/within', '3; moonstone:Ada'),
-    ('Home', '/', '1; 2; 3; 6; moonstone:Ada'),
+    ('Matthew Bushell', '/', '1; 3; moonstone:Ada'),
+    ('Home', '/home', '1; 2; 3; 6; moonstone:Ada'),
     ('Work', '/work', '3; 6'),
     ('Community', '/community', '3; 6'),
     ('Cyberspace', '/cyberspace', '3; 5'),
@@ -53,7 +54,6 @@ def blocks(yes=None, pins=True, heart=HEART, aside=None):
     spine['7']['1'] = {'_': 'THE PAGES — for the tests.'}
     for i, (name, path, reads) in enumerate(PAGES, 1):
         spine['7']['1'][str(i)] = '%s, %s: %s' % (name, path, reads)
-    spine['7']['1']['9'] = 'Every page: look:Phenomemental; the comment box; Share on each drawing; visit counting; the footer'
     spine['7']['3'] = {'_': 'THE VOICES SET ASIDE — for the tests.'}
     for i, line in enumerate(aside or [], 1):
         spine['7']['3'][str(i)] = line
