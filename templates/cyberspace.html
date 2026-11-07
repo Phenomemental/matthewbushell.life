@@ -7,22 +7,22 @@
 <div class="read" style="margin-top:clamp(20px,4vw,34px)">
   <p class="drop">{{5.12}}</p>
 </div>
-{{#if 7.262}}<div class="figpair" style="margin-top:26px">{{#refs 7.264}}<figure class="fig"><img src="{{root}}/pictures/{{plain:.}}" alt="{{plain:.2}}"><figcaption>{{.1}}</figcaption></figure>{{/refs}}</div>{{/if}}
+{{#if 5.24}}{{#refs 5.24}}<figure class="fig" style="max-width:240px;margin:18px auto 24px"><img src="{{root}}/pictures/{{plain:.}}" alt="{{plain:.2}}"><figcaption>{{.1}}</figcaption></figure>{{/refs}}{{/if}}
+<div class="read">
+  <p>{{5.13}}</p>
+  <p>{{5.14}}</p>
+</div>
+{{#if 5.15}}{{#refs 5.15}}<figure class="fig" style="max-width:280px;margin:18px auto 24px"><img src="{{root}}/pictures/{{plain:.}}" alt="{{plain:.2}}"><figcaption>{{.1}}</figcaption></figure>{{/refs}}{{/if}}
+<div class="read">
+  <p>{{5.16}}</p>
+</div>
 <div class="tools" data-share data-comment-at="5.1"></div>
 
 <section class="sec" style="max-width:780px;margin-left:auto;margin-right:auto">
   <h2 class="h2 small" style="margin-bottom:6px">{{5.2}}</h2>
   <p class="sub" style="margin:0 auto 18px">{{5.21}}</p>
-  {{#if 5.23}}<div class="read" style="margin-bottom:22px"><p>{{5.23}}</p></div>{{/if}}
-  {{#if 5.24}}{{#refs 5.24}}<figure class="fig" style="max-width:260px;margin:0 auto 26px"><img src="{{root}}/pictures/{{plain:.}}" alt="{{plain:.2}}"><figcaption>{{.1}}</figcaption></figure>{{/refs}}{{/if}}
   {{#each 5.22 depth=2}}<article class="room"><p class="when">{{.}}</p><div><h3 class="h3">{{.1}}</h3><p>{{.2}}</p>{{#if .3}}<div class="figs">{{#refs .3}}<figure class="fig"><img src="{{root}}/pictures/{{plain:.}}" alt="{{plain:.2}}"><figcaption>{{.1}}</figcaption></figure>{{/refs}}</div>{{/if}}</div></article>{{/each}}
 </section>
-
-{{#if 5.31}}<section class="sec" style="text-align:center">
-  <div class="quotes">
-    {{#each 5.3}}<blockquote><p>{{.}}</p><footer>{{.1}}</footer></blockquote>{{/each}}
-  </div>
-</section>{{/if}}
 
 <section class="sec">
   <h2 class="h2 small" style="margin-bottom:16px">{{5.4}}</h2>
@@ -36,14 +36,11 @@
   </div>
 </section>
 
-<section class="sec">
-  <h2 class="h2 small" style="margin-bottom:6px">{{5.5}}</h2>
-  <p class="sub" style="margin:0 auto 22px">{{5.51}}</p>
-  <div class="grid2" style="max-width:880px;margin:0 auto">
-    {{#each 5.52}}<article class="g"><h3 class="h3">{{.}}</h3><p>{{.1}}</p></article>{{/each}}
+{{#if 5.31}}<section class="sec" style="text-align:center">
+  <div class="quotes">
+    {{#each 5.3}}<blockquote><p>{{.}}</p><footer>{{.1}}</footer></blockquote>{{/each}}
   </div>
-  <p class="golink" style="margin-top:24px">{{5.53}}</p>
-</section>
+</section>{{/if}}
 
 <section class="sec">
   <div class="roles">
@@ -55,8 +52,4 @@
       {{#if .33}}<p class="more"><a href="{{url:.34}}">{{.33}} →</a></p>{{/if}}
     </article>{{/refs}}
   </div>
-  <div class="grid2 shorts">
-    {{#refs 3.49}}<article class="g"><h3 class="h3">{{.}}</h3><p>{{.1}}</p>{{#if .5}}<p class="more"><a href="{{url:.6}}">{{.5}} →</a></p>{{/if}}</article>{{/refs}}
-  </div>
-  {{#if 3.451}}<div class="before"><h4>{{3.65}}</h4><ul>{{#each 3.45 depth=2}}<li><em>{{.}}</em>{{.1}}</li>{{/each}}</ul></div>{{/if}}
 </section>
