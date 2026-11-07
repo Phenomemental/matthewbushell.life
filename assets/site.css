@@ -197,6 +197,12 @@ html:not(.js) .tools,html:not(.js) [data-tool]{display:none}
 .say-as{font-size:.86em;font-style:italic;color:var(--muted)}
 .say-status{margin:8px 0 0;font-size:.9em;font-style:italic;color:var(--muted)}
 .say-status:empty{display:none}
+.fold{margin:4px 0 0}
+.fold summary{display:inline-flex;align-items:center;min-height:44px;cursor:pointer;font-style:italic;color:var(--accent);list-style:none}
+.fold summary::-webkit-details-marker{display:none}
+.fold summary::before{content:'+ ';font-style:normal;margin-right:4px}
+.fold[open] summary::before{content:'− '}
+.fold summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .said{list-style:none;margin:12px 0 0;padding:0}
 .said li{margin:0 0 10px;padding:2px 0 2px 12px;border-left:2px solid var(--line);font-size:.94em;line-height:1.45;overflow-wrap:anywhere}
 .said .you{color:var(--muted);font-style:italic}
