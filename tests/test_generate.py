@@ -316,6 +316,13 @@ class Guards(Base):
         self.assertNotIn('<script>alert(1)</script>', h)
         self.assertIn('Lorem &lt;script&gt;alert(1)&lt;/script&gt; &amp; "ipsum".', h)
 
+    def test_a_page_of_writing_keeps_its_lines_and_paragraphs(self):
+        data = blocks(yes=['Writing'])
+        data['spine:life-work']['4']['7']['2']['2'] = 'I\nWho will be <b>there</b>\nto hold her?\n\n\nII\nMight *she* catch the scent?'
+        self.run_with(data)
+        h = self.page('/writing')
+        self.assertIn('<p>I<br>\nWho will be &lt;b&gt;there&lt;/b&gt;<br>\nto hold her?</p><p>II<br>\nMight <em>she</em> catch the scent?</p>', h)
+
     def test_only_https_links_this_sites_paths_and_one_mailto(self):
         for bad in ('[x](javascript:alert(1))', '[x](http://example.com/)', '[x](//example.com/)', '[x](data:text/html,hi)'):
             data = blocks(yes=['Story'])

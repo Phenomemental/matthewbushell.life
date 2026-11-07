@@ -9,6 +9,7 @@ with a line at "_" and children at digits 1-9.
   {{a|b}}            the first of these that exists
   {{plain:x}}        the line with no markup, for attributes
   {{url:x}}          the line as a link address
+  {{paras:x}}        the line as paragraphs: a blank line starts a new one, a line break is kept
   {{n}}              the loop's position, from 1
   {{#each 3.14}}     children 1 to 9 in order; depth=2 for lists nested by period, to=5 to stop early
   {{#refs 3.73}}     the addresses in a semicolon list, each as the item
@@ -129,6 +130,12 @@ def rich(line, root=''):
     return ''.join(out)
 
 
+def paras(line, root=''):
+    """A poem or a letter: a blank line starts a new paragraph, and a line break inside one is kept."""
+    parts = [p.strip() for p in re.split(r'\n\s*\n', line.replace('\r', '')) if p.strip()]
+    return ''.join('<p>%s</p>' % rich(p, root).replace('\n', '<br>\n') for p in parts)
+
+
 def plain(line):
     s = LINK.sub(lambda m: m.group(1), line)
     s = EM.sub(r'\1', s)
@@ -224,6 +231,8 @@ def slot(ref, ctx):
         return plain(need(ctx, ref[6:]))
     if ref.startswith('url:'):
         return html.escape(url(need(ctx, ref[4:]), ctx.root), quote=True)
+    if ref.startswith('paras:'):
+        return paras(need(ctx, ref[6:]), ctx.root)
     return rich(need(ctx, ref), ctx.root)
 
 
