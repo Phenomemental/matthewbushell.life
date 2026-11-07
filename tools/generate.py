@@ -162,6 +162,9 @@ def fold(s):
     return re.sub(r'[\s_-]+', '', str(s).lower())
 
 
+MOUNT = re.compile(r'^(?P<block>\S+)\s+as\s+(?P<at>[0-9])$')
+
+
 class Page:
     def __init__(self, index, name, path, reads):
         self.index, self.name, self.path, self.reads = index, name, path, reads
@@ -173,13 +176,32 @@ class Page:
         return [r for r in self.reads if re.fullmatch(r'[1-7]', r)]
 
     @property
+    def mounts(self):
+        """'spine:wholeless-nights as 8': another block the page reads whole, at 8 or 9 of its tree."""
+        out = {}
+        for r in self.reads:
+            m = MOUNT.match(r)
+            if m:
+                out[m.group('at')] = m.group('block')
+        return out
+
+    @property
     def blocks(self):
-        return [r for r in self.reads if not re.fullmatch(r'[0-9]', r)]
+        out = []
+        for r in self.reads:
+            m = MOUNT.match(r)
+            if m:
+                out.append(m.group('block'))
+            elif not re.fullmatch(r'[0-9]', r):
+                out.append(r)
+        return out
 
 
 def page_map(seven):
-    """7.1: one line per page, 'name, path: what it reads', separated by semicolons. 7.19's 'Every page'
-    line has no path and is not a page: the look is baked into site.css, so it is not read."""
+    """7.1: one line per page, 'name, path: what it reads', separated by semicolons. A number is a branch
+    of the spine; a name is another block the page pins; 'block as 8' mounts that block whole at 8 (or 9)
+    of the page's tree, so a template can walk it. 7.19's 'Every page' line has no path and is not a page:
+    the look is baked into site.css, so it is not read."""
     node = raw_at(seven, '1')
     if not isinstance(node, dict):
         raise Fatal('the page map at spine:life-work 7.1 is not there')
@@ -195,6 +217,8 @@ def page_map(seven):
         for r in reads:
             if re.fullmatch(r'[0-9]', r) and not re.fullmatch(r'[1-7]', r):
                 raise Fatal('page %s reads branch %s, which holds no site words' % (m.group('name'), r))
+            if MOUNT.match(r) and not re.fullmatch(r'[89]', MOUNT.match(r).group('at')):
+                raise Fatal('page %s mounts a block at %s; a mount sits at 8 or 9' % (m.group('name'), MOUNT.match(r).group('at')))
         page = Page(d, m.group('name').strip(), m.group('path'), reads)
         if page.path in seen:
             raise Fatal('two pages at ' + page.path)
@@ -636,6 +660,15 @@ def generate(source, out, site=SITE, root='', pictures=None, record_path=None, p
             state[page.path] = ('held', why)
             continue
         tree = restricted(spine, page, box_line=('class="tools"' in tpl or 'data-tool=' in tpl))
+        for at, block in page.mounts.items():
+            whole = source.get(block)
+            if whole is None:
+                why = 'it reads %s whole, and the beach has no such block' % block
+                break
+            tree[at] = whole
+        if why:
+            state[page.path] = ('held', why)
+            continue
         try:
             content = tool_ids(fill.fill(tpl, tree, root=root))
         except fill.Missing as e:

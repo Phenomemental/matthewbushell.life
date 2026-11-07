@@ -15,9 +15,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fixture  # noqa: E402
 from fixture import GRAY, PAGES, blocks, generate  # noqa: E402
 
-ALL = ['/', '/story', '/now', '/places', '/writing', '/digital', '/hello', '/support']
-FILES = {'/': 'index.html', '/story': 'story.html', '/now': 'now.html', '/places': 'places.html',
-         '/writing': 'writing.html', '/digital': 'digital.html', '/hello': 'hello.html', '/support': 'support.html'}
+ALL = ['/within', '/', '/work', '/community', '/cyberspace', '/book', '/hello', '/support']
+FILES = {'/within': 'within.html', '/': 'index.html', '/work': 'work.html', '/community': 'community.html',
+         '/cyberspace': 'cyberspace.html', '/book': 'book.html', '/hello': 'hello.html', '/support': 'support.html'}
 ROOT = '/matthewbushell.life'
 
 
@@ -102,11 +102,11 @@ class EveryPage(Base):
 
     def test_the_menu_and_footer(self):
         self.run_with(blocks())
-        h = self.page('/story')
+        h = self.page('/work')
         nav = re.search(r'<nav class="nav"[^>]*>(.*?)</nav>', h, re.S).group(1)
         names = re.findall(r'>([^<]+)</a>', nav)
-        self.assertEqual(names, ['Home', 'Story', 'Now', 'Places', 'Writing', 'Digital', 'Say hello'])
-        self.assertIn('class="here" aria-current="page">Story', nav)
+        self.assertEqual(names, ['Within', 'Home', 'Work', 'Community', 'Cyberspace', 'The Book', 'Say hello'])
+        self.assertIn('class="here" aria-current="page">Work', nav)
         foot = re.search(r'<footer class="foot">(.*?)</footer>', h, re.S).group(1)
         self.assertIn('Finding support', foot)
         self.assertTrue(foot.strip().endswith('<p class="made">Made by Matthew Bushell, Northampton</p>'))
@@ -119,7 +119,7 @@ class EveryPage(Base):
                 self.assertTrue(url.startswith(ROOT + '/'), '%s %s="%s"' % (path, attr, url))
         self.run_with(blocks(), root='', site='https://www.matthewbushell.life')
         h = self.page('/')
-        self.assertIn('href="/story"', h)
+        self.assertIn('href="/work"', h)
         self.assertIn('<link rel="canonical" href="https://www.matthewbushell.life/">', h)
 
     def test_the_same_words_make_the_same_bytes(self):
@@ -130,16 +130,16 @@ class EveryPage(Base):
         self.assertEqual(first, second)
 
     def test_sitemap_and_robots(self):
-        self.run_with(blocks(yes=['Home', 'Story']))
+        self.run_with(blocks(yes=['Home', 'Work']))
         sitemap = self.read('sitemap.xml')
         self.assertIn('<loc>https://phenomemental.github.io/matthewbushell.life/</loc>', sitemap)
-        self.assertIn('<loc>https://phenomemental.github.io/matthewbushell.life/story</loc>', sitemap)
-        self.assertNotIn('/now<', sitemap)
+        self.assertIn('<loc>https://phenomemental.github.io/matthewbushell.life/work</loc>', sitemap)
+        self.assertNotIn('/community<', sitemap)
         self.assertIn('Sitemap: https://phenomemental.github.io/matthewbushell.life/sitemap.xml', self.read('robots.txt'))
 
     def test_the_tools_are_wired(self):
         self.run_with(blocks())
-        h = self.page('/story')
+        h = self.page('/')
         self.assertIn('<div class="tools" data-share data-comment-at="2" id="at-2">', h)
         self.assertIn('<template id="tool-words"><p class="boxline">', h)
         self.assertRegex(h, r'<script src="%s/assets/door\.js\?v=[0-9a-f]{8}"></script>' % ROOT)
@@ -153,10 +153,11 @@ class EveryPage(Base):
         hello = self.page('/hello')
         self.assertIn('data-tool="note"', hello)
         self.assertIn('data-tool="door"', hello)
+        self.assertIn('data-tool="note" data-pool="pool:wholeless-nights"', self.page('/book'))
 
     def test_the_set_aside_is_baked_in(self):
         self.run_with(blocks(aside=['Lorem Ipsum at 3.6', 'pool:life-work 4']))
-        cfg = json.loads(re.search(r'id="life-work">(.*?)</script>', self.page('/places')).group(1))
+        cfg = json.loads(re.search(r'id="life-work">(.*?)</script>', self.page('/within')).group(1))
         self.assertEqual(cfg['aside'], {'voices': ['loremipsum@3.6'], 'slots': ['4']})
 
     def test_a_branch_opening_line_is_never_printed(self):
@@ -169,36 +170,36 @@ class EveryPage(Base):
 
 class TheYes(Base):
     def test_a_page_with_no_yes_is_not_written(self):
-        rep = self.run_with(blocks(yes=[p[0] for p in PAGES if p[0] != 'Writing']))
-        self.assertNotIn('/writing', rep['published'])
-        self.assertIsNone(self.read('writing.html'))
+        rep = self.run_with(blocks(yes=[p[0] for p in PAGES if p[0] != 'The Book']))
+        self.assertNotIn('/book', rep['published'])
+        self.assertIsNone(self.read('book.html'))
         nav = re.search(r'<nav class="nav"[^>]*>(.*?)</nav>', self.page('/'), re.S).group(1)
-        self.assertNotIn('Writing', nav)
-        self.assertNotIn('/writing.html', self.run_.files())
+        self.assertNotIn('The Book', nav)
+        self.assertNotIn('/book.html', self.run_.files())
 
     def test_a_link_to_a_page_with_no_yes_prints_as_plain_words(self):
-        data = blocks(yes=[p[0] for p in PAGES if p[0] not in ('Story', 'Writing', 'Finding support')])
-        data['spine:life-work']['1']['3']['3'] = 'Read [the whole story](/story) and [the shelf](/writing#shelf) here.'
+        data = blocks(yes=[p[0] for p in PAGES if p[0] not in ('Work', 'The Book', 'Finding support')])
+        data['spine:life-work']['1']['3']['3'] = 'Read [the whole story](/work) and [the shelf](/book#shelf) here.'
         self.run_with(data)
         h = self.page('/')
-        self.assertNotRegex(h, r'href="%s/(story|writing|support)' % ROOT)
+        self.assertNotRegex(h, r'href="%s/(work|book|support)' % ROOT)
         self.assertIn('Read <span>the whole story</span> and <span>the shelf</span> here.', h)
-        self.assertIn('<span>%s</span>' % data['spine:life-work']['1']['3']['6'], h)
+        self.assertIn('<span>Work</span>', h)  # the door to a room with no yes is just its name
         self.assertIn('<p><span>Finding support</span></p>', h)
         self.assertRegex(h, r'href="%s/hello"' % ROOT)
 
     def test_with_no_yes_for_home_the_front_is_the_holding_page(self):
-        self.run_with(blocks(yes=['Story']))
+        self.run_with(blocks(yes=['Work']))
         self.assertIn('This house is still being built.', self.read('index.html'))
-        self.assertIsNotNone(self.read('story.html'))
-        self.assertNotRegex(self.read('story.html'), r'href="%s/"' % ROOT)
+        self.assertIsNotNone(self.read('work.html'))
+        self.assertNotRegex(self.read('work.html'), r'href="%s/"' % ROOT)
 
     def test_a_yes_taken_back_takes_the_page_down(self):
         self.run_with(blocks())
-        self.assertIsNotNone(self.read('writing.html'))
-        rep = self.run_with(blocks(yes=[p[0] for p in PAGES if p[0] != 'Writing']))
-        self.assertIsNone(self.read('writing.html'))
-        self.assertIn('Writing has no yes, so it comes down', rep['notes'])
+        self.assertIsNotNone(self.read('book.html'))
+        rep = self.run_with(blocks(yes=[p[0] for p in PAGES if p[0] != 'The Book']))
+        self.assertIsNone(self.read('book.html'))
+        self.assertIn('The Book has no yes, so it comes down', rep['notes'])
         self.run_with(blocks(yes=[]))
         self.assertEqual(self.run_.files(), ['404.html', 'assets/site.css', 'index.html', 'robots.txt'])
 
@@ -214,26 +215,26 @@ class Sealed(Base):
         data = blocks()
         data['spine:life-work']['2']['1']['2'] = GRAY
         rep = self.run_with(data)
-        self.assertNotIn('/story', rep['published'])
-        self.assertIsNone(self.read('story.html'))
+        self.assertNotIn('/', rep['published'])
+        self.assertIn('This house is still being built.', self.read('index.html'))
         held = {h['page']: h['why'] for h in rep['held']}
-        self.assertIn('sealed', held['Story'])
-        self.assertIn('Story is held', [i['title'] for i in rep['issues']])
+        self.assertIn('sealed', held['Home'])
+        self.assertIn('Home is held', [i['title'] for i in rep['issues']])
         self.assertNotIn('Encrypted', self.all_text())
         self.assertNotIn(GRAY['1'], self.all_text())
 
     def test_a_sealed_node_partway_along_an_address_is_refused(self):
         data = blocks()
-        data['spine:life-work']['3']['6'] = GRAY  # Places reads 3.62: the walk meets the envelope at 3.6
+        data['spine:life-work']['3']['6'] = GRAY  # Within reads 3.63: the walk meets the envelope at 3.6
         rep = self.run_with(data)
-        self.assertNotIn('/places', rep['published'])
+        self.assertNotIn('/within', rep['published'])
         self.assertNotIn(GRAY['2'], self.all_text())
 
     def test_a_sealed_item_in_a_list_is_refused(self):
         data = blocks()
         data['spine:life-work']['4']['4']['2']['3'] = GRAY  # one book on the shelf
         rep = self.run_with(data)
-        self.assertNotIn('/writing', rep['published'])
+        self.assertNotIn('/book', rep['published'])
         self.assertNotIn(GRAY['1'], self.all_text())
 
     def test_a_sealed_line_beside_every_box_holds_the_pages_with_boxes(self):
@@ -247,35 +248,35 @@ class Sealed(Base):
         data = blocks()
         data['spine:life-work']['5']['1']['2'] = 'Lorem ipsum o290fr9cE/Qs1Zk2Lm8Pq4Rt6Vx0Yb3Nc5Df7Gh9Jk1Lm3 dolor.'
         rep = self.run_with(data)
-        self.assertNotIn('/digital', rep['published'])
-        self.assertIn('scrambled', {h['page']: h['why'] for h in rep['held']}['Digital'])
+        self.assertNotIn('/cyberspace', rep['published'])
+        self.assertIn('scrambled', {h['page']: h['why'] for h in rep['held']}['Cyberspace'])
 
     def test_the_words_encrypted_gray_are_refused_even_unsealed(self):
         data = blocks()
         data['spine:life-work']['5']['1']['2'] = 'Encrypted (gray); readable only with the author secret.'
         rep = self.run_with(data)
-        self.assertNotIn('/digital', rep['published'])
+        self.assertNotIn('/cyberspace', rep['published'])
 
 
 class Pins(Base):
     def test_a_missing_pin_holds_the_page(self):
         rep = self.run_with(blocks(pins=False))
         held = {h['page']: h['why'] for h in rep['held']}
-        self.assertEqual(sorted(held), ['Home', 'Places'])
+        self.assertEqual(sorted(held), ['Home', 'The Book', 'Within'])
         self.assertIn('no pin for it', held['Home'])
         self.assertIn('This house is still being built.', self.read('index.html'))
-        self.assertIsNone(self.read('places.html'))
-        self.assertNotRegex(self.page('/story'), r'href="%s/places' % ROOT)
-        self.assertNotRegex(self.page('/story'), r'href="%s/"' % ROOT)
+        self.assertIsNone(self.read('within.html'))
+        self.assertNotRegex(self.page('/work'), r'href="%s/within' % ROOT)
+        self.assertNotRegex(self.page('/work'), r'href="%s/"' % ROOT)
 
     def test_a_changed_pin_holds_the_last_good_page_and_opens_an_issue(self):
         self.run_with(blocks())
         home_before = self.page('/')
-        places_before = self.page('/places')
+        within_before = self.page('/within')
         rep = self.run_with(blocks(heart='Lorem ipsum heart, changed in the night.'))
         self.assertNotIn('/', rep['published'])
         self.assertEqual(self.page('/'), home_before)
-        self.assertEqual(self.page('/places'), places_before)
+        self.assertEqual(self.page('/within'), within_before)
         titles = [i['title'] for i in rep['issues']]
         self.assertIn('Home is held: the pin for moonstone:Ada 0 has changed', titles)
         body = [i for i in rep['issues'] if i['title'].startswith('Home is held')][0]['body']
@@ -286,22 +287,22 @@ class Pins(Base):
 
     def test_a_changed_pin_with_no_page_before_keeps_it_down(self):
         rep = self.run_with(blocks(heart='Something else entirely.'))
-        self.assertIsNone(self.read('places.html'))
+        self.assertIsNone(self.read('within.html'))
         self.assertIn('This house is still being built.', self.read('index.html'))
-        self.assertIn('(not kept', [i for i in rep['issues'] if i['title'].startswith('Places is held')][0]['body'])
+        self.assertIn('(not kept', [i for i in rep['issues'] if i['title'].startswith('Within is held')][0]['body'])
 
     def test_a_pin_marked_follows_lets_the_line_flow(self):
         data = blocks(heart='A new heart.')
-        for i in ('1', '4'):
+        for i in ('1', '2'):
             data['function:life-work']['4']['2'][i]['1'] = fixture.pin_line('moonstone:Ada', '0', fixture.HEART, follows=True)
         rep = self.run_with(data)
         self.assertIn('/', rep['published'])
-        self.assertIn('/places', rep['published'])
+        self.assertIn('/within', rep['published'])
 
     def test_a_fresh_pin_lets_the_page_back_up(self):
         self.run_with(blocks())
         data = blocks(heart='A new heart.')
-        for i in ('1', '4'):
+        for i in ('1', '2'):
             data['function:life-work']['4']['2'][i]['1'] = fixture.pin_line('moonstone:Ada', '0', 'A new heart.', date='6 November 2026')
         rep = self.run_with(data)
         self.assertIn('/', rep['published'])
@@ -312,7 +313,7 @@ class Guards(Base):
         data = blocks()
         data['spine:life-work']['2']['1']['2'] = 'Lorem <script>alert(1)</script> & "ipsum".'
         self.run_with(data)
-        h = self.page('/story')
+        h = self.page('/')
         self.assertNotIn('<script>alert(1)</script>', h)
         self.assertIn('Lorem &lt;script&gt;alert(1)&lt;/script&gt; &amp; "ipsum".', h)
 
@@ -324,42 +325,48 @@ class Guards(Base):
 
     def test_only_https_links_this_sites_paths_and_one_mailto(self):
         for bad in ('[x](javascript:alert(1))', '[x](http://example.com/)', '[x](//example.com/)', '[x](data:text/html,hi)'):
-            data = blocks(yes=['Story'])
-            data['spine:life-work']['2']['1']['2'] = 'Lorem ' + bad + ' ipsum.'
+            data = blocks(yes=['Work'])
+            data['spine:life-work']['3']['2']['2'] = 'Lorem ' + bad + ' ipsum.'
             rep = self.run_with(data)
             self.assertEqual(rep['published'], [], bad)
-        data = blocks(yes=['Story'])
-        data['spine:life-work']['2']['1']['2'] = 'Write to [me](mailto:a@example.com) or [me](mailto:b@example.com).'
+        data = blocks(yes=['Work'])
+        data['spine:life-work']['3']['2']['2'] = 'Write to [me](mailto:a@example.com) or [me](mailto:b@example.com).'
         rep = self.run_with(data)
         self.assertEqual(rep['published'], [])
-        data['spine:life-work']['2']['1']['2'] = 'Write to [me](mailto:a@example.com), see [this](https://example.com/a?b=1&c=2).'
+        data['spine:life-work']['3']['2']['2'] = 'Write to [me](mailto:a@example.com), see [this](https://example.com/a?b=1&c=2).'
         rep = self.run_with(data)
-        self.assertEqual(rep['published'], ['/story'])
-        self.assertIn('href="https://example.com/a?b=1&amp;c=2"', self.page('/story'))
+        self.assertEqual(rep['published'], ['/work'])
+        self.assertIn('href="https://example.com/a?b=1&amp;c=2"', self.page('/work'))
 
     def test_a_page_whose_words_change_by_more_than_half_is_held(self):
         self.run_with(blocks())
-        before = self.page('/story')
+        before = self.page('/cyberspace')
         data = blocks()
-        story = data['spine:life-work']['2']
-        for period in story['2'].values():
+        digital = data['spine:life-work']['5']
+        for period in digital['2']['2'].values():
             if isinstance(period, dict):
                 for m in period.values():
                     if isinstance(m, dict):
                         m['2'] = 'Wholly different words now, written fresh from end to end in one go.'
-        story['1']['2'] = 'Wholly different opening words, written fresh from end to end in one go.'
+                        m['1'] = 'Wholly different title now'
+        digital['1']['2'] = 'Wholly different opening words, written fresh from end to end in one go, and then some more of them.'
+        digital['4']['1'] = 'Wholly different words about the ground, written fresh from end to end in one go, and then some more.'
+        digital['4']['2'] = 'And more different words here too, written fresh, so that more than half of the page has moved.'
+        for card in digital['5']['2'].values():
+            if isinstance(card, dict):
+                card['1'] = 'Wholly different words now, written fresh from end to end in one go.'
         rep = self.run_with(data)
-        self.assertNotIn('/story', rep['published'])
-        self.assertEqual(self.page('/story'), before)
-        self.assertIn('Story is held: its words changed by more than half at once', [i['title'] for i in rep['issues']])
+        self.assertNotIn('/cyberspace', rep['published'])
+        self.assertEqual(self.page('/cyberspace'), before)
+        self.assertIn('Cyberspace is held: its words changed by more than half at once', [i['title'] for i in rep['issues']])
         for k in data['function:life-work']['4']['1']:
-            if data['function:life-work']['4']['1'][k].startswith('Story'):
-                data['function:life-work']['4']['1'][k] = 'Story, 6 November 2026'
+            if data['function:life-work']['4']['1'][k].startswith('Cyberspace'):
+                data['function:life-work']['4']['1'][k] = 'Cyberspace, 6 November 2026'
         rep = self.run_with(data)
-        self.assertIn('/story', rep['published'])
+        self.assertIn('/cyberspace', rep['published'])
 
     def test_a_missing_picture_holds_the_page(self):
-        data = blocks(yes=['Story'])
+        data = blocks(yes=['Home'])
         data['spine:life-work']['7']['5']['2']['2'] = 'not-there.jpg'
         rep = self.run_with(data)
         self.assertEqual(rep['published'], [])
@@ -379,9 +386,15 @@ class Guards(Base):
         seven = {'1': {'1': 'Home, /: 1; 3', '2': 'Odd, /odd: 8', '9': 'Every page: look:Phenomemental'}}
         with self.assertRaises(generate.Fatal):
             generate.page_map(seven)
-        seven = {'1': {'1': 'Home, /: 1; 3; moonstone:Ada', '9': 'Every page: look:Phenomemental; the footer'}}
+        seven = {'1': {'1': 'Home, /: 1; 3; moonstone:Ada', '2': 'The Book, /book: 4; spine:wholeless-nights as 8',
+                       '9': 'Every page: look:Phenomemental; the footer'}}
         pages = generate.page_map(seven)
-        self.assertEqual([(p.name, p.path, p.branches, p.blocks) for p in pages], [('Home', '/', ['1', '3'], ['moonstone:Ada'])])
+        self.assertEqual([(p.name, p.path, p.branches, p.blocks, p.mounts) for p in pages],
+                         [('Home', '/', ['1', '3'], ['moonstone:Ada'], {}),
+                          ('The Book', '/book', ['4'], ['spine:wholeless-nights'], {'8': 'spine:wholeless-nights'})])
+        seven = {'1': {'1': 'Home, /: 1; 3', '2': 'Odd, /odd: spine:x as 3', '9': 'Every page: look:Phenomemental'}}
+        with self.assertRaises(generate.Fatal):
+            generate.page_map(seven)
 
     def test_the_beach_is_read_raw(self):
         asked = []
@@ -440,14 +453,14 @@ class Guards(Base):
         self.run_with(blocks(yes=[]))
         rep = self.run_with(blocks(yes=[]))
         self.assertEqual(rep['notes'], [])
-        rep = self.run_with(blocks(yes=['Story']))
+        rep = self.run_with(blocks(yes=['Work']))
         self.assertEqual(rep['notes'], [])
 
     def test_a_preview_gives_every_page_a_pretend_yes(self):
         data = blocks(yes=[], pins=False)
         rep = self.run_with(data, extra=['--preview'])
         self.assertEqual(rep['published'], ALL)
-        self.assertIn('<meta name="robots" content="noindex">', self.page('/story'))
+        self.assertIn('<meta name="robots" content="noindex">', self.page('/work'))
         self.assertTrue(any('a preview carries on' in n for n in rep['notes']))
 
 

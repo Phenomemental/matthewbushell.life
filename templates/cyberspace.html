@@ -1,6 +1,7 @@
 <header style="margin-bottom:clamp(16px,3vw,26px)">
-  <h1 class="h1">{{5.1}}</h1>
-  <p class="sub">{{5.11}}</p>
+  <p class="ordinal">{{3.41}}</p>
+  <h1 class="h1" style="margin-top:2px">{{3.4}}</h1>
+  <p class="sub">{{3.42}}</p>
 </header>
 <svg class="vignette" viewBox="0 0 900 190" role="img" aria-label="{{plain:7.2612}}"><!--BIRDS--><path class="tide" d="M0 150 C 90 128, 170 172, 270 150 S 440 124, 540 150 S 730 176, 900 142" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"></path><path d="M60 170 C 180 156, 260 184, 400 168 S 640 156, 840 172" fill="none" style="stroke:var(--accent)" stroke-width="1.4" stroke-linecap="round"></path></svg>
 <div class="read" style="margin-top:clamp(20px,4vw,34px)">
@@ -23,10 +24,13 @@
 
 <section class="sec">
   <h2 class="h2 small" style="margin-bottom:16px">{{5.4}}</h2>
-  <div class="read">
-    <p>{{5.41}}</p>
-    <p>{{5.42}}</p>
-    <p style="margin:0">{{5.43}}</p>
+  <div class="spread">
+    <div>
+      <p>{{5.41}}</p>
+      <p>{{5.42}}</p>
+      <p style="margin:0">{{5.43}}</p>
+    </div>
+    {{#if 3.46}}<div>{{#refs 3.46}}<figure class="fig aside"><img src="{{root}}/pictures/{{plain:.}}" alt="{{plain:.2}}"><figcaption>{{.1}}</figcaption></figure>{{/refs}}</div>{{/if}}
   </div>
 </section>
 
@@ -39,3 +43,18 @@
   <p class="golink" style="margin-top:24px">{{5.53}}</p>
 </section>
 
+<section class="sec">
+  <div class="roles">
+    {{#refs 3.47}}<article id="{{plain:.37}}" class="role">
+      <h2>{{.3}}</h2>
+      <p class="org">{{.31}}</p>
+      <p>{{.32}}</p>
+      {{#if .39}}<div class="figpair">{{#refs .39}}<figure class="fig"><img src="{{root}}/pictures/{{plain:.}}" alt="{{plain:.2}}"><figcaption>{{.1}}</figcaption></figure>{{/refs}}</div>{{/if}}
+      {{#if .33}}<p class="more"><a href="{{url:.34}}">{{.33}} →</a></p>{{/if}}
+    </article>{{/refs}}
+  </div>
+  <div class="grid2 shorts">
+    {{#refs 3.49}}<article class="g"><h3 class="h3">{{.}}</h3><p>{{.1}}</p>{{#if .5}}<p class="more"><a href="{{url:.6}}">{{.5}} →</a></p>{{/if}}</article>{{/refs}}
+  </div>
+  {{#if 3.451}}<div class="before"><h4>{{3.65}}</h4><ul>{{#each 3.45 depth=2}}<li><em>{{.}}</em>{{.1}}</li>{{/each}}</ul></div>{{/if}}
+</section>
