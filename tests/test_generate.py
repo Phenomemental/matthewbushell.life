@@ -225,7 +225,7 @@ class Sealed(Base):
 
     def test_a_sealed_node_partway_along_an_address_is_refused(self):
         data = blocks()
-        data['spine:life-work']['3']['6'] = GRAY  # Within reads 3.63: the walk meets the envelope at 3.6
+        data['spine:life-work']['3']['5'] = GRAY  # Within reads 3.59: the walk meets the envelope at 3.5
         rep = self.run_with(data)
         self.assertNotIn('/within', rep['published'])
         self.assertNotIn(GRAY['2'], self.all_text())
