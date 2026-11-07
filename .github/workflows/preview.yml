@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
-      contents: read
+      contents: write   # the preview branch
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Test the generator
@@ -37,10 +37,15 @@ jobs:
           --report "$RUNNER_TEMP/report.json"
       - name: Say what happened
         run: cat "$RUNNER_TEMP/report.json"
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        with:
-          name: preview
-          path: |
-            ${{ runner.temp }}/preview
-            ${{ runner.temp }}/report.json
-          retention-days: 1
+      - name: Keep the preview on its own branch, for reading
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          rm -rf "$RUNNER_TEMP/branch" && mkdir -p "$RUNNER_TEMP/branch"
+          cp -r "$RUNNER_TEMP/preview/." "$RUNNER_TEMP/branch/"
+          cp "$RUNNER_TEMP/report.json" "$RUNNER_TEMP/branch/report.json"
+          cd "$RUNNER_TEMP/branch"
+          git init -q -b preview
+          git add -A
+          git commit -q -m "A preview, not the site"
+          git push -q --force "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" preview:preview
