@@ -202,15 +202,20 @@
     }
     var st = el('p', 'say-status'); st.setAttribute('role', 'status');
     form.insertBefore(st, line);
-    var list = el('ul', 'said notes'); list.hidden = true;
-    form.parentNode.insertBefore(list, form.nextSibling);
-    function paint() {
+    /* the notes already left fold away under one line; a tap opens them */
+    var fold = document.createElement('details'); fold.className = 'fold'; fold.hidden = true;
+    var head = document.createElement('summary'); fold.appendChild(head);
+    var list = el('ul', 'said notes'); fold.appendChild(list);
+    form.parentNode.insertBefore(fold, form.nextSibling);
+    function paint(open) {
       get(ROOM).then(function (pool) {
         var notes = poolNotes(pool);
         list.innerHTML = notes.map(function (n) {
           return '<li><b>' + esc(n.who || 'a visitor') + '</b>' + (when(n.when) ? ' · ' + esc(when(n.when)) : '') + '<br>' + esc(n.text) + '</li>';
         }).join('');
-        list.hidden = !notes.length;
+        head.textContent = notes.length === 1 ? 'Read the one note left so far' : 'Read the ' + notes.length + ' notes left so far';
+        fold.hidden = !notes.length;
+        if (open) fold.open = true;
       }, function () {});
     }
     var clear = Door ? Door.keepDraft(box, ROOM) : function () {};
@@ -223,7 +228,7 @@
       var me = Door && Door.me();
       send.disabled = true; st.textContent = 'Sending…';
       Beach.postNote(ROOM, me ? me.name : 'a visitor', t).then(function () {
-        clear(); box.value = ''; st.textContent = 'Sent. Anyone can read it.'; paint();
+        clear(); box.value = ''; st.textContent = 'Sent. Anyone can read it.'; paint(true);
       }, function () { st.textContent = 'That didn’t get through. Please try again in a moment.'; })
         .then(function () { send.disabled = false; });
     }
