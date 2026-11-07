@@ -30,27 +30,6 @@
 </section>
 
 <section class="sec">
-  <h2 class="h2 small" style="margin-bottom:20px">{{4.25}}</h2>
-  <div class="read">
-    <p>{{4.251}}</p>
-    <p>{{4.252}}</p>
-    <p class="cap" style="text-align:left;max-width:none;margin:0">{{4.253}}</p>
-  </div>
-</section>
-
-<section class="sec" id="watches" style="text-align:center">
-  <h2 class="h2 small">{{4.3}}</h2>
-  <p class="sub" style="margin:6px auto 16px">{{4.31}}</p>
-  <div class="tally" aria-hidden="true">{{#each 4.32}}<span class="ticks tone{{n}}">{{#repeat .1}}<span class="tick"></span>{{/repeat}}</span>{{/each}}</div>
-  <p class="legend">{{#each 4.32}}<span class="tone{{n}}">{{.1}} {{.}}</span>{{/each}}</p>
-  <div class="watches">
-    {{#each 8.3 depth=2}}<details class="watch"><summary><span class="n">{{n}}</span><span class="w">{{head:.}}</span></summary><p>{{tail:.}}</p></details>{{/each}}
-  </div>
-  <p style="margin:18px 0 0;font-style:italic"><a href="{{url:4.331}}">{{4.33}} →</a></p>
-  <div class="tools" data-share data-comment-at="4.3"></div>
-</section>
-
-<section class="sec">
   <h2 class="h2 small" style="margin-bottom:20px">{{4.5}}</h2>
   <div class="read">
     <p>{{4.51}}</p>
@@ -80,10 +59,24 @@
 </section>
 
 <section class="sec">
-  <h2 class="h2 small" style="margin-bottom:20px">{{4.6}}</h2>
-  <div class="grid2" style="max-width:860px;margin:0 auto">
-    {{#each 4.6}}<article class="g"><h3 class="h3">{{.}}</h3><p>{{.1}}</p></article>{{/each}}
+  <h2 class="h2 small" style="margin-bottom:20px">{{4.25}}</h2>
+  <div class="read">
+    <p>{{4.251}}</p>
+    <p>{{4.252}}</p>
+    <p class="cap" style="text-align:left;max-width:none;margin:0">{{4.253}}</p>
   </div>
+</section>
+
+<section class="sec" id="watches" style="text-align:center">
+  <h2 class="h2 small">{{4.3}}</h2>
+  <p class="sub" style="margin:6px auto 16px">{{4.31}}</p>
+  <div class="tally" aria-hidden="true">{{#each 4.32}}<span class="ticks tone{{n}}">{{#repeat .1}}<span class="tick"></span>{{/repeat}}</span>{{/each}}</div>
+  <p class="legend">{{#each 4.32}}<span class="tone{{n}}">{{.1}} {{.}}</span>{{/each}}</p>
+  <div class="watches">
+    {{#each 8.3 depth=2}}<details class="watch"><summary><span class="n">{{n}}</span><span class="w">{{head:.}}</span></summary><p>{{tail:.}}</p></details>{{/each}}
+  </div>
+  <p style="margin:18px 0 0;font-style:italic"><a href="{{url:4.331}}">{{4.33}} →</a></p>
+  <div class="tools" data-share data-comment-at="4.3"></div>
 </section>
 
 <section class="sec" id="notes" style="max-width:620px;margin-left:auto;margin-right:auto">
@@ -95,4 +88,12 @@
     <button type="button" class="btn solid" style="margin-top:8px">Leave a note</button>
     <p class="boxline">{{6.2}}</p>
   </form>
+</section>
+
+
+<section class="sec">
+  <h2 class="h2 small" style="margin-bottom:20px">{{4.6}}</h2>
+  <div class="grid2" style="max-width:860px;margin:0 auto">
+    {{#each 4.6}}<article class="g"><h3 class="h3">{{.}}</h3><p>{{.1}}</p></article>{{/each}}
+  </div>
 </section>
