@@ -194,6 +194,7 @@
   }
   document.querySelectorAll('[data-tool="note"]').forEach(function (form) {
     var box = form.querySelector('textarea'), send = form.querySelector('button');
+    var ROOM = form.getAttribute('data-pool') || POOL;  /* a form may write to another room, such as the book's */
     var line = form.querySelector('.boxline');
     if (line && !line.querySelector('a[href$="/support"]')) {
       var fs = boxLine().querySelector('a[href$="/support"]');
@@ -204,7 +205,7 @@
     var list = el('ul', 'said notes'); list.hidden = true;
     form.parentNode.insertBefore(list, form.nextSibling);
     function paint() {
-      get(POOL).then(function (pool) {
+      get(ROOM).then(function (pool) {
         var notes = poolNotes(pool);
         list.innerHTML = notes.map(function (n) {
           return '<li><b>' + esc(n.who || 'a visitor') + '</b>' + (when(n.when) ? ' · ' + esc(when(n.when)) : '') + '<br>' + esc(n.text) + '</li>';
@@ -212,7 +213,7 @@
         list.hidden = !notes.length;
       }, function () {});
     }
-    var clear = Door ? Door.keepDraft(box, POOL) : function () {};
+    var clear = Door ? Door.keepDraft(box, ROOM) : function () {};
     if (Door) Door.mic(box);
     function go(ev) {
       if (ev) ev.preventDefault();
@@ -221,7 +222,7 @@
       if (!Beach || !Beach.postNote) { st.textContent = 'That didn’t get through. Please try again in a moment.'; return; }
       var me = Door && Door.me();
       send.disabled = true; st.textContent = 'Sending…';
-      Beach.postNote(POOL, me ? me.name : 'a visitor', t).then(function () {
+      Beach.postNote(ROOM, me ? me.name : 'a visitor', t).then(function () {
         clear(); box.value = ''; st.textContent = 'Sent. Anyone can read it.'; paint();
       }, function () { st.textContent = 'That didn’t get through. Please try again in a moment.'; })
         .then(function () { send.disabled = false; });

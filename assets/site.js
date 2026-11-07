@@ -6,6 +6,12 @@ document.documentElement.classList.add('js');
     var f = function (o) { return new Intl.DateTimeFormat('en-GB', Object.assign({ timeZone: 'Europe/London' }, o)).format(d); };
     var line = 'It’s ' + f({ hour: '2-digit', minute: '2-digit', hour12: false }) + ' on a ' + f({ weekday: 'long' }) + ' in Northampton.';
     document.querySelectorAll('[data-clock]').forEach(function (el) { el.textContent = line; });
+    /* The sundial's shadow, on Within: up at noon, left in the morning, right in the evening, down at midnight. */
+    var parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', hour: '2-digit', minute: '2-digit', hour12: false }).formatToParts(d);
+    var h = 0, m = 0;
+    parts.forEach(function (x) { if (x.type === 'hour') h = +x.value; if (x.type === 'minute') m = +x.value; });
+    var angle = ((h % 24) + m / 60 - 12) * 15;
+    document.querySelectorAll('[data-shadow]').forEach(function (el) { el.setAttribute('transform', 'rotate(' + angle.toFixed(1) + ' 250 138)'); });
   }
   clock(); setInterval(clock, 20000);
 

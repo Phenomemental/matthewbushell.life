@@ -17,16 +17,22 @@ sys.path.insert(0, os.path.join(REPO, 'tools'))
 import generate  # noqa: E402
 
 PAGES = [
-    ('Home', '/', '1; 3; 4; 6; moonstone:Ada'),
-    ('Story', '/story', '2'),
-    ('Now', '/now', '3; 6'),
-    ('Places', '/places', '3; moonstone:Ada'),
-    ('Writing', '/writing', '4'),
-    ('Digital', '/digital', '5'),
+    ('Within', '/within', '3; moonstone:Ada'),
+    ('Home', '/', '1; 2; 3; 6; moonstone:Ada'),
+    ('Work', '/work', '3; 6'),
+    ('Community', '/community', '3; 6'),
+    ('Cyberspace', '/cyberspace', '3; 5'),
+    ('The Book', '/book', '4; spine:wholeless-nights as 8'),
     ('Say hello', '/hello', '6'),
     ('Finding support', '/support', '6'),
 ]
 HEART = 'Lorem ipsum heart, dolor sit amet.'
+BOOK = {'_': 'Lorem Nights, for the tests.', '1': 'What it is about: lorem.',
+        '3': {'_': 'The watches', '1': {'_': 'Watches one to nine'}, '2': {'_': 'Watches ten to eighteen'}, '3': {'_': 'Watches nineteen to twenty-seven'}}}
+for _shelf in ('1', '2', '3'):
+    for _d in range(1, 10):
+        BOOK['3'][_shelf][str(_d)] = {'_': 'Watch %s%d — Lorem ipsum dolor sit amet.' % (_shelf, _d), '9': ''}
+BOOK['3']['1']['1']['1'] = {'_': 'Encrypted (gray); readable only with the author secret.', '1': 'o290fr9cE/Qs1Zk2Lm8Pq4Rt6Vx0Yb3Nc5Df7Gh9Jk1Lm3Np5Qr7St9Uv1Wx3Yz5AbCdEfGh', '2': 'Zx9Yw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0Fe', '9': {'_': 'gray', '1': 'self'}}
 GRAY = {'_': 'Encrypted (gray); readable only with the author secret.',
         '1': 'o290fr9cE/Qs1Zk2Lm8Pq4Rt6Vx0Yb3Nc5Df7Gh9Jk1Lm3Np5Qr7St9Uv1Wx3Yz5AbCdEfGh',
         '2': 'Zx9Yw8Vu7Ts6Rq5Po4Nm3Lk2Ji1Hg0Fe', '9': {'_': 'gray', '1': 'self'}}
@@ -61,7 +67,10 @@ def blocks(yes=None, pins=True, heart=HEART, aside=None):
         for i, (name, path, reads) in enumerate(PAGES, 1):
             if 'moonstone:Ada' in reads:
                 law['4']['2'][str(i)] = {'_': name, '1': pin_line('moonstone:Ada', '0', HEART)}
-    return {'spine:life-work': spine, 'function:life-work': law, 'moonstone:Ada': {'_': heart, '1': 'Lorem a critique.'}}
+            if 'spine:wholeless-nights' in reads:
+                law['4']['2'][str(i)] = {'_': name, '1': pin_line('spine:wholeless-nights', '3', BOOK['3'], follows=True)}
+    return {'spine:life-work': spine, 'function:life-work': law, 'moonstone:Ada': {'_': heart, '1': 'Lorem a critique.'},
+            'spine:wholeless-nights': BOOK}
 
 
 class Run:
