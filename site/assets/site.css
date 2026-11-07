@@ -259,6 +259,11 @@ section[id]{scroll-margin-top:24px}
 .practice .spread p{margin:0 0 1em}
 .fig.dial{background:none}
 /* The Book: the watches as a numbered column */
-.watches{list-style:none;margin:22px auto 0;padding:0;max-width:640px;text-align:left}
-.watches li{display:grid;grid-template-columns:2.2em minmax(0,1fr);gap:0 6px;padding:7px 0;border-top:1px solid var(--line-soft);font-size:.96em;line-height:1.45}
-.watches .n{color:var(--accent);font-style:italic;text-align:right;padding-right:4px}
+.watches{margin:22px auto 0;max-width:640px;text-align:left}
+.watch{border-top:1px solid var(--line-soft)}
+.watch summary{display:grid;grid-template-columns:2.2em minmax(0,1fr);gap:0 6px;padding:9px 0;cursor:pointer;list-style:none;font-size:1.02em;line-height:1.4}
+.watch summary::-webkit-details-marker{display:none}
+.watch .n{color:var(--accent);font-style:italic;text-align:right;padding-right:4px}
+.watch .w{font-weight:600}
+.watch[open] .w{color:var(--accent)}
+.watch p{margin:0 0 12px 2.6em;font-size:.96em;line-height:1.45}
