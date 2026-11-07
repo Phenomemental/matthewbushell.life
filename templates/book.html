@@ -43,9 +43,9 @@
   <p class="sub" style="margin:6px auto 16px">{{4.31}}</p>
   <div class="tally" aria-hidden="true">{{#each 4.32}}<span class="ticks tone{{n}}">{{#repeat .1}}<span class="tick"></span>{{/repeat}}</span>{{/each}}</div>
   <p class="legend">{{#each 4.32}}<span class="tone{{n}}">{{.1}} {{.}}</span>{{/each}}</p>
-  <ol class="watches">
-    {{#each 8.3 depth=2}}<li><span class="n">{{n}}</span><span class="w">{{.}}</span></li>{{/each}}
-  </ol>
+  <div class="watches">
+    {{#each 8.3 depth=2}}<details class="watch"><summary><span class="n">{{n}}</span><span class="w">{{head:.}}</span></summary><p>{{tail:.}}</p></details>{{/each}}
+  </div>
   <p style="margin:18px 0 0;font-style:italic"><a href="{{url:4.331}}">{{4.33}} →</a></p>
   <div class="tools" data-share data-comment-at="4.3"></div>
 </section>

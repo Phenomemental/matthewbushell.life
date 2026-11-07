@@ -10,6 +10,7 @@ with a line at "_" and children at digits 1-9.
   {{plain:x}}        the line with no markup, for attributes
   {{url:x}}          the line as a link address
   {{paras:x}}        the line as paragraphs: a blank line starts a new one, a line break is kept
+  {{head:x}} {{tail:x}}  the line split at its first dash ' — ': the words before it, and the words after
   {{n}}              the loop's position, from 1
   {{#each 3.14}}     children 1 to 9 in order; depth=2 for lists nested by period, to=5 to stop early
   {{#refs 3.73}}     the addresses in a semicolon list, each as the item
@@ -233,6 +234,10 @@ def slot(ref, ctx):
         return html.escape(url(need(ctx, ref[4:]), ctx.root), quote=True)
     if ref.startswith('paras:'):
         return paras(need(ctx, ref[6:]), ctx.root)
+    if ref.startswith('head:') or ref.startswith('tail:'):
+        line = need(ctx, ref[5:])
+        head, dash, tail = line.partition(' — ')
+        return rich(head if ref.startswith('head:') else tail, ctx.root)
     return rich(need(ctx, ref), ctx.root)
 
 

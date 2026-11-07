@@ -317,6 +317,11 @@ class Guards(Base):
         self.assertNotIn('<script>alert(1)</script>', h)
         self.assertIn('Lorem &lt;script&gt;alert(1)&lt;/script&gt; &amp; "ipsum".', h)
 
+    def test_a_line_splits_at_its_dash_into_head_and_tail(self):
+        tree = {'1': 'The Return — A GP surgery at eighteen, and a *word*.', '2': 'No dash here'}
+        self.assertEqual(generate.fill.fill('{{head:1}}|{{tail:1}}|{{head:2}}|{{tail:2}}', tree),
+                         'The Return|A GP surgery at eighteen, and a <em>word</em>.|No dash here|')
+
     def test_a_paragraphs_slot_keeps_lines_and_paragraphs(self):
         tree = {'1': 'I\nWho will be <b>there</b>\nto hold her?\n\n\nII\nMight *she* catch the [scent](https://example.com/)?'}
         html = generate.fill.fill('{{paras:1}}', tree)
