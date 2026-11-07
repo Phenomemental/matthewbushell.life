@@ -1,16 +1,16 @@
 {
  "pages": {
   "/": {
-   "yes": "Home, 7 November 2026"
+   "yes": "Home, 7 November 2026, the facts set right across the rooms at 14:58"
   },
   "/book": {
-   "yes": "The Book, 7 November 2026"
+   "yes": "The Book, 7 November 2026, the facts set right across the rooms at 14:58"
   },
   "/community": {
-   "yes": "Community, 7 November 2026"
+   "yes": "Community, 7 November 2026, the facts set right across the rooms at 14:58"
   },
   "/cyberspace": {
-   "yes": "Cyberspace, 7 November 2026"
+   "yes": "Cyberspace, 7 November 2026, the facts set right across the rooms at 14:58"
   },
   "/hello": {
    "yes": "Say hello, 7 November 2026"
@@ -19,15 +19,15 @@
    "yes": "Finding support, 7 November 2026"
   },
   "/within": {
-   "yes": "Within, 7 November 2026, written again with the facts set right at 12:17"
+   "yes": "Within, 7 November 2026, the facts set right across the rooms at 14:58"
   },
   "/work": {
-   "yes": "Work, 7 November 2026"
+   "yes": "Work, 7 November 2026, the facts set right across the rooms at 14:58"
   }
  },
  "pins": {
   "/book|spine:wholeless-nights|3": {
-   "fingerprint": "7820a8655b4b",
+   "fingerprint": "db5b5cb28e7f",
    "lines": [
     "3: The watches: the chapters are watches, a working list of 27. Each is a night; read a watch and leave your thoughts beside it in your own notebook.",
     "3.1: Watches one to nine",
@@ -73,7 +73,7 @@
     "3.24: The Kitchen Floor — Written four times before and never plainly. The centre of the book.",
     "3.241: (sealed)",
     "3.25: The Magnet — A £1.50 horseshoe magnet, a small lie at a till, a park bench, and forty-seven printed pages that changed how he saw everything.",
-    "3.26: Alan — \"Nature herself never excludes you. Only some people, in some places do.\" A decade of letters with the man who wrote it.",
+    "3.26: Alan — \"Nature herself never excludes you. Only some people, in some places do.\" Fourteen years of letters with the man who wrote it.",
     "3.261: (sealed)",
     "3.27: Adam — A psychiatrist and pioneer of psychodrama, a stranger who answered his first letter the same day: two questors at the edge of the old ways of thinking. He pointed towards the caring professions, a road he was already on.",
     "3.271: (sealed)",
@@ -89,7 +89,7 @@
     "3.322: (sealed)",
     "3.33: NISA — A physicist who spoke of devotion and an old way of counting in the same breath. A way of counting and a way of loving in one conversation.",
     "3.331: (sealed)",
-    "3.34: Portobello — A long ride north, and a house by the sea where Louie Gardiner taught him presence in action. Not a lesson but an experience: mirrors became windows.",
+    "3.34: Portobello — A long ride north, and a house by the sea where Louie Gardiner taught him presence in action. Not a lesson but an experience: people who, instead of handing him back his reflection, let him see further than himself.",
     "3.35: Roy — Rev. Roy Reynolds wrote with many people, and with him. He offered four ways of thinking and doing, from fixing things to the inviting emptiness and beyond. Then his death.",
     "3.351: (sealed)",
     "3.36: The Shape of Emotion — A pandemic, fifteen-hour days, and a comment on LinkedIn from a stranger who shared his name. A dining table, a photo of his daughters on the fridge, and happy tears for the first time in years.",
