@@ -578,45 +578,19 @@
    "6": "7.243",
    "9": {
     "_": "Intus",
-    "1": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.",
-    "5": "Conscientia, acceptatio, actio.",
-    "2": {
-     "_": "Conscientia",
-     "1": "Linea.",
-     "2": {
-      "_": "Quattuor quaestiones",
-      "1": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt."
-     },
-     "3": {
-      "_": "Praesentia",
-      "1": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt."
-     }
-    },
-    "3": {
-     "_": "Acceptatio",
-     "1": "Linea.",
-     "2": {
-      "_": "Forma Affectus",
-      "1": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt."
-     }
-    },
-    "4": {
-     "_": "Actio",
-     "1": "Linea.",
-     "2": {
-      "_": "Quinque columnae",
-      "1": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt."
-     },
-     "3": {
-      "_": "Sex portae",
-      "1": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt."
-     },
-     "4": {
-      "_": "Vigilia",
-      "1": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.",
-      "5": "Liber",
-      "6": "/book"
-     }
+    "1": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    "2": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    "3": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    "4": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    "5": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    "6": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    "7": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    "8": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    "9": {
+     "_": "picturae",
+     "1": "7.231",
+     "3": "7.2461",
+     "6": "7.2462"
     }
    }
   },
