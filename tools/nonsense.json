@@ -776,41 +776,12 @@
     "1": "[Nunc Bipolaris](https://example.com/), Martio 0000. [Veritas](https://example.com/), Iunio 0000."
    },
    "8": {
-    "_": "[Consociatio](https://example.com/)",
-    "1": "Omnia Negotia, Iunio 0000."
-   },
-   "9": {
     "_": "Cetera",
     "1": "Articuli in diariis. [Carmina](https://example.com/) et fabulae."
    }
   },
   "7": {
-   "_": "Aliquot Paginae",
-   "1": "Carmen, epistula, scriptum, et initium orationis.",
-   "2": {
-    "_": "Puella ad Portam",
-    "1": "Carmen, Martio 0000.",
-    "2": "I\nQuis aderit ut eam teneat\ncum manum pungit\nin spina?\n\nII\nNum odorem capiat\nquem sparsi dum movebar\nin vento?",
-    "3": "poem"
-   },
-   "3": {
-    "_": "Ad Roy, et circulum",
-    "1": "Ex epistula, 0 Ianuarii 0000.",
-    "2": "Intra, extra et circum me fuisti.\n\nHoc cum multis vestrum facio.\n\n…\n\nMihi occurrit te simpliciter amare.",
-    "3": "letter"
-   },
-   "4": {
-    "_": "Scriptum",
-    "1": "Scriptum, Novembri 0000.",
-    "2": "Cum in schola media essem, duo cognomina habui.\n\nHis diebus animum habeo sentiendi quod sentio.",
-    "3": "post"
-   },
-   "5": {
-    "_": "Oratio",
-    "1": "Initium orationis meae, Septembri 0000.",
-    "2": "Ergo, hoc finge. Duodeviginti annos natus sum.\n\n‘Audivistine?’\n\n‘Non,’ mater respondit.",
-    "3": "talk"
-   }
+   "_": "Aliquot Paginae: vacua donec designetur."
   }
  },
  "5": {
