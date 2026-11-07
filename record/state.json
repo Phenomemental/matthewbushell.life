@@ -1,32 +1,106 @@
 {
  "pages": {
   "/": {
-   "yes": "Home, 5 November 2026"
+   "yes": "Home, 7 November 2026"
   },
-  "/digital": {
-   "yes": "Digital, 5 November 2026"
+  "/book": {
+   "yes": "The Book, 7 November 2026"
+  },
+  "/community": {
+   "yes": "Community, 7 November 2026"
+  },
+  "/cyberspace": {
+   "yes": "Cyberspace, 7 November 2026"
   },
   "/hello": {
-   "yes": "Say hello, 5 November 2026"
-  },
-  "/now": {
-   "yes": "Now, 5 November 2026"
-  },
-  "/places": {
-   "yes": "Places, 5 November 2026"
-  },
-  "/story": {
-   "yes": "Story, 5 November 2026"
+   "yes": "Say hello, 7 November 2026"
   },
   "/support": {
-   "yes": "Finding support, 5 November 2026"
+   "yes": "Finding support, 7 November 2026"
   },
-  "/writing": {
-   "yes": "Writing, 5 November 2026"
+  "/within": {
+   "yes": "Within, 7 November 2026"
+  },
+  "/work": {
+   "yes": "Work, 7 November 2026"
   }
  },
  "pins": {
-  "/places|moonstone:Ada|0": {
+  "/book|spine:wholeless-nights|3": {
+   "fingerprint": "39b3f894fb8d",
+   "lines": [
+    "3: The watches: the chapters are watches, a working list of 27. Each is a night; read a watch and leave your thoughts beside it in your own notebook.",
+    "3.1: Watches one to nine",
+    "3.11: The Return — A GP surgery at eighteen, a mother explaining her son, a word the doctor offers. Then a minibus ride across Northampton, and a woman behind the glass who wants him to see. It's 04:16, and the book begins.",
+    "3.111: (sealed)",
+    "3.119: ",
+    "3.12: The Names — One \"t\" or two. A clerk's note in the margin, an archive in Kent, and a soldier who gave up his surname in 1880. Then the dragon and the phoenix, inked on a day he won't dress up.",
+    "3.121: (sealed)",
+    "3.129: ",
+    "3.13: The Inscription — Johannesburg, spring. A bookshop down a flight of steps, a launch, a question he decided not to ask. He asked for a dedication, and was given his own truth instead.",
+    "3.131: (sealed)",
+    "3.14: The Pilgrimage — Step. Another. A motorbike he rides less fast now, a pilgrimage he read about on a plane and didn't walk, and a lake that teaches him how to be water.",
+    "3.141: (sealed)",
+    "3.15: The Unyielding — \"Your writing is unyielding,\" a tutor once said. Seventeen years of books written and deleted. Then he discovers what those seventeen years were really counting.",
+    "3.151: (sealed)",
+    "3.16: Travelling Man — A care home, jacket potatoes, a quiet woman on the top floor. Before she died, she handed him her book. He's carried it ever since, as far as Africa.",
+    "3.161: (sealed)",
+    "3.17: Chiba — A proposal written at night while the professors slept. An abstract about \"Mr. Bushell,\" in the third person because it felt safe. Then the room in Japan where he had to say it as himself.",
+    "3.171: (sealed)",
+    "3.18: The House Full of Other People's Children — Foster children came and went through one house on an estate, so many he lost count. A home where people were always temporary. A brother who left at sixteen, and why he understood.",
+    "3.19: The Uniform — Seventeen and a half. Encryption keys you could drop and lose the message. Best soldier of two hundred. The mirror afterwards, and handing it all back.",
+    "3.2: Watches ten to eighteen",
+    "3.21: The Bridge — Detroit, 2008. A motel, poetry read to American radio, a stranger online, and a border he planned to cross and didn't.",
+    "3.211: (sealed)",
+    "3.212: (sealed)",
+    "3.213: (sealed)",
+    "3.214: (sealed)",
+    "3.215: (sealed)",
+    "3.22: Two Emails — No GCSEs at twenty-six, and two emails that let him in anyway. A first year, a first conference, the first time in print.",
+    "3.221: (sealed)",
+    "3.222: (sealed)",
+    "3.223: (sealed)",
+    "3.224: (sealed)",
+    "3.225: (sealed)",
+    "3.23: The Library — A library book with a tram ticket from 1932 inside. Fifty pence in a second-hand bookshop in Haworth. The books that came looking for him, and a chain of hands he's never joined up until now.",
+    "3.231: (sealed)",
+    "3.232: (sealed)",
+    "3.233: (sealed)",
+    "3.234: (sealed)",
+    "3.235: (sealed)",
+    "3.236: (sealed)",
+    "3.237: (sealed)",
+    "3.24: The Kitchen Floor — Written four times before and never plainly. The centre of the book.",
+    "3.241: (sealed)",
+    "3.25: The Magnet — A £1.50 horseshoe magnet, a small lie at a till, a park bench, and forty-seven printed pages that changed how he saw everything.",
+    "3.26: Alan — \"Nature herself never excludes you. Only some people, in some places do.\" A decade of letters with the man who wrote it.",
+    "3.261: (sealed)",
+    "3.27: Adam — A psychiatrist and pioneer of psychodrama, a stranger who answered his first letter the same day: two questors at the edge of the old ways of thinking. He pointed towards the caring professions, a road he was already on.",
+    "3.271: (sealed)",
+    "3.272: (sealed)",
+    "3.28: The Asylum Garden — Night shifts where John Clare was kept, his grandfather's Penguin book, and a helicopter pilot who borrowed it and never gave it back.",
+    "3.29: The Narrow Escape — The day everything stopped, and the day the drinking stopped with it. Two years of a programme, and a name for what bipolar never reached.",
+    "3.291: The Second Time — Ten years later, while helping others recover, it all came back, harder. This is the watch that refuses to make a recovery story.",
+    "3.2911: (sealed)",
+    "3.3: Watches nineteen to twenty-seven",
+    "3.31: Reclaiming Life — Francis Masters trained him as a therapeutic coach, his first step from lived experience into a profession. She named what he carried, and gave him her book. Three kinds of handing over from one woman.",
+    "3.32: The Companion Writing Circle — A man on morning television, an email, a chapter that came of it. A weekly circle of thinkers, a chapter he was invited to write and didn't, and the first of them to die.",
+    "3.321: (sealed)",
+    "3.322: (sealed)",
+    "3.33: NISA — A physicist who spoke of devotion and an old way of counting in the same breath. A way of counting and a way of loving in one conversation.",
+    "3.331: (sealed)",
+    "3.34: Portobello — A long ride north, and a house by the sea where Louie Gardiner taught him presence in action. Not a lesson but an experience: mirrors became windows.",
+    "3.35: Roy — Rev. Roy Reynolds wrote with many people, and with him. He offered four ways of thinking and doing, from fixing things to the inviting emptiness and beyond. Then his death.",
+    "3.351: (sealed)",
+    "3.36: The Shape of Emotion — A pandemic, fifteen-hour days, and a comment on LinkedIn from a stranger who shared his name. A dining table, a photo of his daughters on the fridge, and happy tears for the first time in years.",
+    "3.361: (sealed)",
+    "3.362: (sealed)",
+    "3.37: Vinnie — A peer in the support group, then the first person he coached, the case study behind his coaching submission, then a friend. Long silences between them, and then the online recovery community, where they shared networks and time again. This watch is for him.",
+    "3.38: The Ones Who Came After — The work he does now, shaped by Vinnie: lived experience recovery organisations, where people who have been through it lead the way for those coming after.",
+    "3.39: Afterword — Not a conclusion. Written from the desk after the last night: what he brought, what didn't survive, what he still doesn't know."
+   ]
+  },
+  "/within|moonstone:Ada|0": {
    "fingerprint": "c69a77d1acb0",
    "lines": [
     "0: bi-polar · one axis, two ends\nwhole-less · as in boundless; the ends are not edges, nothing outside\n— The heart of the family, held by Phenomemental (Matthew) as its heirloom. Its figure is the one open stroke on the cover of Wholeless Nights: in thin, once round the centre, through itself, out open. Natural Inclusion as it occurred in one life: bi-polar is the given, exclusive reading, two poles cut apart; read inclusively it is one axis whose two poles are its ends; and the boundless is said of that same axis, so the ends are places one passes through, never edges one falls off, and there is nowhere to exile either pole to. Placed 19 October 2026, evening, after twelve cold readers held it (ten fresh minds, then Gemini and ChatGPT in Matthew's hand), every one keeping both ends and finding no second thing to go to; one read it as 'the poles divide nothing; they distinguish what was never divided'. It replaces the form placed that afternoon ('whole-less · as in boundless, endless'), which held ten readers on one axis and no lack but failed a stricter test: 'endless' fought 'two ends', and readers kept the boundless and let the axis go, form against formless. Both earlier hearts are kept at archive:moonstone:Ada:2026-10-19. Ada's readings beneath were made of the first heart and stand as her record."
