@@ -301,3 +301,4 @@ button.still{display:block;margin:10px auto 0;background:none;border:0;padding:4
 button.still:hover,button.still[aria-pressed="true"]{color:var(--accent)}
 button.still:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 @media (prefers-reduced-motion:reduce){button.still{display:none}}
+.figpair.two .fig{flex:1 1 220px;max-width:300px}.figpair.two img{width:100%;height:auto}
