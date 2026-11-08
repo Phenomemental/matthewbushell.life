@@ -3,23 +3,25 @@
   <h1 class="h1" style="margin-top:2px">{{3.1}}</h1>
   <p class="sub">{{3.12}}</p>
 </header>
-<div class="read" style="margin-bottom:clamp(24px,4vw,40px)"><p class="drop">{{3.62}}</p></div>
+{{#if 3.16}}{{#refs 3.16}}<figure class="fig" style="max-width:720px;margin:0 auto clamp(24px,4vw,38px)"><img src="{{root}}/pictures/{{plain:.}}" alt="{{plain:.2}}"><figcaption>{{.1}}</figcaption></figure>{{/refs}}{{/if}}
+<div class="read">
+  <p class="drop">{{3.62}}</p>
+  <p>{{1.34}}</p>
+  <p>{{1.35}}</p>
+</div>
 <div class="spread">
-  <div><p class="drop">{{1.21}}</p></div>
+  <div><p>{{1.21}}</p></div>
   <p class="note"><span class="hand">{{1.22}}</span>{{1.221}}</p>
   <div><p>{{1.23}}</p></div>
   <p class="note">{{1.24}}</p>
   <div><p>{{1.39}}</p></div>
   <div></div>
 </div>
-<div class="spread">
-  <div><p>{{1.33}}</p></div>
-  <div></div>
-  <div><p>{{1.34}}</p></div>
-  <div></div>
-  <div><p>{{1.38}}</p></div>
-  <figure class="fig aside"><img src="{{root}}/pictures/{{plain:7.214}}" alt="{{plain:7.2142}}"><figcaption>{{7.2141}}</figcaption></figure>
+<div class="read">
+  <p>{{1.33}}</p>
+  <p>{{1.36}}</p>
 </div>
+{{#if 3.17}}<div class="secfigs">{{#refs 3.17}}<figure class="fig"><img src="{{root}}/pictures/{{plain:.}}" alt="{{plain:.2}}"><figcaption>{{.1}}</figcaption></figure>{{/refs}}</div>{{/if}}
 <section class="sec" id="years" style="margin-top:clamp(30px,5vw,48px)">
   <h2 class="h2 small">{{2.1}}</h2>
   <p class="sub" style="margin:6px auto 22px">{{2.11}}</p>
@@ -75,22 +77,6 @@
     <p style="margin:0 auto;max-width:520px;font-size:1.15em;font-style:italic">{{2.3}}</p>
   </div>
 </section>
-<section class="sec" id="homeis">
-  <h2 class="h2 small" style="margin-bottom:22px">{{3.13}}</h2>
-  {{#if 3.16}}<div class="secfigs">{{#refs 3.16}}<figure class="fig"><img src="{{root}}/pictures/{{plain:.}}" alt="{{plain:.2}}"><figcaption>{{.1}}</figcaption></figure>{{/refs}}</div>{{/if}}
-  <div class="grid2">
-    {{#refs 3.17}}<article class="g"><h3 class="h3">{{.}}</h3><p>{{.1}}</p>{{#if .9}}{{#refs .9}}<figure class="fig"><img src="{{root}}/pictures/{{plain:.}}" alt="{{plain:.2}}"><figcaption>{{.1}}</figcaption></figure>{{/refs}}{{/if}}</article>{{/refs}}
-  </div>
-  <div class="tools" data-share data-comment-at="3.1"></div>
-</section>
-
-{{#if 1.61}}<section aria-labelledby="say" class="sec" style="text-align:center">
-  <h2 id="say" class="h2 mid" style="margin-bottom:18px">{{1.6}}</h2>
-  <div class="quotes">
-    {{#each 1.6}}<blockquote><p>{{.}}</p><footer>{{.1}}</footer></blockquote>{{/each}}
-  </div>
-</section>{{/if}}
-
 <section id="hello" class="sec" style="text-align:center">
   <h2 class="h2" style="margin-bottom:12px">{{6.16}}</h2>
   <p style="margin:0 auto 18px;max-width:600px">{{6.161}}</p>
