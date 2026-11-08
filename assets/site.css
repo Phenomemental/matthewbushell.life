@@ -290,3 +290,14 @@ section[id]{scroll-margin-top:24px}
 .room .figs .fig{margin:0;max-width:none}
 .room .figs img{aspect-ratio:4/3;object-fit:cover;width:100%}
 .room .figs figcaption{font-size:.85em}
+.living .living-cap{min-height:2.8em;margin:6px 0 0;text-align:center;font-style:italic;color:var(--muted);font-size:.98em;line-height:1.35}
+.living .living-cap .q{color:var(--accent)}
+.pillars{max-width:520px;margin:8px auto 0;text-align:center}
+.pillars .lintel{margin:0 0 2px;padding-bottom:3px;border-bottom:2px solid var(--ink);font-style:italic;color:var(--muted);font-size:.95em}
+.pillars .row{display:flex;flex-wrap:wrap;justify-content:center}
+.pillar{width:20%;min-width:96px;height:auto;color:var(--ink);overflow:visible}
+.pillar text{font-family:inherit;font-style:italic;font-size:16px;fill:currentColor}
+button.still{display:block;margin:10px auto 0;background:none;border:0;padding:4px 8px;font:inherit;font-size:.9em;font-style:italic;color:var(--muted);text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px;cursor:pointer}
+button.still:hover,button.still[aria-pressed="true"]{color:var(--accent)}
+button.still:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+@media (prefers-reduced-motion:reduce){button.still{display:none}}

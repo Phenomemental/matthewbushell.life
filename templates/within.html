@@ -18,40 +18,43 @@
 </div>
 
 <div class="read"><p>{{3.595}}</p></div>
-<svg viewBox="-50 0 460 330" role="img" aria-label="{{plain:7.2962}}" style="width:100%;max-width:340px;display:block;margin:10px auto 0;color:var(--ink);font-size:15px;font-style:italic">
+<figure class="living" style="max-width:360px;margin:10px auto 0">
+<svg id="portals" viewBox="-50 0 460 330" role="img" aria-label="{{plain:7.2962}}" style="width:100%;display:block;color:var(--ink);font-size:15px;font-style:italic;overflow:visible">
   <g stroke="var(--line)" stroke-dasharray="2 4" fill="none"><line x1="180" y1="160" x2="180" y2="60"></line><line x1="180" y1="160" x2="266.6" y2="110"></line><line x1="180" y1="160" x2="266.6" y2="210"></line><line x1="180" y1="160" x2="180" y2="260"></line><line x1="180" y1="160" x2="93.4" y2="210"></line><line x1="180" y1="160" x2="93.4" y2="110"></line></g>
-  <g fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="180" cy="60" r="9"></circle><circle cx="266.6" cy="110" r="9"></circle><circle cx="266.6" cy="210" r="9"></circle><circle cx="180" cy="260" r="9"></circle><circle cx="93.4" cy="210" r="9"></circle><circle cx="93.4" cy="110" r="9"></circle></g>
-  <circle cx="180" cy="160" r="12" fill="var(--accent)"></circle>
-  <g fill="currentColor"><text x="180" y="40" text-anchor="middle">what happened</text><text x="283" y="114" text-anchor="start">what’s ahead</text><text x="283" y="214" text-anchor="start">what you made of it</text><text x="180" y="290" text-anchor="middle">a choice</text><text x="77" y="214" text-anchor="end">what matters</text><text x="77" y="114" text-anchor="end">what you felt</text><text x="180" y="188" text-anchor="middle" font-size="13">presence</text></g>
+  <circle id="p-ripple" cx="180" cy="160" r="12" fill="none" stroke="var(--accent)" stroke-width="1.4" opacity="0"></circle>
+  <line id="p-thread" x1="180" y1="160" x2="180" y2="160" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" opacity="0"></line>
+  <g fill="var(--paper)" stroke="currentColor" stroke-width="1.6"><circle data-k="happened" cx="180" cy="60" r="9"></circle><circle data-k="ahead" cx="266.6" cy="110" r="9"></circle><circle data-k="made" cx="266.6" cy="210" r="9"></circle><circle data-k="choice" cx="180" cy="260" r="9"></circle><circle data-k="matters" cx="93.4" cy="210" r="9"></circle><circle data-k="felt" cx="93.4" cy="110" r="9"></circle></g>
+  <circle id="p-centre" cx="180" cy="160" r="12" fill="var(--accent)"></circle>
+  <g fill="currentColor"><text data-k="happened" x="180" y="40" text-anchor="middle">what happened</text><text data-k="ahead" x="283" y="114" text-anchor="start">what’s ahead</text><text data-k="made" x="283" y="214" text-anchor="start">what you made of it</text><text data-k="choice" x="180" y="290" text-anchor="middle">a choice</text><text data-k="matters" x="77" y="214" text-anchor="end">what matters</text><text data-k="felt" x="77" y="114" text-anchor="end">what you felt</text><text x="180" y="188" text-anchor="middle" font-size="13">presence</text></g>
+  <circle id="p-you" cx="180" cy="160" r="5" fill="var(--paper)" stroke="currentColor" stroke-width="1.6" opacity="0"></circle>
 </svg>
+<figcaption class="living-cap" id="portal-cap" aria-live="off"></figcaption>
+</figure>
 
 <div class="spread" style="margin-top:clamp(22px,4vw,34px)">
   <div><p>{{3.596}}</p></div>
-  <figure class="fig aside" aria-hidden="true">
-    <svg viewBox="0 0 160 230" style="width:100%;max-width:140px;display:block;margin:0 auto;color:var(--ink)">
+  <figure class="fig aside living" aria-hidden="true">
+    <svg id="shape" viewBox="0 0 160 230" style="width:100%;max-width:170px;display:block;margin:0 auto;color:var(--ink);overflow:visible">
+      <line id="s-scan" x1="22" x2="138" y1="20" y2="20" stroke="var(--accent)" stroke-width="1" opacity="0"></line>
       <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="80" cy="30" r="18"></circle>
         <path d="M 62 56 C 40 62, 30 80, 30 100 L 30 150 C 30 165, 36 175, 44 180 L 44 215 M 116 215 L 116 180 C 124 175, 130 165, 130 150 L 130 100 C 130 80, 120 62, 98 56"></path>
       </g>
-      <path d="M 80 96 C 100 88, 112 104, 106 122 C 100 140, 84 146, 70 136 C 56 126, 54 108, 66 100 C 70 97, 75 97, 80 96 Z" fill="var(--accent)" opacity=".9"></path>
+      <path id="s-blob" d="M 80 96 C 100 88, 112 104, 106 122 C 100 140, 84 146, 70 136 C 56 126, 54 108, 66 100 C 70 97, 75 97, 80 96 Z" fill="var(--accent)" opacity=".9"></path>
+      <path id="s-line" d="" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="4 3" opacity="0"></path>
     </svg>
+    <p class="living-cap" id="shape-cap"></p>
     <figcaption>{{7.2941}}</figcaption>
   </figure>
 </div>
 {{#if 3.5994}}{{#refs 3.5994}}<figure class="fig" style="max-width:520px;margin:clamp(18px,3vw,28px) auto 0"><img src="{{root}}/pictures/{{plain:.}}" alt="{{plain:.2}}"><figcaption>{{.1}}</figcaption></figure>{{/refs}}{{/if}}
 
 <div class="read"><p>{{3.597}}</p></div>
-<svg viewBox="0 0 420 200" role="img" aria-label="{{plain:7.2952}}" style="width:100%;max-width:400px;display:block;margin:6px auto 0;color:var(--ink);font-size:15px;font-style:italic">
-  <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-    <path d="M 36 44 H 64 M 50 44 V 150 M 36 150 H 64"></path>
-    <path d="M 116 44 H 144 M 130 44 V 150 M 116 150 H 144"></path>
-    <path d="M 196 44 H 224 M 210 44 V 150 M 196 150 H 224"></path>
-    <path d="M 276 44 H 304 M 290 44 V 150 M 276 150 H 304"></path>
-    <path d="M 356 44 H 384 M 370 44 V 150 M 356 150 H 384"></path>
-    <path d="M 20 30 H 400" stroke="var(--line)"></path>
-  </g>
-  <g fill="currentColor" text-anchor="middle"><text x="50" y="180">thinking</text><text x="130" y="180">feeling</text><text x="210" y="180">moving</text><text x="290" y="180">nourishing</text><text x="370" y="180">relating</text></g>
-</svg>
+<figure class="living pillars" role="img" aria-label="{{plain:7.2952}}">
+  <p class="lintel">emotional fitness</p>
+  <div class="row"><svg class="pillar" data-p="think" viewBox="0 0 100 140"><g class="pl-think" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path class="pl-spiral"></path></g><path d="M 22 108 H 78" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path><text x="50" y="132" text-anchor="middle">thinking</text></svg><svg class="pillar" data-p="feel" viewBox="0 0 100 140"><path class="pl-wave" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"></path><path d="M 22 108 H 78" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path><text x="50" y="132" text-anchor="middle">feeling</text></svg><svg class="pillar" data-p="move" viewBox="0 0 100 140"><path class="pl-eight" fill="none" stroke="var(--line)" stroke-width="1.2" stroke-dasharray="2 4"></path><circle class="pl-mover" r="5" cx="50" cy="62" fill="currentColor"></circle><path d="M 22 108 H 78" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path><text x="50" y="132" text-anchor="middle">moving</text></svg><svg class="pillar" data-p="grow" viewBox="0 0 100 140"><g class="pl-seed" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path class="pl-stem"></path><path class="pl-leafL" fill="var(--accent)" stroke="none"></path><path class="pl-leafR" fill="var(--accent)" stroke="none"></path></g><path d="M 22 108 H 78" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path><text x="50" y="132" text-anchor="middle">nourishing</text></svg><svg class="pillar" data-p="relate" viewBox="0 0 100 140"><defs><clipPath id="pl-clip"><circle class="pl-a" cx="42" cy="62" r="19"></circle></clipPath></defs><circle class="pl-lens" cx="58" cy="62" r="19" fill="var(--accent)" opacity=".85" clip-path="url(#pl-clip)"></circle><circle class="pl-ao" cx="42" cy="62" r="19" fill="none" stroke="currentColor" stroke-width="1.8"></circle><circle class="pl-bo" cx="58" cy="62" r="19" fill="none" stroke="currentColor" stroke-width="1.8"></circle><path d="M 22 108 H 78" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path><text x="50" y="132" text-anchor="middle">relating</text></svg></div>
+</figure>
+<button class="still" type="button" data-living-pause aria-pressed="false">Hold the drawings still</button>
 
 <div class="read" style="margin-top:clamp(22px,4vw,34px)">
   {{paras:3.598}}
@@ -59,3 +62,4 @@
 </div>
 {{#if 3.5993}}{{#refs 3.5993}}<figure class="fig" style="max-width:420px;margin:clamp(22px,4vw,34px) auto 0"><img src="{{root}}/pictures/{{plain:.}}" alt="{{plain:.2}}"><figcaption>{{.1}}</figcaption></figure>{{/refs}}{{/if}}
 <div class="tools" data-share data-comment-at="3.59"></div>
+<script src="{{root}}/assets/living.js" defer></script>
