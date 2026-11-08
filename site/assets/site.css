@@ -23,7 +23,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 .sec{margin-top:clamp(46px,7vw,74px)}
 .read{max-width:640px;margin-left:auto;margin-right:auto}
 .read p{margin:0 0 1em}
-.drop::first-letter{float:left;font-size:4.3em;line-height:.8;padding:.07em .09em 0 0;color:var(--accent);font-weight:500}
+.drop::first-letter,.dropfirst>p:first-child::first-letter{float:left;font-size:4.3em;line-height:.8;padding:.07em .09em 0 0;color:var(--accent);font-weight:500}
 .spread{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,230px);gap:0 clamp(26px,4vw,48px);max-width:900px;margin:0 auto}
 .spread p{margin:0 0 1em}
 .fig.aside{align-self:start;margin:0 0 1em}
