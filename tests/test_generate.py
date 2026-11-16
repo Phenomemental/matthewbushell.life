@@ -534,11 +534,13 @@ class TheFilmPage(Base):
         files = self.run_.files()
         self.assertEqual(len([f for f in files if re.fullmatch(r'the-approach/plates/plate_[a-z_]+\.jpg', f)]), 8)
         self.assertEqual(len([f for f in files if re.fullmatch(r'the-approach/voices/[a-z0-9_]+\.mp3', f)]), 36)
-        self.assertIn('the-approach/voices/voices.js', files)
+        self.assertNotIn('the-approach/voices/voices.js', files)
+        self.assertEqual(len([f for f in files if re.fullmatch(r'the-approach/clips/[a-z_]+[.]mp4', f)]), 7)
         self.assertNotIn('the-approach/clips/gate.mp4', files)
         h = self.read(self.FILE)
         self.assertIn('data-plates="%s/the-approach/plates/"' % ROOT, h)
         self.assertIn('data-voices="%s/the-approach/voices/"' % ROOT, h)
+        self.assertIn('data-clips="%s/the-approach/clips/"' % ROOT, h)
 
     def test_it_is_in_no_menu_and_no_sitemap(self):
         self.run_with(blocks())
