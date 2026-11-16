@@ -162,6 +162,34 @@
   .wbig{top:36%}
 }
 @media (prefers-reduced-motion:reduce){.fdial,.diary,.centre,.over,.clip,.station,.fwho,.wbig,.wcard,.wbg .bg{transition:none}.wbg .bg{animation:none}}
+
+/* the sky can be explored: touches fall through the title to the sky; only the buttons take them */
+.js .front.on{pointer-events:none}
+.js .front.on .go{pointer-events:auto}
+.film.insky canvas{touch-action:none;cursor:grab}
+.film.insky.dragging canvas{cursor:grabbing}
+.go.third{display:none;background:rgba(10,10,14,.7);border-color:rgba(238,242,255,.3);box-shadow:none}
+/* while exploring, the title steps aside and both ways in wait at the foot */
+.film.exploring .front{top:auto;bottom:calc(14px + env(safe-area-inset-bottom));transition:none}
+.film.exploring .front h1,.film.exploring .front .topline{display:none}
+.film.exploring .ways{margin-top:0;gap:8px}
+.film.exploring .ways .go{display:inline-block;min-height:46px;padding:0 18px;font-size:18px;letter-spacing:.03em;background-color:rgba(8,10,22,.82)}
+.starcard{position:absolute;z-index:6;width:min(310px,80%);box-sizing:border-box;padding:12px 34px 14px 16px;border-radius:10px;background:rgba(6,9,22,.9);border:1px solid rgba(238,242,255,.3);box-shadow:0 10px 40px rgba(0,0,0,.6);color:#f1ebdd;text-align:left;user-select:text;-webkit-user-select:text}
+.starcard .sname{margin:0;font-size:16px;font-weight:600;letter-spacing:.06em;color:#e8c98a;overflow-wrap:anywhere}
+.starcard .sline{margin:6px 0 0;font-size:19px;line-height:1.3;overflow-wrap:break-word}
+.starcard .sclose{position:absolute;top:0;right:0;width:44px;height:44px;border:0;background:none;font-size:24px;line-height:1;color:rgba(238,242,255,.8)}
+.starcard .swalk{margin-top:12px;min-height:46px;padding:0 22px;font-size:19px}
+.below{position:absolute;z-index:4;left:50%;bottom:calc(2px + env(safe-area-inset-bottom));transform:translateX(-50%);width:56px;height:44px;border:0;background:none;font-size:22px;color:rgba(238,242,255,.55);display:none}
+.film.insky:not(.exploring) .below{display:block}
+
+/* the radio inside the walk: the dial across the foot, the walk's buttons lifted above it, the station named under the address */
+.film.radio .walk{padding-bottom:calc(126px + env(safe-area-inset-bottom))}
+.film.radio .station{top:calc(48px + env(safe-area-inset-top))}
+.film.radio .fwho{top:calc(70px + env(safe-area-inset-top))}
+@media (min-width:900px) and (min-height:560px){
+  .film.radio .walk{padding-bottom:132px}
+  .film.radio .station{top:52px}.film.radio .fwho{top:76px}
+}
 </style>
 </head>
 <body>
@@ -189,10 +217,18 @@
   <p class="topline">We kept our lives in this shape. Keep one of us.</p>
   <div class="ways">
     <button type="button" class="go" id="walkin" hidden>Walk into the film</button>
-    <button type="button" class="go second" id="tune" hidden>Tune the radio</button>
+    <button type="button" class="go third" id="totitle">Back to the title</button>
   </div>
   <noscript><p class="nojs">This page reads the film live from Pscale, and needs JavaScript to walk it.</p></noscript>
 </div>
+
+<aside class="starcard" id="starcard" hidden aria-live="polite">
+  <button type="button" class="sclose" id="sclose" aria-label="Close">×</button>
+  <p class="sname" id="sname"></p>
+  <p class="sline" id="sline"></p>
+  <button type="button" class="go swalk" id="swalk" hidden>Walk into the film</button>
+</aside>
+<button type="button" class="below" id="below" aria-label="Below the film: say something, and the way in">▾</button>
 
 <p class="station" id="station" role="status"></p>
 <p class="fwho" id="who"></p>
@@ -200,8 +236,6 @@
 <p class="centre" id="centre"></p>
 <p class="thought" id="thought"></p>
 
-<button type="button" class="mini left" id="tosky">◂ Back to the sky</button>
-<button type="button" class="mini right" id="enter">Walk into the film ▸</button>
 <div class="fdial" id="dial">
   <div class="scale" id="scale"><div class="needle" id="needle"></div></div>
   <p class="hint" id="hint">drag the dial · tune between the lives</p>
@@ -388,8 +422,8 @@
     buildScale(); layoutClip();
   }
   function unit() { return Math.max(W, H) * 0.56; }
-  function sx(wx) { return cam.ax * W + (wx - cam.x) * cam.z * unit(); }
-  function sy(wy) { return cam.ay * H + (wy - cam.y) * cam.z * unit(); }
+  var skyR = 0;   /* how far the sky has been turned */
+  function proj(wx, wy) { var k = cam.z * unit(), dx = (wx - cam.x) * k, dy = (wy - cam.y) * k, c = Math.cos(skyR), s = Math.sin(skyR); return [cam.ax * W + dx * c - dy * s, cam.ay * H + dx * s + dy * c]; }
   function moveTo(to, dur, fn, done) { move = { from: { x: cam.x, y: cam.y, z: cam.z, ax: cam.ax, ay: cam.ay }, to: to, t0: now(), dur: CALM ? 0.01 : dur, fn: fn || ease, done: done }; }
   function stepCam(t) {
     if (!move) return;
@@ -414,7 +448,7 @@
       ctx.globalAlpha = alpha * s.a * 0.55; ctx.fillRect(x, y, s.s, s.s);
     }
     /* a soft haze where the disc is thickest */
-    var hx = sx(0), hy = sy(0), hr = u * z * 0.75;
+    var hp = proj(0, 0), hx = hp[0], hy = hp[1], hr = u * z * 0.75, cr = Math.cos(skyR), sr = Math.sin(skyR), ddx, ddy;
     var hz = ctx.createRadialGradient(hx, hy, 0, hx, hy, hr);
     hz.addColorStop(0, 'rgba(70,92,170,.2)'); hz.addColorStop(0.5, 'rgba(40,54,120,.08)'); hz.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.globalAlpha = alpha; ctx.fillStyle = hz; ctx.fillRect(0, 0, W, H);
@@ -422,7 +456,7 @@
     var born = clamp((t - starsBorn) / 2.5, 0, 1), zs = Math.pow(z, 0.42);
     for (i = 0; i < stars.length; i++) {
       s = stars[i];
-      x = cam.ax * W + (s.x - cam.x) * z * u; y = cam.ay * H + (s.y - cam.y) * z * u;
+      ddx = (s.x - cam.x) * z * u; ddy = (s.y - cam.y) * z * u; x = cam.ax * W + ddx * cr - ddy * sr; y = cam.ay * H + ddx * sr + ddy * cr;
       if (x < -30 || x > W + 30 || y < -30 || y > H + 30) continue;
       var tw = 0.86 + 0.14 * Math.sin(t * s.sp + s.ph);
       var rad = (1.5 + s.m * s.m * 9.5) * zs;
@@ -430,7 +464,7 @@
       ctx.drawImage(SPR[s.tint], x - rad, y - rad, rad * 2, rad * 2);
     }
     /* the film's star, crimson, breathing slowly */
-    var fx = sx(filmStar.x), fy = sy(filmStar.y), breath = 0.5 + 0.5 * Math.sin(t * 0.9);
+    var fp = proj(filmStar.x, filmStar.y), fx = fp[0], fy = fp[1], breath = 0.5 + 0.5 * Math.sin(t * 0.9);
     var fr = (26 + 9 * breath) * Math.pow(z, 0.5) * (wide ? 1.2 : 1);
     ctx.globalAlpha = alpha * (0.78 + 0.22 * breath);
     ctx.drawImage(SPR_FILM, fx - fr, fy - fr, fr * 2, fr * 2);
@@ -575,7 +609,7 @@
     toSky(false);
   }
 
-  /* ── the sky, and the two ways in: walking into the film, and the radio. Each leads to the other and back. ── */
+  /* ── the sky, and its one way in: walking into the film. The radio lives inside the walk, at one moment. ── */
   var mode = 'boot', pendingPath = null, tuned = false, tuneT0 = -99, skyT0 = -99;
   function setMode(m) {
     if (m !== 'dial' && cur) leave();
@@ -583,27 +617,19 @@
     mode = m;
     stage.classList.toggle('walking', m === 'walk');
     stage.classList.toggle('tuning', m === 'dial');
+    stage.classList.toggle('insky', m === 'sky');
+    if (m !== 'sky') { explore(false); pts = {}; gest = null; }
     elFront.classList.toggle('on', m === 'sky');
     elDial.classList.toggle('on', m === 'dial');
   }
   function clearHash() { if (location.hash) history.replaceState(null, '', location.pathname + location.search); }
   function toSky(back) {
-    setMode('sky');
+    setMode('sky'); explore(false); touchT = now();
     if (back) { skyT0 = now(); cam = restCam(); cam.z *= 2.4; moveTo(restCam(), 2.4, easeOut); }
     else { skyT0 = now() - 9; cam = restCam(); move = null; }
     clearHash();
   }
-  /* to the radio: the sky gives way to static, and the needle finds the first life */
-  function toDial() {
-    if (mode === 'dial') return;
-    var from = mode;
-    setMode('dial');
-    tuneT0 = from === 'sky' ? now() : now() - 9;
-    move = null;
-    if (!tuned) { tuned = true; target = FIRST; primeClip(); }
-    clearHash();
-  }
-  /* into the film: from the sky, flying into the crimson star; from the radio, straight in */
+  /* into the film: flying into the crimson star */
   function enterFilm() {
     if (!film) { pendingPath = []; elNotice.hidden = false; readAll(); return; }
     if (mode === 'sky' && !CALM) {
@@ -658,7 +684,7 @@
 
   /* ── the dial ── */
   var elDial = $('dial'), elScale = $('scale'), elNeedle = $('needle');
-  var elStation = $('station'), elWho = $('who'), elDiary = $('diary'), elCentre = $('centre'), elThought = $('thought'), elEnter = $('enter');
+  var elStation = $('station'), elWho = $('who'), elDiary = $('diary'), elCentre = $('centre'), elThought = $('thought');
   var f = 0, target = 0, dragging = false, px = -1, py = -1;
   function needle() { return f; }
   function buildScale() {
@@ -669,8 +695,8 @@
   }
   function setFromX(x) { var r = elScale.getBoundingClientRect(); target = clamp((x - r.left) / r.width, 0, 1); }
   elDial.addEventListener('pointerdown', function (e) {
-    if (mode !== 'dial') return;
-    dragging = true;
+    if (!radioOn) return;
+    dragging = true; $('wcard').classList.remove('on');   /* the line steps aside once the dial is taken */
     try { elDial.setPointerCapture(e.pointerId); } catch (err) { /* no capture, no matter */ }
     setFromX(e.clientX); e.preventDefault();
   });
@@ -712,7 +738,7 @@
         if (beside) {
           var s = stage.getBoundingClientRect(), r = beside.getBoundingClientRect();
           if (above) e.style.bottom = (s.bottom - r.top + 10) + 'px'; else e.style.top = (r.bottom - s.top + 42) + 'px';
-        } else e.style.top = (above ? 13 + (i % 4) * 2 : 64 + (i % 4) * 2) + '%';
+        } else e.style.top = (above ? 23 + (i % 4) * 2 : 62 + (i % 4) * 2) + '%';   /* clear of the station's name above and the buttons below */
         stage.appendChild(e);
         requestAnimationFrame(function () { requestAnimationFrame(function () { e.style.opacity = 0.97; e.style.transform = 'translateY(-30px)'; }); });
         Sound.crackle();
@@ -751,7 +777,8 @@
       later(function () { elCentre.style.color = '#f2f4ff'; elCentre.style.textShadow = '0 0 22px rgba(170,190,255,.6),0 0 6px #000'; elCentre.textContent = L.text; elCentre.style.opacity = 1; Sound.say(L.voice, 0, { gain: 1 }); }, 5600);
     }
     if (L.kind === 'thought') { showThought(L.text, null); Sound.say(L.voice, 0.8, { close: true, gain: 0.9 }); }
-    if (L.kind === 'memory') startMemory({ src: 'video', dig: L.digits });
+    /* the last station carries straight on into the memory itself, the next moment of the walk */
+    if (L.kind === 'memory') later(function () { if (radioOn) radioCarry(); }, 1300);
   }
   function leave() {
     cur = null; clearTimers(); Sound.hush();
@@ -783,7 +810,6 @@
   function stopMemory() {
     if (!mem) return;
     mem = null; vid.classList.remove('on'); vid.pause(); clipSeek();
-    elEnter.classList.remove('lit');
   }
   function sampleFrame(el, b) {
     var oc = document.createElement('canvas'), sw = 200, sh = 112; oc.width = sw; oc.height = sh;
@@ -853,7 +879,6 @@
         clipSeek(); vid.muted = !Sound.isOn();
         var pl = vid.play(); if (pl && pl.catch) pl.catch(function () { vid.muted = true; var p2 = vid.play(); if (p2 && p2.catch) p2.catch(function () {}); });
         vid.classList.add('on');
-        if (mode === 'dial') elEnter.classList.add('lit');
       } else if (mem.onLand) mem.onLand();
     }
     if (mem.src !== 'video' && tb > 5.2) mem = null;
@@ -1019,6 +1044,7 @@
     raw.replace(/^[^:]*:\s*/, '').split(/;\s*(?=[1-8],\s)/).forEach(function (item) {
       var m = /^([1-8]),\s*([\s\S]*)$/.exec(item.trim()); if (!m) return;
       var t = m[2], pl = (/plate_[a-z_]+/.exec(t) || [])[0] || null;
+      if (/THE RADIO/.test(t)) { out[m[1]] = { img: null, fx: null, burst: null, radio: true }; return; }
       var burst = /burst/i.test(t) ? (/clip|\.mp4/i.test(t) ? 'video' : 'img') : null;
       var clip = burst ? null : (/\b([a-z0-9_]+\.mp4)\b/.exec(t) || [])[1] || null, take = /trial clip[^;]*?\(([a-z0-9_]+)/.exec(t);
       if (!clip && !burst && take && TAKES[take[1]]) clip = TAKES[take[1]];
@@ -1035,7 +1061,7 @@
       if (!p.img) p.img = last;
       if (p.img && p.burst !== 'video') last = p.img;
       var line = story(parent[String(d)]);
-      if (p.clip) { p.say = []; return; }   /* a clip carries its own picture and sound; only a voice timed against it is added */
+      if (p.clip || p.radio) { p.say = []; return; }   /* a clip carries its own picture and sound; only a voice timed against it is added */
       if (!p.fx && !p.burst && /eighty-one/i.test(line)) p.fx = 'pips';
       var low = line.toLowerCase().replace(/[‘’]/g, "'"), found = [];
       SPOKEN.forEach(function (s) { var at = low.indexOf(s[1]); if (at >= 0) found.push([at, s[0]]); });
@@ -1060,7 +1086,7 @@
   function clearBg() { $('bgA').classList.remove('on'); $('bgB').classList.remove('on'); }
   function wLater(fn, ms) { wTimers.push(setTimeout(fn, ms)); }
   function wclear() {
-    wTimers.forEach(clearTimeout); wTimers = []; Sound.hush(); if (mem) stopMemory();
+    wTimers.forEach(clearTimeout); wTimers = []; Sound.hush(); radioStop(); if (mem) stopMemory();
     clipTurn++; elClip.pause(); elClip.classList.remove('on'); stage.classList.remove('clipping');
   }
   /* a moment's clip, with its own sound, behind the paper sheet; the walk carries on when it has played */
@@ -1123,6 +1149,12 @@
     } else { /* a moment */
       wPlan = planOf(p);
       elBig.style.opacity = 0; elLine.textContent = line;
+      if (wPlan.radio) {
+        /* the radio, here and only here: the walk waits, the dial rises, and the viewer tunes through the kept lives */
+        clearBg(); radioStart();
+        wLater(function () { if (radioOn) elSheet.classList.add('on'); }, 500);
+        acts(ks); return;
+      }
       if (wPlan.clip) {
         setBg(wPlan.img); playClip(wPlan, line);
         elSheet.classList.remove('on'); wLater(function () { elSheet.classList.add('on'); }, 1200);
@@ -1152,7 +1184,7 @@
     big(first ? 'End of ' + first.charAt(0).toLowerCase() + first.slice(1) : 'The end, for now.', elBig.getAttribute('data-end'));
     elActs.textContent = '';
     btn('Walk again', function () { auto = true; goWalk([]); }, 'red');
-    btn('Tune the radio', toDial); btn('Back to the sky', function () { toSky(true); }, 'out');
+    btn('Back to the sky', function () { toSky(true); }, 'out');
   }
   function btn(label, fn, cls, digit) {
     var b = document.createElement('button'); b.type = 'button'; if (cls) b.className = cls;
@@ -1161,6 +1193,18 @@
     b.addEventListener('click', function (e) { e.stopPropagation(); fn(); });
     elActs.appendChild(b); return b;
   }
+  /* the radio inside the walk */
+  var radioOn = false;
+  function radioStart() {
+    radioOn = true; f = 0; target = 0; tuneT0 = now() - 9; nextGhost = performance.now() + 1500;
+    stage.classList.add('radio'); elDial.classList.add('on'); primeClip();
+  }
+  function radioStop() {
+    if (!radioOn) return;
+    radioOn = false; dragging = false; leave();
+    stage.classList.remove('radio'); elDial.classList.remove('on');
+  }
+  function radioCarry() { var q = nextPath(wpath); auto = true; if (q) goWalk(q); else endWalk(); }
   function carry() {
     auto = !auto;
     if (auto) { var q = nextPath(wpath); if (q) goWalk(q); else endWalk(); }
@@ -1168,13 +1212,13 @@
   }
   function acts(ks) {
     elActs.textContent = '';
-    btn(auto ? 'Pause' : 'Carry on ▸', carry, auto ? '' : 'red').id = 'carry';
+    if (radioOn) btn('Carry on ▸', radioCarry, 'red').id = 'carry';
+    else btn(auto ? 'Pause' : 'Carry on ▸', carry, auto ? '' : 'red').id = 'carry';
     ks.forEach(function (d) {
       var w = story(wNode[String(d)]).replace(/[‘’'"“”]/g, '').split(/[.:,]/)[0].split(/\s+/).slice(0, 4).join(' ');
       btn(w, function () { goWalk(wpath.concat([d])); }, '', String(d));
     });
     if (wpath.length) btn('Up', function () { goWalk(wpath.slice(0, -1)); }).id = 'up';
-    btn('Tune the radio', toDial).id = 'todial';
     btn('Back to the sky', function () { toSky(true); }, 'out').id = 'out';
   }
   function startWalk(p, flown) {
@@ -1252,6 +1296,131 @@
     if (mem) drawMemory(nowMs);
     if (veil > 0) { ctx.globalAlpha = veil; ctx.fillStyle = '#1a0510'; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1; veil = Math.max(0, veil - 0.02); }
   }
+
+  /* ── exploring the sky: drag to move and turn through it, pinch or wheel to zoom, tap a star for its card.
+        The card's opening line is read live, one small read for that block alone. ── */
+  var elStar = $('starcard'), elSName = $('sname'), elSLine = $('sline'), elSWalk = $('swalk');
+  var exploring = false, touchT = -99, pts = {}, gest = null, picked = null, LINES_READ = {}, ZMIN = 0.7, ZMAX = 14, lastSky = 0;
+  function unitNow() { return cam.z * unit(); }
+  function unproj(sxp, syp) {
+    var dx = sxp - cam.ax * W, dy = syp - cam.ay * H, c = Math.cos(-skyR), s = Math.sin(-skyR), k = unitNow();
+    return [cam.x + (dx * c - dy * s) / k, cam.y + (dx * s + dy * c) / k];
+  }
+  /* slide the sky by a move on the screen */
+  function pan(dx, dy) {
+    var c = Math.cos(-skyR), s = Math.sin(-skyR), k = unitNow();
+    cam.x = clamp(cam.x - (dx * c - dy * s) / k, -1.4, 1.4); cam.y = clamp(cam.y - (dx * s + dy * c) / k, -1.1, 1.1);
+  }
+  /* zoom, and turn, about a point on the screen, so what is under the finger stays under it */
+  function zoomAbout(sxp, syp, k, turn) {
+    var w = unproj(sxp, syp);
+    cam.z = clamp(cam.z * k, ZMIN, ZMAX); skyR += turn || 0;
+    var p = proj(w[0], w[1]); pan(sxp - p[0], syp - p[1]);
+  }
+  function explore(on) {
+    if (exploring === on) return;
+    exploring = on; stage.classList.toggle('exploring', on);
+    if (!on) closeStar();
+  }
+  function touchSky() { touchT = now(); move = null; }
+  function at(e) { var r = stage.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
+  function two() { var k = Object.keys(pts); return k.length >= 2 ? [pts[k[0]], pts[k[1]]] : null; }
+  canvas.addEventListener('pointerdown', function (e) {
+    if (mode !== 'sky') return;
+    var p = at(e); pts[e.pointerId] = p;
+    gest = { x: p[0], y: p[1], moved: 0, t: now(), dist: 0, ang: 0, turn: e.shiftKey || e.button === 2, many: Object.keys(pts).length > 1 };
+    try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* no capture, no matter */ }
+    touchSky(); stage.classList.add('dragging');
+  });
+  canvas.addEventListener('pointermove', function (e) {
+    if (mode !== 'sky' || !pts[e.pointerId] || !gest) return;
+    var p = at(e), was = pts[e.pointerId]; pts[e.pointerId] = p; touchSky();
+    var pair = two();
+    if (pair) {
+      var dist = Math.max(8, Math.sqrt(Math.pow(pair[0][0] - pair[1][0], 2) + Math.pow(pair[0][1] - pair[1][1], 2))), ang = Math.atan2(pair[1][1] - pair[0][1], pair[1][0] - pair[0][0]);
+      if (gest.dist) {
+        var turn = ang - gest.ang; if (turn > Math.PI) turn -= TAU; if (turn < -Math.PI) turn += TAU;
+        zoomAbout((pair[0][0] + pair[1][0]) / 2, (pair[0][1] + pair[1][1]) / 2, dist / gest.dist, turn);
+      }
+      gest.dist = dist; gest.ang = ang; gest.moved = 99; gest.many = true; explore(true);
+      return;
+    }
+    var dx = p[0] - was[0], dy = p[1] - was[1];
+    gest.moved += Math.abs(dx) + Math.abs(dy);
+    if (gest.moved > 8) {
+      explore(true);
+      if (gest.turn) zoomAbout(cam.ax * W, cam.ay * H, 1, dx * 0.006); else pan(dx, dy);
+    }
+  });
+  function lift(e) {
+    if (!pts[e.pointerId]) return;
+    var p = pts[e.pointerId]; delete pts[e.pointerId];
+    var left = Object.keys(pts).length;
+    if (gest && !left && !gest.many && gest.moved <= 8 && now() - gest.t < 0.7 && mode === 'sky' && e.type === 'pointerup') tapSky(p[0], p[1]);
+    if (!left) { gest = null; stage.classList.remove('dragging'); } else if (gest) gest.dist = 0;
+    touchSky();
+  }
+  canvas.addEventListener('pointerup', lift);
+  canvas.addEventListener('pointercancel', lift);
+  canvas.addEventListener('contextmenu', function (e) { if (mode === 'sky') e.preventDefault(); });
+  canvas.addEventListener('wheel', function (e) {
+    if (mode !== 'sky') return;
+    var k = Math.exp(-e.deltaY * 0.0014), nz = clamp(cam.z * k, ZMIN, ZMAX);
+    if (nz === cam.z) return;   /* at the edge of the zoom the wheel is the page's again, so the sheet below can be reached */
+    e.preventDefault();
+    var p = at(e); zoomAbout(p[0], p[1], nz / cam.z, 0); explore(true); touchSky();
+  }, { passive: false });
+
+  /* a tap: the nearest star under the finger, the film's own first */
+  function tapSky(x, y) {
+    var f = proj(filmStar.x, filmStar.y), best = null, bd = 26 * 26, i;
+    if (Math.pow(f[0] - x, 2) + Math.pow(f[1] - y, 2) < 36 * 36) best = { name: FILM, x: filmStar.x, y: filmStar.y };
+    else for (i = 0; i < stars.length; i++) {
+      var p = proj(stars[i].x, stars[i].y), d = Math.pow(p[0] - x, 2) + Math.pow(p[1] - y, 2);
+      if (d < bd) { bd = d; best = stars[i]; }
+    }
+    if (best) openStar(best); else closeStar();
+  }
+  function openStar(s) {
+    picked = { name: s.name, x: s.x, y: s.y };
+    explore(true);
+    elSName.textContent = s.name; elSWalk.hidden = s.name !== FILM; elStar.hidden = false; placeStar();
+    var name = s.name;
+    function show(text) { if (picked && picked.name === name) elSLine.textContent = text; }
+    if (LINES_READ[name] != null) { show(LINES_READ[name]); return; }
+    show('Reading…');
+    get(WIRE + '?block=' + encodeURIComponent(name) + '&spindle=0').then(function (j) {
+      var line = tidy(sealed(j) ? '' : lineOf(j)).replace(/\s+/g, ' ').trim();
+      if (sealed(j)) line = 'This block is sealed.';
+      else if (!line) line = 'Nothing is written at the top of this block.';
+      else if (line.length > 200) line = line.slice(0, 200).replace(/\s+\S*$/, '') + '…';
+      LINES_READ[name] = line; show(line);
+    }).catch(function () { show('Pscale could not be reached.'); });
+  }
+  function closeStar() { picked = null; elStar.hidden = true; }
+  function placeStar() {
+    if (!picked) return;
+    var p = proj(picked.x, picked.y), w = elStar.offsetWidth, h = elStar.offsetHeight;
+    if (p[0] < -20 || p[0] > W + 20 || p[1] < -20 || p[1] > H + 20) { closeStar(); return; }
+    var floor = H - (stage.querySelector('.front').offsetHeight || 0) - 30;
+    var top = p[1] + 22; if (top + h > floor) top = p[1] - 22 - h;
+    top = clamp(top, 56, Math.max(56, floor - h));   /* never under the corner, never over the ways in */
+    elStar.style.left = clamp(p[0] - w / 2, 10, Math.max(10, W - w - 10)) + 'px'; elStar.style.top = top + 'px';
+  }
+  /* the ring round the star whose card is open, the card kept beside it, and the gentle drift when the sky is left alone */
+  function tendSky(t) {
+    var dt = Math.min(0.1, Math.max(0, t - lastSky)); lastSky = t;
+    if (mode !== 'sky') return;
+    if (picked) {
+      placeStar();
+      if (picked) { var p = proj(picked.x, picked.y); ctx.strokeStyle = picked.name === FILM ? 'rgba(255,120,140,.9)' : 'rgba(232,201,138,.9)'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(p[0], p[1], 15 + 2 * Math.sin(t * 2), 0, TAU); ctx.stroke(); }
+    }
+    if (!CALM && !picked && !move && !Object.keys(pts).length && t - touchT > 3) skyR += dt * 0.006;
+  }
+  $('sclose').addEventListener('click', closeStar);
+  elSWalk.addEventListener('click', enterFilm);
+  $('totitle').addEventListener('click', function () { explore(false); moveTo(restCam(), 1.8, ease); });
+  $('below').addEventListener('click', function () { var u = document.querySelector('.under'); if (u && u.scrollIntoView) u.scrollIntoView({ behavior: CALM ? 'auto' : 'smooth', block: 'start' }); });
 
   /* ── sound: made here, with the voice files, and only after a tap ── */
   var Sound = (function () {
@@ -1398,9 +1567,16 @@
     sound: Sound.state, mode: function () { return mode; }, soundOn: Sound.isOn, voices: Sound.loaded, heard: Sound.heard,
     lives: function () { return LIVES.map(function (L) { return { f: L.f, band: L.band, who: L.who, kind: L.kind, date: L.date || '', text: L.text || '', over: L.over || [], thought: L.thought || '', digits: L.digits || '', voice: L.voice || '', overV: L.overV || [], thoughtV: L.thoughtV || '' }; }); },
     on: function () { return cur ? cur.band : ''; },
+    sky: function () {
+      var f = proj(filmStar.x, filmStar.y), out = [], i, j;
+      for (i = 0; i < stars.length && out.length < 400; i++) { var p = proj(stars[i].x, stars[i].y); if (p[0] > 30 && p[0] < W - 30 && p[1] > 70 && p[1] < H - 150) out.push({ name: stars[i].name, x: p[0], y: p[1] }); }
+      /* stars standing clear of their neighbours, for a tap that cannot be mistaken */
+      var clear = out.filter(function (a) { for (j = 0; j < out.length; j++) if (out[j] !== a && Math.pow(out[j].x - a.x, 2) + Math.pow(out[j].y - a.y, 2) < 60 * 60) return false; return Math.pow(f[0] - a.x, 2) + Math.pow(f[1] - a.y, 2) > 80 * 80; });
+      return { exploring: exploring, x: cam.x, y: cam.y, z: cam.z, r: skyR, picked: picked ? picked.name : '', film: f, clear: clear.slice(0, 40), seen: out.length };
+    },
     beach: function () { var nb = nearest(); return { stars: B3.length, stations: STN.map(function (s) { return s.name; }), blur: 1 - nb[1], cam: camT.slice() }; },
     memory: function () { return mem ? { t: (performance.now() - mem.t0) / 1000, src: mem.src, particles: mem.P ? mem.P.length : -1, real: !!mem.real, clip: vid.currentTime, paused: vid.paused } : null; },
-    walk: function () { return walking ? { path: wpath.join(''), address: cutAddress(wpath), auto: auto, ended: wEnded, kids: kidsOf(wNode), plate: (wPlan && wPlan.img) || '', fx: (wPlan && wPlan.fx) || '', burst: (wPlan && wPlan.burst) || '', say: (wPlan && wPlan.say) || [], clip: (wPlan && wPlan.clip) || '', pos: (wPlan && wPlan.pos) || 0, sayAt: (wPlan && wPlan.sayAt) || [], title: !!(wNode && kidsOf(wNode).length),
+    walk: function () { return walking ? { path: wpath.join(''), address: cutAddress(wpath), auto: auto, ended: wEnded, kids: kidsOf(wNode), plate: (wPlan && wPlan.img) || '', fx: (wPlan && wPlan.fx) || '', burst: (wPlan && wPlan.burst) || '', say: (wPlan && wPlan.say) || [], clip: (wPlan && wPlan.clip) || '', pos: (wPlan && wPlan.pos) || 0, sayAt: (wPlan && wPlan.sayAt) || [], title: !!(wNode && kidsOf(wNode).length), radio: radioOn,
       playing: { name: elClip.getAttribute('data-name') || '', on: elClip.classList.contains('on'), t: elClip.currentTime, paused: elClip.paused, muted: elClip.muted, w: elClip.videoWidth, fit: elClip.style.objectPosition } } : null; }
   };
   function soundLabel() { elSound.textContent = Sound.isOn() ? 'Sound off' : (Sound.state() === 'none' ? 'Tune in' : 'Sound on'); elSound.setAttribute('aria-pressed', String(Sound.isOn())); }
@@ -1424,10 +1600,9 @@
     stepCam(t);
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     if (mode === 'opening') drawOpening(t);
-    else if (mode === 'walk') drawWalk();
-    else if (mode === 'dial') { f += (target - f) * 0.18; drawDial(t); }
+    else if (mode === 'walk') { if (radioOn) { f += (target - f) * 0.18; drawDial(t); } else drawWalk(); }
     else {
-      drawSky(t, ease((t - skyT0) / 1.6));
+      drawSky(t, ease((t - skyT0) / 1.6)); tendSky(t);
       if (mode === 'fly' && move) { var k = easeIn((t - move.t0) / move.dur); ctx.globalAlpha = k * k; ctx.fillStyle = '#1a0510'; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1; }
       Sound.bed(0.012, 1100);
     }
@@ -1441,11 +1616,8 @@
   if (window.ResizeObserver) new ResizeObserver(resize).observe(stage);
 
   /* ── hands: buttons and keys ── */
-  $('walkin').hidden = false; $('tune').hidden = false;
+  $('walkin').hidden = false;
   $('walkin').addEventListener('click', enterFilm);
-  $('tune').addEventListener('click', toDial);
-  elEnter.addEventListener('click', enterFilm);
-  $('tosky').addEventListener('click', function () { toSky(true); });
   elSkip.addEventListener('click', endOpening);
   window.addEventListener('hashchange', function () {
     var p = hashPath();
@@ -1459,10 +1631,8 @@
       if (/^[1-8]$/.test(e.key)) { var p = wpath.concat([Number(e.key)]); if (!wEnded && cutAt(p) !== undefined) { e.preventDefault(); goWalk(p); } }
       else if (e.key === 'Backspace') { e.preventDefault(); if (wpath.length) goWalk(wpath.slice(0, -1)); }
       else if (e.key === 'Escape') { e.preventDefault(); toSky(true); }
-    } else if (mode === 'dial') {
-      /* the arrow keys tune */
-      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); target = clamp(target + (e.key === 'ArrowRight' ? 0.01 : -0.01), 0, 1); }
-      else if (e.key === 'Escape') { e.preventDefault(); toSky(true); }
+      /* at the radio the arrow keys tune */
+      else if (radioOn && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) { e.preventDefault(); $('wcard').classList.remove('on'); target = clamp(target + (e.key === 'ArrowRight' ? 0.01 : -0.01), 0, 1); }
     } else if (mode === 'opening' && e.key === 'Escape') endOpening();
   });
 
