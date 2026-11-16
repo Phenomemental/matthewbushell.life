@@ -524,10 +524,21 @@ class TheFilmPage(Base):
     def test_its_clip_is_carried_beside_it(self):
         self.run_with(blocks())
         h = self.read(self.FILE)
-        self.assertIn('src="%s/the-approach/clips/gate.mp4"' % ROOT, h)
-        self.assertIn('the-approach/clips/gate.mp4', self.run_.files())
-        src = os.path.join(fixture.REPO, 'the-approach', 'clips', 'gate.mp4')
-        self.assertEqual(os.path.getsize(os.path.join(self.run_.out, 'the-approach', 'clips', 'gate.mp4')), os.path.getsize(src))
+        self.assertIn('src="%s/the-approach/clips/she_is_home_scene.mp4"' % ROOT, h)
+        self.assertIn('the-approach/clips/she_is_home_scene.mp4', self.run_.files())
+        src = os.path.join(fixture.REPO, 'the-approach', 'clips', 'she_is_home_scene.mp4')
+        self.assertEqual(os.path.getsize(os.path.join(self.run_.out, 'the-approach', 'clips', 'she_is_home_scene.mp4')), os.path.getsize(src))
+
+    def test_its_places_and_voices_are_carried_and_the_old_clip_is_gone(self):
+        self.run_with(blocks())
+        files = self.run_.files()
+        self.assertEqual(len([f for f in files if re.fullmatch(r'the-approach/plates/plate_[a-z_]+\.jpg', f)]), 8)
+        self.assertEqual(len([f for f in files if re.fullmatch(r'the-approach/voices/[a-z0-9_]+\.mp3', f)]), 36)
+        self.assertIn('the-approach/voices/voices.js', files)
+        self.assertNotIn('the-approach/clips/gate.mp4', files)
+        h = self.read(self.FILE)
+        self.assertIn('data-plates="%s/the-approach/plates/"' % ROOT, h)
+        self.assertIn('data-voices="%s/the-approach/voices/"' % ROOT, h)
 
     def test_it_is_in_no_menu_and_no_sitemap(self):
         self.run_with(blocks())
