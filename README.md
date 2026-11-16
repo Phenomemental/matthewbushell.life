@@ -10,6 +10,9 @@ the beach too, at `spine:life-work` 8. It is not copied here.
 ## What's here
 
 - `templates/` — the pages, as slots that name addresses in `spine:life-work`. No site words.
+  `the-approach.html` is the one page outside the page map: the film's page, carried whole to
+  `/the-approach/` while the site is up, in no menu and no sitemap. It reads `film:the-approach` live in
+  the reader's browser; its plan is on the beach at `film:the-approach` 6.4.
 - `assets/` — the look (`site.css`), the page's own moves (`site.js`), the mark, and the reader
   tools copied from Phenomemental/happyseaurchin-beach: `beach.js`, `door.js` (MIT), `door.css`,
   and `tools.js`.
