@@ -617,15 +617,16 @@
 
   /* broadcasts and snippets, drifting at the edges while the title stands */
   var SLOTS_WIDE = [[5, 12, 0], [4, 56, 0], [6, 76, 0], [5, 16, 1], [4, 60, 1], [6, 80, 1]];
-  var SLOTS_TALL = [[5, 9, 0], [5, 77, 1], [5, 87, 0]];
+  var SLOTS_TALL = [[5, 9, 0, 'top'], [5, 78, 1, 'low'], [5, 80, 0, 'low']];   /* on a phone, one above the title and one below it */
   var slotBusy = {}, airCount = 0;
   function clearAir() { Array.prototype.forEach.call(elAir.children, function (e) { e.classList.remove('on'); }); }
   function freeSlot(low) {
     var slots = wide ? SLOTS_WIDE : SLOTS_TALL, open = [];
-    for (var i = 0; i < slots.length; i++) if (!slotBusy[(wide ? 'w' : 't') + i] && (!low || wide || slots[i][1] > 50)) open.push(i);
+    var key = function (j) { return (wide ? 'w' : 't') + (slots[j][3] || j); };
+    for (var i = 0; i < slots.length; i++) if (!slotBusy[key(i)] && (!low || wide || slots[i][1] > 50)) open.push(i);
     if (!open.length || Object.keys(slotBusy).length >= (wide ? 3 : 2)) return null;
     var i2 = open[Math.floor(Math.random() * open.length)];
-    return { key: (wide ? 'w' : 't') + i2, s: slots[i2] };
+    return { key: key(i2), s: slots[i2] };
   }
   function airNext() {
     if (!casts.length && !snips.length) return;
