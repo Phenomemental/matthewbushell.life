@@ -1297,7 +1297,7 @@
   /* ── exploring the sky: drag to move and turn through it, pinch or wheel to zoom, tap a star for its card.
         The card's opening line is read live, one small read for that block alone. ── */
   var elStar = $('starcard'), elSName = $('sname'), elSLine = $('sline'), elSWalk = $('swalk');
-  var exploring = false, touchT = -99, pts = {}, gest = null, picked = null, LINES_READ = {}, BIG = 40 * 1024, ZMIN = 0.7, ZMAX = 14, lastSky = 0;
+  var exploring = false, touchT = -99, pts = {}, gest = null, picked = null, LINES_READ = {}, BIG = 40000, ZMIN = 0.7, ZMAX = 14, lastSky = 0;
   function unitNow() { return cam.z * unit(); }
   function unproj(sxp, syp) {
     var dx = sxp - cam.ax * W, dy = syp - cam.ay * H, c = Math.cos(-skyR), s = Math.sin(-skyR), k = unitNow();
@@ -1397,7 +1397,7 @@
       LINES_READ[name] = line; show(line);
     }).catch(function () { show('Pscale could not be reached.'); });
   }
-  function kb(n) { var k = n / 1024; return (k < 10 ? k.toFixed(1) : String(Math.round(k))) + ' KB'; }
+  function kb(n) { var k = n / 1000;   /* as the index counts them */ return (k < 10 ? k.toFixed(1) : String(Math.round(k))) + ' KB'; }
   function closeStar() { picked = null; elStar.hidden = true; }
   function placeStar() {
     if (!picked) return;
