@@ -340,6 +340,7 @@
       return { name: name, x: p.x, y: p.y, m: m, tint: p.u < 0.2 ? 2 : p.u < 0.62 ? 0 : 1, ph: p.v * TAU, sp: 0.25 + p.u * 0.5 };
     }).filter(function (s) { return s.name && s.name !== FILM; });
     starsBorn = now();
+    beachStars();
   }
   (function () { var r = rnd(81); for (var i = 0; i < 520; i++) dust.push({ x: r() * 2 - 1, y: r() * 2 - 1, a: 0.1 + r() * 0.3, s: 0.4 + r() * 0.7 }); })();
 
@@ -635,6 +636,7 @@
     LIVES = [];
     for (var d = 1; d <= 9; d++) { var n = nodeAt([1, 6, d]); if (n != null && !sealed(n)) { var L = parseLife(lineOf(n)); if (L) LIVES.push(L); } }
     LIVES.forEach(function (L, i) { L.f = LIVES.length > 1 ? FIRST + i * (0.88 / (LIVES.length - 1)) : 0.5; });
+    stationStars();
     if (pendingPath) { var p = pendingPath; pendingPath = null; startWalk(p, false); }
   }
 
@@ -840,6 +842,72 @@
     if (mem.src !== 'video' && tb > 5.2) mem = null;
   }
 
+
+  /* ── the beach behind the dial: tuning is travel through the real Pscale sky, coming into and out of focus.
+        Every block is a star, from the live index; each station sits at a star, the last at the film's own. ── */
+  var B3 = [], STN = [], camT = [0, 0, 0], camSet = false;
+  function hh(str, k) { var x = 2166136261 ^ k; for (var i = 0; i < str.length; i++) { x ^= str.charCodeAt(i); x = Math.imul(x, 16777619); } x ^= x >>> 13; x = Math.imul(x, 0x5bd1e995); x ^= x >>> 15; return (x >>> 0) / 4294967295; }
+  function beachStars() {
+    var bytes = (index && index.bytes) || {}, names = ((index && index.blocks) || []).map(function (b) { return typeof b === 'string' ? b : (b && b.name) || ''; }).filter(Boolean);
+    if (names.length && names.indexOf(FILM) < 0) names.push(FILM);
+    B3 = names.map(function (name) {
+      var kind = name.split(':')[0], arm = ARMS.indexOf(kind), r, ang, y, size = Number(bytes[name]) || 300;
+      if (arm >= 0) { r = 0.15 + 0.85 * Math.pow(hh(name, 1), 0.7); ang = arm * TAU / 9 + r * 3.2 + (hh(name, 2) - 0.5) * 0.35; y = (hh(name, 3) - 0.5) * 0.05; }
+      else { ang = hh(name, 2) * TAU; r = 0.1 + 0.95 * Math.pow(hh(name, 1), 0.5); y = (hh(name, 3) - 0.5) * 0.25; }
+      return { name: name, p: [r * Math.cos(ang), y, r * Math.sin(ang)], br: 0.25 + 1.6 * Math.min(1, Math.max(0, Math.log(Math.max(size, 50)) / Math.LN10 - 1.6)) / 3.2 };
+    });
+    stationStars();
+  }
+  function stationStars() {
+    STN = [];
+    if (!B3.length) return;
+    var own = null; for (var j = 0; j < B3.length; j++) if (B3[j].name === FILM) own = B3[j];
+    STN = LIVES.map(function (L, i) { return (i === LIVES.length - 1 && own) || B3[Math.floor(hh('station' + i, 7) * B3.length) % B3.length]; });
+  }
+  function beachSprite(rgb) {
+    var c = document.createElement('canvas'); c.width = c.height = 64;
+    var g = c.getContext('2d'), gr = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    gr.addColorStop(0, 'rgba(' + rgb + ',1)'); gr.addColorStop(0.2, 'rgba(' + rgb + ',.5)'); gr.addColorStop(1, 'rgba(' + rgb + ',0)');
+    g.fillStyle = gr; g.fillRect(0, 0, 64, 64); return c;
+  }
+  var SP_B = beachSprite('200,218,255'), SP_R = beachSprite('255,90,105'), SP_G = beachSprite('255,214,150');
+  function beachTarget(fv) {
+    var n = STN.length, i;
+    if (fv <= LIVES[0].f) return STN[0].p;
+    if (fv >= LIVES[n - 1].f) return STN[n - 1].p;
+    for (i = 0; i < n - 1; i++) if (fv >= LIVES[i].f && fv <= LIVES[i + 1].f) {
+      var k = (fv - LIVES[i].f) / (LIVES[i + 1].f - LIVES[i].f), e = k * k * (3 - 2 * k), a = STN[i].p, b = STN[i + 1].p;
+      return [a[0] + (b[0] - a[0]) * e, a[1] + (b[1] - a[1]) * e, a[2] + (b[2] - a[2]) * e];
+    }
+    return STN[0].p;
+  }
+  function drawBeach(sig, nowMs, lockStar, fade) {
+    if (!B3.length || !STN.length || STN.length !== LIVES.length) return;
+    var tg = beachTarget(f), i;
+    if (!camSet) { camT = tg.slice(); camSet = true; }
+    for (i = 0; i < 3; i++) camT[i] += (tg[i] - camT[i]) * 0.12;
+    var yaw = f * 7 + nowMs * 0.00004, pitch = 0.42, dist = 0.55 - 0.25 * sig;
+    var eye = [camT[0] + dist * Math.cos(pitch) * Math.cos(yaw), camT[1] + dist * Math.sin(pitch), camT[2] + dist * Math.cos(pitch) * Math.sin(yaw)];
+    var fw = [camT[0] - eye[0], camT[1] - eye[1], camT[2] - eye[2]], n = Math.sqrt(fw[0] * fw[0] + fw[1] * fw[1] + fw[2] * fw[2]) || 1;
+    fw = [fw[0] / n, fw[1] / n, fw[2] / n];
+    var rt = [-fw[2], 0, fw[0]]; n = Math.sqrt(rt[0] * rt[0] + rt[2] * rt[2]) || 1; rt = [rt[0] / n, 0, rt[2] / n];
+    var up = [rt[1] * fw[2] - rt[2] * fw[1], rt[2] * fw[0] - rt[0] * fw[2], rt[0] * fw[1] - rt[1] * fw[0]];
+    var S = Math.min(W, H) * 0.9, cxp = W / 2, cyp = H * 0.42, blur = 1 - sig;   /* out of focus between stations, sharp on one */
+    ctx.globalCompositeOperation = 'lighter';
+    for (i = 0; i < B3.length; i++) {
+      var st = B3[i], d0 = st.p[0] - eye[0], d1 = st.p[1] - eye[1], d2 = st.p[2] - eye[2], z = d0 * fw[0] + d1 * fw[1] + d2 * fw[2];
+      if (z <= 0.02) continue;
+      var x = cxp + (d0 * rt[0] + d1 * rt[1] + d2 * rt[2]) * S / z, y = cyp - (d0 * up[0] + d1 * up[1] + d2 * up[2]) * S / z;
+      if (x < -60 || x > W + 60 || y < -60 || y > H + 60) continue;
+      var near = Math.min(5, 0.35 / z), r = (1.4 + st.br * 2.2) * (0.6 + near * 0.6), isL = st === lockStar;
+      var R = r * (1 + 7 * blur * blur) + (isL ? 14 * sig : 0), a = Math.min(1, (0.3 + st.br * 0.5) * (1 / (1 + 5 * blur * blur))) * fade;
+      var sp = isL ? (st.name === FILM ? SP_R : SP_G) : SP_B;
+      ctx.globalAlpha = a; ctx.drawImage(sp, x - R, y - R, R * 2, R * 2);
+      if (blur > 0.25) { ctx.globalAlpha = a * 0.35; ctx.drawImage(sp, x - R + blur * 9, y - R, R * 2, R * 2); }   /* a ghost image, like a lens not yet found */
+    }
+    ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+  }
+
   function drawDial(t) {
     var nowMs = performance.now(), nb = nearest(), L = nb[0], s = nb[1], g, i;
     /* lock and unlock */
@@ -854,10 +922,11 @@
       if (between || Math.random() < 0.3) Sound.ghost(between ? [0.04, 0.08, 0.16, 0.32][Math.floor(Math.random() * 4)] : 0.025);
       nextGhost = nowMs + (between ? 2200 + Math.random() * 4200 : 9000 + Math.random() * 8000);
     }
-    /* picture: the sky gives way to the dark between stations */
+    /* picture: the sky of the title gives way to the beach itself, out of focus until the needle finds a star */
     var k = ease((t - tuneT0) / 1.6);
     if (k < 1) drawSky(t, 1 - k);
     ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = k; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1;
+    drawBeach(s, nowMs, cur && s > 0.62 ? STN[LIVES.indexOf(cur)] : null, k);
     /* stations' worlds, faint behind */
     if (cur && cur.kind === 'archive') {
       var ka = Math.min(1, (nowMs - lockT) / 6000);
@@ -883,8 +952,8 @@
     if (cur && cur.kind === 'diary') { g = ctx.createRadialGradient(W / 2, H * 0.44, 0, W / 2, H * 0.44, Math.min(W, H) * 0.6); g.addColorStop(0, 'rgba(80,58,30,.35)'); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); }
     if (cur && cur.kind === 'thought') { g = ctx.createRadialGradient(W / 2, H * 0.44, 0, W / 2, H * 0.44, Math.min(W, H) * 0.7); g.addColorStop(0, 'rgba(20,30,70,.5)'); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); }
     if (mem) drawMemory(nowMs);
-    /* static, strongest between stations */
-    var grain = Math.floor((1 - s) * (real ? 0 : 1) * 2600 * k) + (cur ? 60 : 0);
+    /* only a light grain is left, strongest between stations */
+    var grain = Math.floor((1 - s) * (real ? 0 : 1) * 700 * k) + (cur ? 30 : 0);
     for (i = 0; i < grain; i++) {
       var v = Math.random();
       ctx.fillStyle = 'rgba(' + (200 + v * 55 | 0) + ',' + (200 + v * 55 | 0) + ',' + (210 + v * 45 | 0) + ',' + (0.08 + v * 0.25) + ')';
@@ -1261,6 +1330,7 @@
     sound: Sound.state, mode: function () { return mode; }, soundOn: Sound.isOn, voices: Sound.loaded, heard: Sound.heard,
     lives: function () { return LIVES.map(function (L) { return { f: L.f, band: L.band, who: L.who, kind: L.kind, date: L.date || '', text: L.text || '', over: L.over || [], thought: L.thought || '', digits: L.digits || '', voice: L.voice || '', overV: L.overV || [], thoughtV: L.thoughtV || '' }; }); },
     on: function () { return cur ? cur.band : ''; },
+    beach: function () { var nb = nearest(); return { stars: B3.length, stations: STN.map(function (s) { return s.name; }), blur: 1 - nb[1], cam: camT.slice() }; },
     memory: function () { return mem ? { t: (performance.now() - mem.t0) / 1000, src: mem.src, particles: mem.P ? mem.P.length : -1, real: !!mem.real, clip: vid.currentTime, paused: vid.paused } : null; },
     walk: function () { return walking ? { path: wpath.join(''), address: cutAddress(wpath), auto: auto, ended: wEnded, kids: kidsOf(wNode), plate: (wPlan && wPlan.img) || '', fx: (wPlan && wPlan.fx) || '', burst: (wPlan && wPlan.burst) || '', say: (wPlan && wPlan.say) || [] } : null; }
   };
