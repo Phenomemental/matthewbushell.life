@@ -1003,8 +1003,6 @@
   var elWalk = $('walk'), elTrail = $('wtrail'), elBig = $('wbig'), elSheet = $('wcard'), elLine = $('wline'), elActs = $('wacts');
   var PLATE_AT = stage.getAttribute('data-plates'), PLATES = {};
   var elClip = $('wclip'), CLIP_AT = stage.getAttribute('data-clips');
-  /* the trial takes are named in the decisions by their take, and kept in the clips folder under these names */
-  var TAKES = { ch1_long_take1_array: 'mara_station_trial.mp4', ch1_long_take5_mara: 'mara_question_trial.mp4' };
   var walking = false, wpath = [], auto = true, wTimers = [], wNode = null, wPlan = null, wT0 = 0, bgFlip = false, wEnded = false, veil = 0, wHeard = [];
   /* the lines that have a voice made for them, found by their opening words; a line with no voice is read in silence */
   var SPOKEN = [['w_clock', "it's a clock"], ['visitor', 'we kept our lives in this shape'], ['w_room', "it's not a message"], ['w_keep', 'say something you want to keep'],
@@ -1040,8 +1038,7 @@
       var t = m[2], pl = (/plate_[a-z_]+/.exec(t) || [])[0] || null;
       if (/THE RADIO/.test(t)) { out[m[1]] = { img: null, fx: null, burst: null, radio: true }; return; }
       var burst = /burst/i.test(t) ? (/clip|\.mp4/i.test(t) ? 'video' : 'img') : null;
-      var clip = burst ? null : (/\b([a-z0-9_]+\.mp4)\b/.exec(t) || [])[1] || null, take = /trial clip[^;]*?\(([a-z0-9_]+)/.exec(t);
-      if (!clip && !burst && take && TAKES[take[1]]) clip = TAKES[take[1]];
+      var clip = burst ? null : (/\b([a-z0-9_]+\.mp4)\b/.exec(t) || [])[1] || null;   /* every clip is named by its file in the decision */
       var across = /framed[^;)]*?(\d{1,3})% across/.exec(t), sayAt = [], re = /\((?:voice )?([a-z]+_[a-z0-9_]*)[^)]*\)\s*at\s*([\d.]+)\s*seconds/g, sm;
       while ((sm = re.exec(t))) sayAt.push([sm[1], Number(sm[2])]);
       if (clip) { out[m[1]] = { img: pl, fx: /crimson/i.test(t) ? 'crimsonlate' : null, burst: null, clip: clip, pos: across ? Math.min(100, Number(across[1])) : 50, sayAt: sayAt }; return; }
@@ -1294,7 +1291,7 @@
   /* ── exploring the sky: drag to move and turn through it, pinch or wheel to zoom, tap a star for its card.
         The card's opening line is read live, one small read for that block alone. ── */
   var elStar = $('starcard'), elSName = $('sname'), elSLine = $('sline'), elSWalk = $('swalk');
-  var exploring = false, touchT = -99, pts = {}, gest = null, picked = null, LINES_READ = {}, ZMIN = 0.7, ZMAX = 14, lastSky = 0;
+  var exploring = false, touchT = -99, pts = {}, gest = null, picked = null, LINES_READ = {}, BIG = 40 * 1024, ZMIN = 0.7, ZMAX = 14, lastSky = 0;
   function unitNow() { return cam.z * unit(); }
   function unproj(sxp, syp) {
     var dx = sxp - cam.ax * W, dy = syp - cam.ay * H, c = Math.cos(-skyR), s = Math.sin(-skyR), k = unitNow();
@@ -1382,6 +1379,9 @@
     var name = s.name;
     function show(text) { if (picked && picked.name === name) elSLine.textContent = text; }
     if (LINES_READ[name] != null) { show(LINES_READ[name]); return; }
+    /* a block the index lists as larger than 40 KB shows its name and size only, and is never downloaded */
+    var size = Number(((index && index.bytes) || {})[name]) || 0;
+    if (size > BIG) { LINES_READ[name] = kb(size); show(LINES_READ[name]); return; }
     show('Reading…');
     get(WIRE + '?block=' + encodeURIComponent(name) + '&spindle=0').then(function (j) {
       var line = tidy(sealed(j) ? '' : lineOf(j)).replace(/\s+/g, ' ').trim();
@@ -1391,6 +1391,7 @@
       LINES_READ[name] = line; show(line);
     }).catch(function () { show('Pscale could not be reached.'); });
   }
+  function kb(n) { var k = n / 1024; return (k < 10 ? k.toFixed(1) : String(Math.round(k))) + ' KB'; }
   function closeStar() { picked = null; elStar.hidden = true; }
   function placeStar() {
     if (!picked) return;
