@@ -59,6 +59,9 @@ ROOM = 'https://mirror.onen.ai/?pool=life-work'
 SITE = 'https://www.matthewbushell.life'
 
 ASSETS = ['site.css', 'site.js', 'mark.svg', 'mark-email.png', 'favicon.svg', 'beach.js', 'door.js', 'door.css', 'tools.js', 'living.js']
+# Pages that stand outside the page map: a template carried whole to its own folder while the site is up.
+# They are in no menu and no sitemap, and read their own words live in the reader's browser.
+STANDALONE = {'the-approach': '/the-approach/'}
 BASE64_RUN = re.compile(r'[A-Za-z0-9+/=_-]{32,}')
 HALF = 0.5
 
@@ -562,6 +565,47 @@ def set_aside(seven):
     return {'voices': sorted(set(voices)), 'slots': sorted(set(slots))}
 
 
+FOOT = re.compile(r'<footer class="foot">.*?</footer>', re.S)
+COUNT = re.compile(r'<!-- visit counting[^>]*-->\n<script\b[^>]*\bdata-goatcounter=[^>]*></script>')
+PIXEL = re.compile(r'<noscript><img\b[^>]*goatcounter[^>]*></noscript>')
+
+
+def standalone(slug, path, base, root, site, spine, aside, live, preview):
+    """A page outside the page map, such as the film's: its own template, with the site's footer, visit
+    counting and reader tools lifted from where every other page gets them, so they are never a second copy.
+    Returns the page, or raises fill.Missing with why it can't be made."""
+    tpl = read_template(slug + '.html')
+    if tpl is None:
+        raise fill.Missing('there is no template for it, templates/%s.html' % slug)
+    foot, count, pixel = FOOT.search(base), COUNT.search(base), PIXEL.search(base)
+    if not (foot and count and pixel):
+        raise fill.Missing('the footer or the visit counting could not be found in templates/_base.html')
+    six = spine.get('6') if isinstance(spine.get('6'), dict) and not fill.is_sealed(spine.get('6')) else {}
+    door = six.get('3')
+    if fill.is_sealed(door) or (isinstance(door, dict) and fill.is_sealed(door.get('1'))):
+        raise fill.Missing('sealed line at 6.3, the way in')
+    parts = {
+        'root': root, 'site': site, 'path': path,
+        'foot': foot.group(0).replace('{{root}}', root),
+        'count': count.group(0),
+        'pixel': pixel.group(0).replace('{{path}}', path),
+        'tools': tools_html(root, site, spine, aside),
+        'robots': '<meta name="robots" content="noindex">' if preview else '',
+        'door_head': fill.rich(text(door), root),
+        'door_sub': fill.rich(text(door.get('1')) if isinstance(door, dict) else '', root),
+    }
+    page_html = re.sub(r'\{\{([a-z_]+)\}\}', lambda m: parts.get(m.group(1), m.group(0)), tpl)
+    if '{{' in DROP.sub(' ', page_html):
+        raise fill.Missing('a slot in templates/%s.html was not filled' % slug)
+    page_html = version_assets(unlink(page_html, root, live), root)
+    if preview:
+        page_html = uncounted(page_html)
+    problems = checks(page_html)
+    if problems:
+        raise fill.Missing('; '.join(problems))
+    return page_html
+
+
 def generate(source, out, site=SITE, root='', pictures=None, record_path=None, preview=False):
     res = Result()
     root = root.rstrip('/')
@@ -807,6 +851,14 @@ def generate(source, out, site=SITE, root='', pictures=None, record_path=None, p
                 files['pictures/' + name] = ('copy', os.path.join(out, 'pictures', name))
             if src and os.path.exists(src) and os.path.getsize(src) > 600 * 1024:
                 res.notes.append('the picture %s is over 600 KB; compress it before it goes in' % name)
+        for slug, path in sorted(STANDALONE.items()):
+            name = path.strip('/') + '/index.html'
+            try:
+                files[name] = standalone(slug, path, base, root, site, spine, aside, live, preview)
+            except fill.Missing as e:
+                res.notes.append('%s is not carried, because %s' % (path, e))
+                if os.path.exists(os.path.join(out, name)):
+                    files[name] = ('copy', os.path.join(out, name))
         urls = ['%s%s' % (site, p.path) for p in pages if p.path in live]
         files['sitemap.xml'] = ('<?xml version="1.0" encoding="UTF-8"?>\n'
                                 '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +

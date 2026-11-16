@@ -497,5 +497,62 @@ class VisitCounting(Base):
             self.assertIn('without cookies', h)
 
 
+class TheFilmPage(Base):
+    """The Approach stands outside the page map: carried whole to its own folder while the site is up."""
+    FILE = 'the-approach/index.html'
+
+    def test_it_is_carried_with_the_sites_footer_counting_and_tools(self):
+        rep = self.run_with(blocks())
+        self.assertEqual(rep['published'], ALL)
+        h = self.read(self.FILE)
+        self.assertIsNotNone(h)
+        self.assertNotIn('{{', h)
+        self.assertIn(VisitCounting.SCRIPT, h)
+        self.assertIn('<noscript><img class="counted" src="https://matthewbushell.goatcounter.com/count?p=/the-approach/" alt=""></noscript>', h)
+        self.assertIn('<link rel="canonical" href="https://phenomemental.github.io/matthewbushell.life/the-approach/">', h)
+        foot = re.search(r'<footer class="foot">(.*?)</footer>', h, re.S).group(1)
+        self.assertEqual(foot, re.search(r'<footer class="foot">(.*?)</footer>', self.page('/work'), re.S).group(1))
+        self.assertTrue(foot.strip().endswith('<p class="made">Made by Matthew Bushell, Northampton</p>'))
+        self.assertIn('<div class="tools" data-share data-comment-at="5.526"></div>', h)
+        self.assertIn('data-tool="door"', h)
+        self.assertIn('<template id="tool-words"><p class="boxline">', h)
+        for name in ('site.css', 'door.css', 'site.js', 'beach.js', 'door.js', 'tools.js'):
+            self.assertRegex(h, r'="%s/assets/%s\?v=[0-9a-f]{8}"' % (ROOT, re.escape(name)))
+        for attr, url in re.findall(r'\b(href|src)="(/[^"]*)"', h):
+            self.assertTrue(url.startswith(ROOT + '/'), '%s="%s"' % (attr, url))
+
+    def test_it_is_in_no_menu_and_no_sitemap(self):
+        self.run_with(blocks())
+        self.assertNotIn('the-approach', self.read('sitemap.xml'))
+        for path in ALL:
+            self.assertNotIn('the-approach', self.page(path), path)
+
+    def test_it_holds_none_of_the_sites_words_but_the_door_lines(self):
+        data = blocks()
+        self.run_with(data)
+        h = self.read(self.FILE)
+        six = data['spine:life-work']['6']
+        allowed = {generate.text(six['2']), generate.text(six['3']), generate.text(six['3'].get('1')) if isinstance(six['3'], dict) else ''}
+        for line in words_in(data):
+            if line not in allowed:
+                self.assertNotIn(line, h)
+
+    def test_the_holding_page_stands_alone(self):
+        self.run_with(blocks(yes=[]))
+        self.assertIsNone(self.read(self.FILE))
+
+    def test_a_preview_of_it_is_not_counted(self):
+        self.run_with(blocks(), extra=['--preview'])
+        h = self.read(self.FILE)
+        self.assertNotIn('goatcounter.com/count', h)
+        self.assertIn('<meta name="robots" content="noindex">', h)
+
+    def test_the_same_run_twice_makes_the_same_bytes(self):
+        self.run_with(blocks())
+        first = self.read(self.FILE)
+        self.run_with(blocks())
+        self.assertEqual(first, self.read(self.FILE))
+
+
 if __name__ == '__main__':
     unittest.main()
