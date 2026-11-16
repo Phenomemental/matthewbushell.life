@@ -13,7 +13,7 @@
 <meta name="theme-color" content="#03050c">
 <link rel="icon" href="/assets/favicon.svg?v=94ae1879" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&amp;family=La+Belle+Aurore&amp;family=Homemade+Apple&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&amp;family=La+Belle+Aurore&amp;family=Caveat:wght@500;600&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/door.css?v=119cf2a6">
 <link rel="stylesheet" href="/assets/site.css?v=3ca2cf1c">
 <!-- visit counting: GoatCounter, no cookies; this exact copy of its script, or none -->
@@ -47,7 +47,6 @@
 .js .front.on{opacity:1;transform:none;pointer-events:auto}
 .front h1{margin:0;text-transform:uppercase;font-size:clamp(40px,8.6vw,104px);font-weight:500;letter-spacing:.2em;margin-right:-.2em;line-height:1.02;color:#f6f2ea;text-shadow:0 0 34px rgba(3,5,12,.95),0 0 80px rgba(194,29,78,.35)}
 .topline{margin:clamp(14px,2.4vh,22px) auto 0;max-width:19em;font-size:clamp(21px,2.5vw,29px);font-style:italic;line-height:1.3;color:rgba(244,241,234,.92);text-shadow:0 0 18px #000,0 0 40px #000;text-wrap:balance}
-.go{margin-top:clamp(22px,3.8vh,38px);min-height:54px;padding:0 34px;border:1px solid var(--ember);border-radius:28px;background:rgba(194,29,78,.2);font-size:22px;letter-spacing:.06em;color:#fff;box-shadow:0 0 40px rgba(194,29,78,.3);transition:background .4s ease}
 .go:hover{background:rgba(194,29,78,.5)}
 .nojs{margin:18px auto 0;max-width:24em;font-style:italic;color:rgba(238,242,255,.75)}
 
@@ -58,64 +57,26 @@
   border:1px solid rgba(238,242,255,.25);border-radius:26px;background:rgba(3,5,12,.82);font-size:19px;font-style:italic}
 .notice .quiet{color:var(--ember);text-decoration:underline;text-underline-offset:3px}
 
-/* the walk: phone first. The ring in the upper half, the paper sheet rising from the bottom. */
-.walk{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;box-sizing:border-box;
-  padding:calc(8px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left));opacity:0;transition:opacity .9s ease}
-.walk.on{opacity:1}
-.whead{flex:none;padding:6px 96px 0 6px;min-height:58px;box-sizing:border-box}
-.where{margin:0;font-size:15px;letter-spacing:.2em;text-transform:uppercase;color:rgba(238,242,255,.72)}
-.where b{font-weight:500;letter-spacing:.06em;color:var(--ember);margin-left:8px;font-size:18px}
-.trail{margin:2px 0 0;min-height:1.2em;font-size:25px;letter-spacing:.08em;color:#f6f2ea}
-.ring{position:relative;flex:1 1 46%;min-height:230px;transition:opacity .28s ease}
-.walk.turn .ring,.walk.turn .paper{opacity:0}
-.hub{position:absolute;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:600;color:#fff;text-shadow:0 0 6px #1a0510,0 0 14px #1a0510,0 1px 2px #000;pointer-events:none}
-.hub:not(:empty){background:radial-gradient(rgba(26,5,16,.6),rgba(26,5,16,.28) 55%,rgba(26,5,16,0) 72%)}
-.hub.scene{box-shadow:0 0 0 2px var(--crimson),0 0 26px rgba(194,29,78,.75)}
-.node{position:absolute;width:48px;height:48px;margin:-24px 0 0 -24px;padding:0;border-radius:50%;border:1px solid rgba(238,242,255,.6);background:rgba(8,12,28,.82);font-size:24px;line-height:1;color:#fff;transition:background .3s ease,border-color .3s ease}
-.node::after{content:'';position:absolute;left:-10px;right:-10px;top:-4px;bottom:-34px}
-.node:hover{background:rgba(60,76,130,.7);border-color:#fff}
-.node.scene{border:2px solid var(--crimson);box-shadow:0 0 16px rgba(194,29,78,.8)}
-.node .lab{position:absolute;top:calc(100% + 4px);left:50%;transform:translateX(-50%);width:92px;font-size:14px;line-height:1.08;letter-spacing:.01em;color:rgba(238,242,255,.92);text-shadow:0 0 8px #000,0 0 16px #000;
-  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;overflow-wrap:anywhere;pointer-events:none}
-.node .lab.tight{font-size:12px;letter-spacing:-.01em}
-.leafline{position:absolute;left:0;right:0;bottom:8px;margin:0;text-align:center;font-style:italic;font-size:18px;color:rgba(238,242,255,.7)}
-.paper{flex:1 1 34%;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;box-sizing:border-box;padding:16px 20px 20px;
-  background:linear-gradient(180deg,var(--page),var(--cream));color:var(--dark);border-radius:3px;box-shadow:0 -6px 40px rgba(0,0,0,.55),inset 0 0 0 1px rgba(133,122,106,.5),inset 0 0 0 5px var(--page),inset 0 0 0 6px rgba(133,122,106,.35);
-  user-select:text;-webkit-user-select:text;transition:opacity .28s ease}
-.paper .at{margin:0;font-size:15px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--crimson)}
-.paper h2{margin:4px 0 8px;font-size:29px;font-weight:500;line-height:1.12;color:var(--dark)}
-.paper .body{margin:0;font-size:20px;line-height:1.45;color:var(--dark);white-space:pre-line;overflow-wrap:break-word}
-.paper .body::first-letter{text-transform:uppercase}
-.wrow{flex:none;display:flex;gap:10px;justify-content:center;padding-top:10px}
-.step{flex:1 1 0;max-width:230px;min-height:50px;padding:0 12px;border:1px solid rgba(238,242,255,.42);border-radius:26px;background:rgba(8,12,28,.74);font-size:20px;letter-spacing:.03em;color:#fff}
-.step:hover{background:rgba(60,76,130,.7)}
-.step[disabled]{opacity:.38;cursor:default}
 
-/* desktop: the ring left of centre and larger, the paper a tall page on the right */
 @media (min-width:900px) and (min-height:560px){
   .cardline{top:26%}
   .front{top:34%}
   .corner{top:18px;right:22px}
-  .walk{display:grid;grid-template-columns:minmax(0,1fr) min(38vw,520px);grid-template-rows:auto minmax(0,1fr) auto;grid-template-areas:"head page" "ring page" "row page";column-gap:clamp(20px,4vw,70px);padding:26px clamp(28px,5vw,90px) 30px clamp(28px,4vw,70px)}
-  .whead{grid-area:head;padding:0;text-align:center}
-  .where{font-size:16px}.where b{font-size:20px}
-  .trail{font-size:32px}
-  .ring{grid-area:ring;min-height:0}
-  .node{width:58px;height:58px;margin:-29px 0 0 -29px;font-size:28px}
-  .node .lab,.node .lab.tight{width:150px;font-size:17px;letter-spacing:.01em;top:calc(100% + 6px)}
-  .hub{width:84px;height:84px;margin:-42px 0 0 -42px;font-size:38px}
-  .paper{grid-area:page;align-self:center;height:min(100%,780px);padding:clamp(28px,3.4vw,50px) clamp(26px,3vw,46px);box-shadow:0 20px 70px rgba(0,0,0,.6),inset 0 0 0 1px rgba(133,122,106,.5),inset 0 0 0 6px var(--page),inset 0 0 0 7px rgba(133,122,106,.35)}
-  .paper .at{font-size:17px}
-  .paper h2{font-size:38px;margin:8px 0 14px}
-  .paper .body{font-size:22px;line-height:1.5}
-  .wrow{grid-area:row;padding-top:6px}
 }
-@media (max-height:700px) and (max-width:899px){.front{top:30%}.ring{min-height:200px}.node .lab{font-size:13px}}
-@media (prefers-reduced-motion:reduce){.cardline,.front,.walk,.ring,.paper{transition:none}}
+@media (max-height:700px) and (max-width:899px){.front{top:26%}}
+@media (prefers-reduced-motion:reduce){.cardline,.front{transition:none}}
 
 /* the site's own sheet beneath the film: the reader tools and the footer, in the site's look */
 .under .sheet{max-width:860px}
 .under .tools{margin-top:0}
+
+.go{min-height:54px;padding:0 30px;border:1px solid var(--ember);border-radius:28px;background:rgba(194,29,78,.2);font-size:22px;letter-spacing:.06em;color:#fff;box-shadow:0 0 40px rgba(194,29,78,.3);transition:background .4s ease}
+
+/* two ways in, side by side */
+.ways{display:flex;flex-wrap:wrap;justify-content:center;gap:12px 14px;margin-top:clamp(22px,3.8vh,38px)}
+.ways .go{margin-top:0}
+.go.second{background:rgba(199,154,82,.16);border-color:#c79a52;box-shadow:0 0 40px rgba(199,154,82,.22)}
+.go.second:hover{background:rgba(199,154,82,.4)}
 
 /* the dial, in brass and amber, across the foot; its crimson needle is the viewer's own */
 .fdial{position:absolute;z-index:5;left:0;right:0;bottom:0;height:calc(118px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);box-sizing:border-box;
@@ -126,39 +87,80 @@
 .num{position:absolute;top:14px;transform:translateX(-50%);font-size:13px;color:rgba(232,201,138,.75);letter-spacing:.05em}
 .needle{position:absolute;top:-10px;width:2px;height:64px;background:#c8384a;box-shadow:0 0 10px #c8384a;transform:translateX(-1px)}
 .hint{position:absolute;left:0;right:0;bottom:calc(12px + env(safe-area-inset-bottom));margin:0;text-align:center;font-style:italic;font-size:15px;color:rgba(232,201,138,.7)}
+/* from the radio: on into the film, or back to the sky */
+.mini{position:absolute;z-index:6;bottom:calc(126px + env(safe-area-inset-bottom));min-height:44px;padding:0 16px;border:1px solid #c8384a;border-radius:999px;background:rgba(200,56,74,.22);font-size:17px;color:#fff;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity 1.2s ease,box-shadow 1.2s ease}
+.mini.left{left:12px;border-color:rgba(232,201,138,.5);background:rgba(10,10,14,.7)}
+.mini.right{right:12px}
+.film.tuning .mini{opacity:1;pointer-events:auto}
+.mini.lit{box-shadow:0 0 34px rgba(200,56,74,.85);background:rgba(200,56,74,.5)}
 
 /* a station coming in: its band and who it is, then its own way of arriving */
-.station{position:absolute;z-index:4;top:calc(60px + env(safe-area-inset-top));left:0;right:0;margin:0;text-align:center;font-size:14px;letter-spacing:.22em;color:#c79a52;text-transform:uppercase;opacity:0;transition:opacity .6s;pointer-events:none}
-.fwho{position:absolute;z-index:4;top:calc(82px + env(safe-area-inset-top));left:0;right:0;margin:0;padding:0 16px;text-align:center;font-style:italic;font-size:17px;color:#8e97aa;opacity:0;transition:opacity .6s;pointer-events:none}
-.diary{position:absolute;z-index:4;left:50%;top:44%;transform:translate(-50%,-50%);width:min(520px,86%);font-family:"Homemade Apple",cursive;font-weight:400;font-size:clamp(15px,3.6vw,19px);line-height:1.9;color:#f3e7cf;
-  text-shadow:0 0 12px rgba(255,214,150,.55),0 0 2px rgba(255,230,190,.9);opacity:0;transition:opacity .8s;pointer-events:none;white-space:pre-wrap}
-.diary .date{display:block;font-family:"Cormorant Garamond",serif;font-size:15px;letter-spacing:.16em;color:#e8c98a;margin-bottom:10px;text-shadow:none}
+.station{position:absolute;z-index:4;top:calc(16px + env(safe-area-inset-top));left:18px;right:130px;margin:0;font-size:14px;letter-spacing:.22em;color:#c79a52;text-transform:uppercase;opacity:0;transition:opacity .6s;pointer-events:none}
+.fwho{position:absolute;z-index:4;top:calc(38px + env(safe-area-inset-top));left:18px;right:130px;margin:0;font-style:italic;font-size:17px;line-height:1.2;color:#aab1c2;opacity:0;transition:opacity .6s;pointer-events:none}
+/* every word must read easily: a clear hand, warm near-white, on a dark panel, never on bare static */
+.diary{position:absolute;z-index:4;left:50%;top:42%;transform:translate(-50%,-50%);width:min(560px,90%);box-sizing:border-box;padding:22px 24px 24px;border-radius:14px;
+  background:radial-gradient(ellipse at center,rgba(28,18,8,.88),rgba(14,9,4,.72));box-shadow:0 0 60px rgba(0,0,0,.8);
+  font-family:"Caveat",cursive;font-weight:500;font-size:clamp(25px,6vw,31px);line-height:1.45;color:#fff6e4;text-shadow:0 0 8px rgba(255,214,150,.45),0 0 1px #fff;opacity:0;transition:opacity .8s;pointer-events:none;white-space:pre-wrap}
+.diary .date{display:block;font-family:"Cormorant Garamond",serif;font-size:17px;letter-spacing:.14em;color:#f4d79c;margin-bottom:10px;text-shadow:none}
 .diary .fhold{display:block;position:relative}
 .diary .ghost{visibility:hidden}
 .diary .live{position:absolute;left:0;top:0;right:0}
-.centre{position:absolute;z-index:4;left:50%;top:42%;transform:translate(-50%,-50%);width:min(620px,88%);margin:0;text-align:center;font-size:clamp(22px,5vw,34px);line-height:1.3;white-space:pre-line;opacity:0;transition:opacity 1s;pointer-events:none}
-.thought{position:absolute;z-index:4;left:50%;top:44%;transform:translate(-50%,-50%) scale(.6);width:min(640px,90%);margin:0;text-align:center;font-style:italic;font-size:clamp(24px,5.6vw,40px);line-height:1.25;color:#ece5d6;opacity:0;filter:blur(10px);pointer-events:none}
-.over{position:absolute;z-index:4;font-style:italic;font-size:clamp(17px,3.8vw,22px);line-height:1.3;color:#dfe6ff;text-shadow:0 0 10px rgba(160,190,255,.6);max-width:70%;opacity:0;transition:opacity 1.2s,transform 6s linear;pointer-events:none}
+.centre{position:absolute;z-index:4;left:50%;top:42%;transform:translate(-50%,-50%);width:min(620px,88%);margin:0;text-align:center;font-size:clamp(22px,5vw,34px);line-height:1.3;white-space:pre-line;text-shadow:0 0 8px #000;opacity:0;transition:opacity 1s;pointer-events:none}
+.thought{position:absolute;z-index:4;left:50%;top:44%;transform:translate(-50%,-50%) scale(.6);width:min(640px,90%);margin:0;text-align:center;font-style:italic;font-size:clamp(24px,5.6vw,40px);line-height:1.25;color:#f1ebdd;text-shadow:0 0 10px #000;opacity:0;filter:blur(10px);pointer-events:none}
+.over{position:absolute;z-index:4;font-style:italic;font-weight:500;font-size:clamp(19px,4.4vw,24px);line-height:1.25;color:#f2f5ff;text-shadow:0 0 6px rgba(0,0,0,.9),0 0 3px #000,0 0 14px rgba(160,190,255,.5);max-width:70%;opacity:0;transition:opacity 1.2s,transform 6s linear;pointer-events:none}
 
 /* the real scene. On a phone it is a band above the dial, wide enough to keep the face whole */
 .clip{position:absolute;z-index:1;left:0;top:13%;width:100%;height:57%;object-fit:cover;opacity:0;transition:opacity 1.4s ease;pointer-events:none;
   -webkit-mask-image:linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);mask-image:linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent)}
 .clip.on{opacity:1}
-.go.walkin{position:absolute;z-index:6;left:50%;bottom:calc(138px + env(safe-area-inset-bottom));transform:translateX(-50%);margin:0;white-space:nowrap;background:rgba(60,10,26,.72);opacity:0;pointer-events:none;transition:opacity 1.8s ease,background .4s ease}
-.go.walkin.on{opacity:1;pointer-events:auto}
-.film:not(.walking) .notice{bottom:calc(128px + env(safe-area-inset-bottom))}
+.film:not(.walking) .notice{bottom:calc(180px + env(safe-area-inset-bottom))}
+.film.walking .notice{bottom:auto;top:calc(58px + env(safe-area-inset-top))}
+
+/* the walk: a place behind each moment, the line on a paper sheet, and where to go next */
+.wbg{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.wbg .bg{position:absolute;inset:-4%;background-size:cover;background-position:center;opacity:0;transition:opacity 1.8s ease;animation:wkb 26s ease-in-out infinite alternate}
+.wbg .bg.on{opacity:1}
+@keyframes wkb{from{transform:scale(1.02)}to{transform:scale(1.12) translate(-1.5%,-1%)}}
+.wshade{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.45),rgba(0,0,0,0) 30%,rgba(0,0,0,.15) 55%,rgba(0,0,0,.78));opacity:0;transition:opacity 1s;pointer-events:none}
+.film.walking .wshade{opacity:1}
+.walk{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;box-sizing:border-box;
+  padding:0 calc(14px + env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left));pointer-events:none}
+.wtrail{position:absolute;top:calc(18px + env(safe-area-inset-top));left:18px;right:130px;margin:0;font-size:14px;letter-spacing:.2em;text-transform:uppercase;color:#e8c98a;text-shadow:0 0 8px #000,0 0 3px #000}
+.wtrail b{color:#ff8d9b;font-weight:600;letter-spacing:.08em;margin-left:.5em;font-size:17px}
+.wbig{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);width:min(640px,88%);margin:0;text-align:center;font-size:clamp(28px,6.4vw,44px);font-weight:500;line-height:1.22;color:#fff;text-shadow:0 0 18px rgba(0,0,0,.95),0 0 4px #000;opacity:0;transition:opacity 1.2s}
+.wbig small{display:block;font-size:.56em;font-style:italic;color:#f1eadb;margin-top:14px;line-height:1.38}
+.wcard{width:min(620px,100%);box-sizing:border-box;padding:16px 22px 16px;background:linear-gradient(180deg,#fbf7ee,#f2e9d8);color:#1d1a17;border-radius:4px;
+  box-shadow:0 10px 40px rgba(0,0,0,.6),inset 0 0 0 1px rgba(133,122,106,.5),inset 0 0 0 5px #fbf7ee,inset 0 0 0 6px rgba(133,122,106,.35);
+  font-size:clamp(20px,4.9vw,23px);line-height:1.38;opacity:0;transform:translateY(12px);transition:opacity .9s,transform .9s;user-select:text;-webkit-user-select:text}
+.wcard.on{opacity:1;transform:none;pointer-events:auto}
+.wcard p{margin:0}
+.wacts{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:12px;pointer-events:auto;max-width:680px}
+.wacts button{min-height:44px;padding:0 15px;border:1px solid rgba(232,201,138,.5);border-radius:999px;background:rgba(10,10,14,.74);font-size:17px;color:#fff;white-space:nowrap}
+.wacts button:hover{background:rgba(60,76,130,.7)}
+.wacts button.red{background:rgba(200,56,74,.4);border-color:#c8384a}
+.wacts button.out{border-color:rgba(238,242,255,.28);color:rgba(238,242,255,.86)}
+.wacts button .d{color:#e8c98a;margin-right:6px;font-weight:600}
+
 @media (min-width:900px) and (min-height:560px){
   .scale{left:14%;right:14%}
-  .station{top:20px}.fwho{top:44px}
+  .station{top:20px;left:0;right:0;text-align:center}
+  .fwho{top:44px;left:0;right:0;text-align:center}
   .clip{top:0;height:100%;-webkit-mask-image:none;mask-image:none}
+  .mini.left{left:24px}.mini.right{right:24px}
+  .wtrail{top:22px;left:0;right:0;text-align:center}
+  .walk{padding-bottom:26px}
+  .wcard{padding:22px 30px}
+  .wbig{top:36%}
 }
-@media (prefers-reduced-motion:reduce){.fdial,.diary,.centre,.over,.clip,.station,.fwho{transition:none}}
+@media (prefers-reduced-motion:reduce){.fdial,.diary,.centre,.over,.clip,.station,.fwho,.wbig,.wcard,.wbg .bg{transition:none}.wbg .bg{animation:none}}
 </style>
 </head>
 <body>
-<main class="film" id="film">
+<main class="film" id="film" data-plates="/the-approach/plates/" data-voices="/the-approach/voices/">
+<div class="wbg" id="wbg"><div class="bg" id="bgA"></div><div class="bg" id="bgB"></div></div>
+<div class="wshade"></div>
 <canvas id="sky" aria-hidden="true"></canvas>
-<video class="clip" id="clip" src="/the-approach/clips/gate.mp4" playsinline preload="metadata" aria-label="Tom at his radio"></video>
+<video class="clip" id="clip" src="/the-approach/clips/she_is_home_scene.mp4" playsinline preload="metadata" aria-label="Tom at his radio"></video>
 
 <div class="corner">
   <button type="button" class="quiet" id="sound" aria-pressed="false" hidden>Tune in</button>
@@ -175,8 +177,11 @@
 <div class="front" id="front">
   <h1>The Approach</h1>
   <p class="topline">We kept our lives in this shape. Keep one of us.</p>
-  <button type="button" class="go" id="tune" hidden>Tune in</button>
-  <noscript><p class="nojs">This page reads the film live from Pscale, and needs JavaScript to tune it.</p></noscript>
+  <div class="ways">
+    <button type="button" class="go" id="walkin" hidden>Walk into the film</button>
+    <button type="button" class="go second" id="tune" hidden>Tune the radio</button>
+  </div>
+  <noscript><p class="nojs">This page reads the film live from Pscale, and needs JavaScript to walk it.</p></noscript>
 </div>
 
 <p class="station" id="station" role="status"></p>
@@ -185,28 +190,18 @@
 <p class="centre" id="centre"></p>
 <p class="thought" id="thought"></p>
 
-<button type="button" class="go walkin" id="enter">Walk into the film</button>
-
+<button type="button" class="mini left" id="tosky">◂ Back to the sky</button>
+<button type="button" class="mini right" id="enter">Walk into the film ▸</button>
 <div class="fdial" id="dial">
   <div class="scale" id="scale"><div class="needle" id="needle"></div></div>
   <p class="hint" id="hint">drag the dial · tune between the lives</p>
 </div>
 
 <div class="walk" id="walk" hidden>
-  <div class="whead">
-    <p class="where">The Approach<b id="addr"></b></p>
-    <p class="trail" id="trail" aria-label="The way walked"></p>
-  </div>
-  <div class="ring" id="ring"></div>
-  <article class="paper" id="paper" tabindex="0" aria-live="polite">
-    <p class="at" id="at"></p>
-    <h2 id="phead"></h2>
-    <p class="body" id="pbody"></p>
-  </article>
-  <div class="wrow">
-    <button type="button" class="step" id="up">Up a level</button>
-    <button type="button" class="step" id="out">Back to the dial</button>
-  </div>
+  <p class="wtrail" id="wtrail"></p>
+  <p class="wbig" id="wbig" data-title="THE APPROACH" data-sub="Walk the film. Carry on, or choose where to go." data-end="To be continued."></p>
+  <article class="wcard" id="wcard" aria-live="polite"><p id="wline"></p></article>
+  <div class="wacts" id="wacts"></div>
 </div>
 
 <p class="notice" id="notice" role="status" hidden><span>Pscale could not be reached.</span> <button type="button" class="quiet" id="again">Try again</button></p>
@@ -261,7 +256,7 @@
   var stage = $('film'), canvas = $('sky'), ctx = canvas.getContext('2d', { willReadFrequently: true });
   if (!ctx) return;
   document.documentElement.classList.add('js');
-  var elCard = $('card'), elFront = $('front'), elWalk = $('walk'), elRing = $('ring');
+  var elCard = $('card'), elFront = $('front'), elWalk0 = null;
   var elSound = $('sound'), elSkip = $('skip'), elNotice = $('notice');
   var CARDS = Array.prototype.map.call(document.querySelectorAll('#cards li'), function (li) { return li.textContent; });
   var CALM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -326,26 +321,6 @@
     }
     return n;
   }
-  function address(path) { return path.length ? path[0] + (path.length > 1 ? '.' + path.slice(1).join('') : '') : ''; }
-  function parseHash() {
-    var h = decodeURIComponent((location.hash || '').slice(1));
-    if (h === '0') return [];
-    if (!/^[1-9](\.[1-9]{1,12})?$/.test(h)) return null;
-    return h.replace('.', '').split('').map(Number);
-  }
-  var DASH = /\s[—–-]\s/;
-  function headOf(line) {
-    var m = DASH.exec(line);
-    if (m && m.index > 0 && m.index <= 64) return { head: line.slice(0, m.index).trim(), tail: line.slice(m.index + m[0].length).trim() };
-    return { head: '', tail: line };
-  }
-  function labelOf(line) {
-    var h = headOf(line).head;
-    if (!h) { var w = line.split(/\s+/).slice(0, 4).join(' '); h = w.replace(/[,;:.]+$/, '') + (w.length < line.length ? '…' : ''); }
-    return h.length > 34 ? h.slice(0, 32).replace(/\s+\S*$/, '') + '…' : h;
-  }
-  function isScene(path) { return path.length === 2 && path[0] === 4; }
-
 
   /* ── the sky: every block a star, placed by a stable hash of its name ── */
   var stars = [], dust = [], filmStar = place(FILM);
@@ -399,7 +374,6 @@
     canvas.width = Math.round(W * DPR); canvas.height = Math.round(H * DPR);
     wide = W >= 900 && H >= 560;
     if (mode === 'sky' && !move) cam = restCam();
-    if (mode === 'walk') { layoutRing(); if (!move) cam = walkCam(); }
     buildScale(); layoutClip();
   }
   function unit() { return Math.max(W, H) * 0.56; }
@@ -587,45 +561,61 @@
     store.set(SEEN, '1');
     showCard(-1);
     elSkip.hidden = true;
-    toSky();
+    toSky(false);
   }
 
-  /* ── the universe, and the way to the dial ── */
-  var mode = 'boot', pendingPath = null, tuned = false, tuneT0 = -99;
+  /* ── the sky, and the two ways in: walking into the film, and the radio. Each leads to the other and back. ── */
+  var mode = 'boot', pendingPath = null, tuned = false, tuneT0 = -99, skyT0 = -99;
   function setMode(m) {
     if (m !== 'dial' && cur) leave();
+    if (m !== 'walk' && walking) leaveWalk();
     mode = m;
     stage.classList.toggle('walking', m === 'walk');
     stage.classList.toggle('tuning', m === 'dial');
     elFront.classList.toggle('on', m === 'sky');
-    elDial.classList.toggle('on', m === 'sky' || m === 'dial');
+    elDial.classList.toggle('on', m === 'dial');
   }
-  function toSky() {
+  function clearHash() { if (location.hash) history.replaceState(null, '', location.pathname + location.search); }
+  function toSky(back) {
     setMode('sky');
-    cam = restCam(); move = null;
+    if (back) { skyT0 = now(); cam = restCam(); cam.z *= 2.4; moveTo(restCam(), 2.4, easeOut); }
+    else { skyT0 = now() - 9; cam = restCam(); move = null; }
+    clearHash();
   }
-  /* into the dial: the title goes, the sky gives way to static, and the needle finds the first life */
+  /* to the radio: the sky gives way to static, and the needle finds the first life */
   function toDial() {
     if (mode === 'dial') return;
     var from = mode;
     setMode('dial');
     tuneT0 = from === 'sky' ? now() : now() - 9;
-    elWalk.classList.remove('on');
-    setTimeout(function () { if (mode !== 'walk') elWalk.hidden = true; }, 900);
+    move = null;
     if (!tuned) { tuned = true; target = FIRST; primeClip(); }
-    if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+    clearHash();
+  }
+  /* into the film: from the sky, flying into the crimson star; from the radio, straight in */
+  function enterFilm() {
+    if (!film) { pendingPath = []; elNotice.hidden = false; readAll(); return; }
+    if (mode === 'sky' && !CALM) {
+      setMode('fly'); Sound.bell(0);
+      moveTo({ x: filmStar.x, y: filmStar.y, z: 70, ax: 0.5, ay: 0.42 }, 2.6, easeIn, function () { startWalk([], true); });
+    } else startWalk([], false);
   }
 
-  /* ── the kept lives, read live from the story at 1.61 to 1.69 ── */
+  /* ── the kept lives, read live from the story at 1.61 to 1.69, each with its own voice ── */
   var LIVES = [], FIRST = 0.06, DIGITS = '2048313271';
+  var CAST = [
+    [/aoife/i, { voice: 'aoife_diary', overV: ['aoife_o1', 'aoife_o2'] }], [/ois[ií]n/i, { voice: 'oisin_diary', thoughtV: 'oisin_thought' }],
+    [/archive/i, { voice: 'archive' }], [/br[ií]d/i, { voice: 'brid_diary', overV: ['brid_o1'] }], [/visitor/i, { voice: 'visitor' }],
+    [/in[eè]s/i, { voice: 'ines_diary' }], [/ferry/i, { overV: ['ferry_1', 'ferry_2', 'ferry_3', 'ferry_4'] }], [/mara/i, { voice: 'mara_thought' }]
+  ];
+  function tidy(s) { return String(s).replace(/\s*\((?:AHEAD|BEHIND)\b[^)]*\)/g, ''); }
   function quoted(s) {
     var out = [], re = /"([^"]*)"|“([^”]*)”/g, m;
     while ((m = re.exec(s))) (m[1] || m[2] || '').split(/\s+\/\s+/).forEach(function (x) { if (x.trim()) out.push(x.trim()); });
     return out;
   }
   function parseLife(raw) {
-    var line = String(raw).replace(/\s*\((?:AHEAD|BEHIND)\b[^)]*\)/g, '');
-    var parts = line.split(/\s—\s/);
+    var line = tidy(raw), parts = line.split(/\s—\s/);
     if (parts.length < 3) return null;
     var rest = parts.slice(2).join(' — '), how = rest.split(/["“]/)[0].toLowerCase(), head = how.split(/[.:(]/)[0];
     var L = { band: parts[0].trim(), who: parts[1].trim() };
@@ -644,13 +634,14 @@
     else if (L.kind === 'memory') { L.digits = (/\b(\d{10})\b/.exec(line) || [])[1] || DIGITS; L.who = L.who.replace(/,\s*/, ' · '); }
     else L.text = all.join('\n');
     if (L.kind !== 'memory' && !L.text && !(L.over && L.over.length)) return null;
+    if (L.kind !== 'memory') for (var i = 0; i < CAST.length; i++) if (CAST[i][0].test(L.who)) { L.voice = CAST[i][1].voice; L.overV = CAST[i][1].overV; L.thoughtV = CAST[i][1].thoughtV; break; }
     return L;
   }
   function filmArrived() {
     LIVES = [];
     for (var d = 1; d <= 9; d++) { var n = nodeAt([1, 6, d]); if (n != null && !sealed(n)) { var L = parseLife(lineOf(n)); if (L) LIVES.push(L); } }
     LIVES.forEach(function (L, i) { L.f = LIVES.length > 1 ? FIRST + i * (0.88 / (LIVES.length - 1)) : 0.5; });
-    if (pendingPath) { var p = pendingPath; pendingPath = null; openWalk(p, true); }
+    if (pendingPath) { var p = pendingPath; pendingPath = null; startWalk(p, false); }
   }
 
   /* ── the dial ── */
@@ -665,8 +656,7 @@
   }
   function setFromX(x) { var r = elScale.getBoundingClientRect(); target = clamp((x - r.left) / r.width, 0, 1); }
   elDial.addEventListener('pointerdown', function (e) {
-    if (mode !== 'sky' && mode !== 'dial') return;
-    if (mode === 'sky') toDial();
+    if (mode !== 'dial') return;
     dragging = true;
     try { elDial.setPointerCapture(e.pointerId); } catch (err) { /* no capture, no matter */ }
     setFromX(e.clientX); e.preventDefault();
@@ -679,7 +669,7 @@
   stage.addEventListener('pointerdown', point);
 
   /* the station you are on */
-  var cur = null, lockT = 0, timers = [];
+  var cur = null, lockT = 0, timers = [], nextGhost = 0;
   function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
   function clearTimers() { timers.forEach(clearTimeout); timers = []; }
   function strengthOf(L) { return Math.max(0, 1 - Math.abs(f - L.f) / 0.045); }
@@ -698,23 +688,20 @@
     var step = function () { if (cur !== mine) return; span.textContent = text.slice(0, ++i); if (i < text.length) later(step, text[i - 1] === '\n' ? 600 : speed + Math.random() * 40); };
     step();
   }
-  function overheard(lines, start, beside) {
+  /* overheard lines keep to a band above the page and a band below it, so they never cross it */
+  function overheard(lines, start, beside, ids) {
     lines.forEach(function (l, i) {
       later(function () {
+        if (ids && ids[i]) Sound.say(ids[i], 0, { pan: i % 2 ? 0.45 : -0.45 });
         var e = document.createElement('div'); e.className = 'over'; e.textContent = l;
-        var left = i % 2 === 0, drift = -30;
-        e.style.left = left ? '7%' : 'auto'; e.style.right = left ? 'auto' : '7%'; e.style.textAlign = left ? 'left' : 'right';
-        if (beside && wide) {
-          /* a wide screen: out at the sides, clear of the page being written */
-          e.style.top = (18 + ((i * 17) % 46)) + '%';
-          e.style.maxWidth = Math.max(180, (W - beside.offsetWidth) / 2 - W * 0.07 - 28) + 'px';
-        } else if (beside) {
-          /* a phone: above the page, then below it */
+        var above = i % 2 === 0;
+        e.style.left = above ? '7%' : 'auto'; e.style.right = above ? 'auto' : '7%'; e.style.textAlign = above ? 'left' : 'right';
+        if (beside) {
           var s = stage.getBoundingClientRect(), r = beside.getBoundingClientRect();
-          if (left) e.style.bottom = (s.bottom - r.top + 12) + 'px'; else e.style.top = (r.bottom - s.top + 44) + 'px';
-        } else e.style.top = (18 + ((i * 17) % 46)) + '%';
+          if (above) e.style.bottom = (s.bottom - r.top + 10) + 'px'; else e.style.top = (r.bottom - s.top + 42) + 'px';
+        } else e.style.top = (above ? 13 + (i % 4) * 2 : 64 + (i % 4) * 2) + '%';
         stage.appendChild(e);
-        requestAnimationFrame(function () { requestAnimationFrame(function () { e.style.opacity = 0.95; e.style.transform = 'translateY(' + drift + 'px)'; }); });
+        requestAnimationFrame(function () { requestAnimationFrame(function () { e.style.opacity = 0.97; e.style.transform = 'translateY(-30px)'; }); });
         Sound.crackle();
         later(function () { e.style.opacity = 0; setTimeout(function () { e.remove(); }, 1300); }, 4200);
       }, start + i * 2600);
@@ -735,37 +722,38 @@
     elStation.textContent = L.band; elWho.textContent = L.who; elStation.style.opacity = 1; elWho.style.opacity = 1;
     if (L.kind === 'diary') {
       elDiary.style.opacity = 1; typeInto(elDiary, L.text, L.date);
-      if (L.over && L.over.length) overheard(L.over, 4500, elDiary);
-      if (L.thought) later(function () { showThought(L.thought, elDiary); }, L.text.length * 60 + 1800);
+      Sound.say(L.voice, 0.9);
+      if (L.over && L.over.length) overheard(L.over, Math.max(4500, L.text.length * 58), elDiary, L.overV);
+      if (L.thought) later(function () { showThought(L.thought, elDiary); Sound.say(L.thoughtV, 0.6, { close: true, gain: 0.9 }); }, L.text.length * 60 + 1800);
     }
-    if (L.kind === 'overheard') overheard(L.over, 300, null);
+    if (L.kind === 'overheard') overheard(L.over, 300, null, L.overV);
     if (L.kind === 'archive' || L.kind === 'centre') {
-      elCentre.style.color = '#ffe3a8'; elCentre.style.textShadow = '0 0 18px rgba(255,200,110,.6)'; elCentre.textContent = L.text; elCentre.style.opacity = 1;
+      elCentre.style.color = '#ffe3a8'; elCentre.style.textShadow = '0 0 18px rgba(255,200,110,.6),0 0 6px #000'; elCentre.textContent = L.text; elCentre.style.opacity = 1;
+      Sound.say(L.voice, 0.8);
     }
     if (L.kind === 'visitor') {
       Sound.pip(660, 0.2, 0.15); var i;
       for (i = 0; i < 9; i++) Sound.pip(990, 1.2 + i * 0.12, 0.09);
       for (i = 0; i < 81; i++) Sound.pip(1320, 2.6 + i * 0.03, 0.05, 0.05);
-      later(function () { elCentre.style.color = '#f2f4ff'; elCentre.style.textShadow = '0 0 22px rgba(170,190,255,.6)'; elCentre.textContent = L.text; elCentre.style.opacity = 1; }, 5600);
+      later(function () { elCentre.style.color = '#f2f4ff'; elCentre.style.textShadow = '0 0 22px rgba(170,190,255,.6),0 0 6px #000'; elCentre.textContent = L.text; elCentre.style.opacity = 1; Sound.say(L.voice, 0, { gain: 1 }); }, 5600);
     }
-    if (L.kind === 'thought') showThought(L.text, null);
-    if (L.kind === 'memory') startMemory(L);
+    if (L.kind === 'thought') { showThought(L.text, null); Sound.say(L.voice, 0.8, { close: true, gain: 0.9 }); }
+    if (L.kind === 'memory') startMemory({ src: 'video', dig: L.digits });
   }
   function leave() {
-    cur = null; clearTimers();
+    cur = null; clearTimers(); Sound.hush();
     [elStation, elWho, elDiary, elCentre].forEach(function (e) { e.style.opacity = 0; });
     stage.querySelectorAll('.over').forEach(function (e) { e.style.opacity = 0; setTimeout(function () { e.remove(); }, 1300); });
     elThought.style.transition = 'opacity .6s'; elThought.style.opacity = 0;
     stopMemory();
   }
 
-  /* ── the memory: it leaves the book as light, then the real scene plays ── */
-  var vid = $('clip'), CLIP_AT = 9.6, mem = null, clipReady = false;
-  function clipSeek() { try { if (Math.abs(vid.currentTime - CLIP_AT) > 0.05) vid.currentTime = CLIP_AT; } catch (e) { /* not yet loaded */ } }
-  vid.addEventListener('loadedmetadata', clipSeek);
-  vid.addEventListener('seeked', function () { clipReady = true; });
+  /* ── the memory: it leaves the book as light, then the real scene plays (or, in the walk, a place stands) ── */
+  var vid = $('clip'), mem = null;
+  function clipSeek() { try { if (vid.currentTime > 0.05) vid.currentTime = 0; } catch (e) { /* not yet loaded */ } }
   function primeClip() {
-    /* asked for at the first touch of the dial, so the scene is waiting when the memory comes */
+    /* asked for at the first touch of the radio or the walk, so the scene is waiting when the memory comes */
+    if (vid.preload === 'auto') return;
     vid.preload = 'auto'; vid.muted = true;
     var p = vid.play();
     if (p && p.then) p.then(function () { if (!(mem && mem.real)) { vid.pause(); clipSeek(); } }).catch(function () {});
@@ -775,18 +763,21 @@
     return { x: r.left - s.left, y: r.top - s.top, w: r.width, h: r.height, ox: wide ? 0.6 : 0.58, oy: wide ? 0.35 : 0.3 };
   }
   function layoutClip() { var b = clipBox(); vid.style.objectPosition = (b.ox * 100) + '% ' + (b.oy * 100) + '%'; }
-  function startMemory(L) { mem = { t0: performance.now(), P: null, dig: L.digits || DIGITS }; clipSeek(); }
+  function startMemory(o) {
+    mem = { t0: performance.now() - (o.digits === false ? 3600 : 0), P: null, src: o.src || 'video', el: o.el || vid, dig: o.dig || DIGITS, onLand: o.onLand };
+    if (mem.src === 'video') clipSeek();
+  }
   function stopMemory() {
     if (!mem) return;
     mem = null; vid.classList.remove('on'); vid.pause(); clipSeek();
-    elEnter.classList.remove('on');
+    elEnter.classList.remove('lit');
   }
-  function sampleFrame() {
+  function sampleFrame(el, b) {
     var oc = document.createElement('canvas'), sw = 200, sh = 112; oc.width = sw; oc.height = sh;
     var o = oc.getContext('2d'), d;
-    try { o.drawImage(vid, 0, 0, sw, sh); d = o.getImageData(0, 0, sw, sh).data; } catch (e) { return null; }
-    /* fitted to where the scene will stand, as the clip itself is */
-    var b = clipBox(), sc = Math.max(b.w / sw, b.h / sh), ox = b.x + (b.w - sw * sc) * b.ox, oy = b.y + (b.h - sh * sc) * b.oy, pts = [];
+    try { o.drawImage(el, 0, 0, sw, sh); d = o.getImageData(0, 0, sw, sh).data; } catch (e) { return null; }
+    /* fitted to where the scene will stand, as the clip or the place itself is */
+    var sc = Math.max(b.w / sw, b.h / sh), ox = b.x + (b.w - sw * sc) * b.ox, oy = b.y + (b.h - sh * sc) * b.oy, pts = [];
     for (var y = 0; y < sh; y++) for (var x = 0; x < sw; x++) {
       var i = (y * sw + x) * 4, r = d[i], g = d[i + 1], bl = d[i + 2], lum = (r * 0.3 + g * 0.59 + bl * 0.11) / 255;
       if (Math.random() > 0.3 + 0.7 * Math.min(1, lum * 2.4)) continue;
@@ -822,13 +813,14 @@
       k = t - 3.6; var rr = 20 + 120 * k * k;
       g = ctx.createRadialGradient(x0, y0, 0, x0, y0, rr); g.addColorStop(0, 'rgba(255,240,235,1)'); g.addColorStop(0.25, 'rgba(255,80,95,.9)'); g.addColorStop(1, 'rgba(255,80,95,0)');
       ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x0, y0, rr, 0, 7); ctx.fill(); ctx.globalCompositeOperation = 'source-over';
-      if (!mem.P) mem.P = sampleFrame() || [];
+      if (!mem.P) mem.P = sampleFrame(mem.el, mem.src === 'video' ? clipBox() : { x: 0, y: 0, w: W, h: H, ox: 0.5, oy: 0.5 }) || [];
       if (!mem.boom) { mem.boom = 1; Sound.boom(); }
       return;
     }
     /* the burst and the gathering */
     var P = mem.P || [], tb = t - 4.6, WW = canvas.width, HH = canvas.height, img = ctx.getImageData(0, 0, WW, HH), D = img.data;
     var leanX = px >= 0 ? px : x0, leanY = py >= 0 ? py : y0;
+    var al = mem.src === 'video' ? 0.9 : 0.9 * Math.max(0, 1 - Math.max(0, tb - 3.4) / 1.6);
     for (i = 0; i < P.length; i++) {
       var p = P[i], spray = (1 - Math.exp(-tb * 1.8)) / 1.8 * 260, ox = x0 + p.vx * spray, oy = y0 + p.vy * spray;
       var ga = Math.min(1, Math.max(0, (tb - 0.5 - p.dl * 0.6) / 2.6)); ga = ga * ga * (3 - 2 * ga);
@@ -838,16 +830,20 @@
       var X = ((ox + (p.tx - ox) * ga) * DPR) | 0, Y = ((oy + (p.ty - oy) * ga) * DPR) | 0;
       if (X < 0 || Y < 0 || X >= WW - 1 || Y >= HH - 1) continue;
       var cr = 255 * (1 - ga) + p.r * ga * 1.3, cg = 205 * (1 - ga) + p.g * ga * 1.3, cb = 150 * (1 - ga) + p.b * ga * 1.3;
-      for (k = 0; k < 4; k++) { var q = ((Y + SPLAT[k][1]) * WW + X + SPLAT[k][0]) * 4, w = 0.9 * SPLAT[k][2]; D[q] += cr * w; D[q + 1] += cg * w; D[q + 2] += cb * w; D[q + 3] = 255; }
+      for (k = 0; k < 4; k++) { var q = ((Y + SPLAT[k][1]) * WW + X + SPLAT[k][0]) * 4, w = al * SPLAT[k][2]; D[q] += cr * w; D[q + 1] += cg * w; D[q + 2] += cb * w; D[q + 3] = 255; }
     }
     ctx.putImageData(img, 0, 0);
     if (tb > 2.4 && !mem.bells) { mem.bells = 1; for (i = 0; i < 18; i++) Sound.pip(1200 * Math.pow(2, Math.floor(Math.random() * 12) / 12), Math.random() * 2.6, 0.04, 1.2); }
     if (tb > 3.6 && !mem.real) {
-      mem.real = 1; clipSeek(); vid.muted = !Sound.isOn();
-      var pl = vid.play(); if (pl && pl.catch) pl.catch(function () { vid.muted = true; var p2 = vid.play(); if (p2 && p2.catch) p2.catch(function () {}); });
-      vid.classList.add('on');
-      var mine = mem; setTimeout(function () { if (mem === mine) elEnter.classList.add('on'); }, 2200);
+      mem.real = 1;
+      if (mem.src === 'video') {
+        clipSeek(); vid.muted = !Sound.isOn();
+        var pl = vid.play(); if (pl && pl.catch) pl.catch(function () { vid.muted = true; var p2 = vid.play(); if (p2 && p2.catch) p2.catch(function () {}); });
+        vid.classList.add('on');
+        if (mode === 'dial') elEnter.classList.add('lit');
+      } else if (mem.onLand) mem.onLand();
     }
+    if (mem.src !== 'video' && tb > 5.2) mem = null;
   }
 
   function drawDial(t) {
@@ -856,6 +852,14 @@
     if (L && s > 0.62) { if (cur !== L) { leave(); enter(L); } } else if (cur && (!L || s < 0.45)) leave();
     var real = mem && mem.real;
     Sound.mix(0.02 + 0.22 * (1 - (cur ? Math.min(1, s * 1.3) : s)) * (real ? 0 : 1), s > 0.15 && s < 0.6 ? 0.025 : 0, 500 + (1 - s) * 1500, cur && cur.kind === 'archive' ? 0.035 : 0);
+    /* station voices pass through one filter tied to the needle: muffled and faint as it nears, clear as it locks */
+    Sound.station(Math.pow(Math.min(1, s * 1.2), 1.5), 500 + Math.pow(s, 2) * 5500);
+    /* ghost voices in the static: sometimes barely there, sometimes clear, and very rarely under a station */
+    if (nowMs > nextGhost) {
+      var between = !cur || s < 0.6;
+      if (between || Math.random() < 0.3) Sound.ghost(between ? [0.04, 0.08, 0.16, 0.32][Math.floor(Math.random() * 4)] : 0.025);
+      nextGhost = nowMs + (between ? 2200 + Math.random() * 4200 : 9000 + Math.random() * 8000);
+    }
     /* picture: the sky gives way to the dark between stations */
     var k = ease((t - tuneT0) / 1.6);
     if (k < 1) drawSky(t, 1 - k);
@@ -895,105 +899,236 @@
     if (s < 0.6) { ctx.fillStyle = 'rgba(255,255,255,' + ((1 - s) * 0.03 * k) + ')'; for (var ly = (nowMs / 7) % 6; ly < H; ly += 6) ctx.fillRect(0, ly, W, 1); }
   }
 
-  /* ── the walk ── */
-  var path = [], ringBox = { cx: 0, cy: 0, rx: 0, ry: 0 }, hubEl = null;
-  function walkCam() { return { x: filmStar.x, y: filmStar.y, z: 2.6, ax: ringBox.cx / W, ay: ringBox.cy / H }; }
-  function enterFilm() {
-    if (!film) { pendingPath = []; elNotice.hidden = false; readAll(); return; }
-    Sound.bell(0);
-    openWalk([], false);
+  /* ── the walk: THE WALKED CUT at 7.2 and nothing else. Positions 1 to 8 are the story; a position's 9 holds
+        its making decisions, which are read here to play the moment and are never shown or offered. ── */
+  var elWalk = $('walk'), elTrail = $('wtrail'), elBig = $('wbig'), elSheet = $('wcard'), elLine = $('wline'), elActs = $('wacts');
+  var PLATE_AT = stage.getAttribute('data-plates'), PLATES = {};
+  var walking = false, wpath = [], auto = true, wTimers = [], wNode = null, wPlan = null, wT0 = 0, bgFlip = false, wEnded = false, veil = 0, wHeard = [];
+  /* the lines that have a voice made for them, found by their opening words; a line with no voice is read in silence */
+  var SPOKEN = [['w_clock', "it's a clock"], ['visitor', 'we kept our lives in this shape'], ['w_room', "it's not a message"], ['w_keep', 'say something you want to keep'],
+    ['w_gate', 'last summer. the gate'], ['w_dial', 'two-oh-four-eight'], ['w_ask', 'what do i do if you go away'], ['w_page', "i'll keep one page"],
+    ['w_night', 'night one. nothing'], ['w_books', 'bring your books']];
+
+  function cutRoot() { var s = film && film['7']; return s && typeof s === 'object' ? s['2'] : undefined; }
+  function cutAt(p) {
+    var n = cutRoot();
+    for (var i = 0; i < p.length; i++) { if (!n || typeof n !== 'object' || sealed(n) || p[i] < 1 || p[i] > 8 || n[String(p[i])] == null) return undefined; n = n[String(p[i])]; }
+    return n;
   }
-  function openWalk(p, straight) {
+  function kidsOf(n) { var out = []; if (n && typeof n === 'object' && !sealed(n)) for (var d = 1; d <= 8; d++) if (n[String(d)] != null) out.push(d); return out; }
+  function story(n) { return tidy(lineOf(n)).trim(); }
+  function cutAddress(p) { return '7.2' + p.join(''); }
+  function hashPath() {
+    var m = /^7\.2([1-8]{0,12})$/.exec(decodeURIComponent((location.hash || '').slice(1)));
+    return m ? m[1].split('').map(Number) : null;
+  }
+  /* a chapter's or a scene's line: its short name, and whatever is said after it */
+  function titleOf(line) {
+    var parts = line.match(/[^.!?]+[.!?]+["'’”]?(\s+|$)/g), title = '', i = 0;
+    if (!parts) return { title: line, sub: '' };
+    while (i < parts.length && (title + parts[i]).trim().length <= 34) title += parts[i++];
+    if (!title) title = parts[i++];
+    return { title: title.trim(), sub: parts.slice(i).join('').trim() };
+  }
+  /* the making decisions at a position's 9: '1, the dead street, plate_street … ; 2, …' */
+  function plansFor(parent) {
+    var out = {}, raw = parent && typeof parent === 'object' ? tidy(lineOf(parent['9'])) : '', last = null;
+    raw.replace(/^[^:]*:\s*/, '').split(/;\s*(?=[1-8],\s)/).forEach(function (item) {
+      var m = /^([1-8]),\s*([\s\S]*)$/.exec(item.trim()); if (!m) return;
+      var t = m[2], pl = (/plate_[a-z_]+/.exec(t) || [])[0] || null;
+      var burst = /burst/i.test(t) ? (/clip/i.test(t) ? 'video' : 'img') : null;
+      var fx = /NO SIGNAL/.test(t) ? 'nosignal' : /\brain\b/i.test(t) ? 'rain' : /crimson/i.test(t) ? 'crimson' : /gold point|one point/i.test(t) ? 'point' :
+        /gold seeping|2\.66/i.test(t) ? 'gold' : /\bship/i.test(t) ? 'ship' : /digits/i.test(t) && !burst ? 'digits' : /\bpips\b/i.test(t) ? 'pips' : null;
+      out[m[1]] = { img: pl, fx: fx, burst: burst };
+    });
+    /* a moment that names no place stays in the place before it (a memory's own place is not somewhere to stay) */
+    kidsOf(parent).forEach(function (d) {
+      var p = out[d] || (out[d] = { img: null, fx: null, burst: null });
+      if (!p.img) p.img = last;
+      if (p.img && p.burst !== 'video') last = p.img;
+      var line = story(parent[String(d)]);
+      if (!p.fx && !p.burst && /eighty-one/i.test(line)) p.fx = 'pips';
+      var low = line.toLowerCase().replace(/[‘’]/g, "'"), found = [];
+      SPOKEN.forEach(function (s) { var at = low.indexOf(s[1]); if (at >= 0) found.push([at, s[0]]); });
+      p.say = found.sort(function (a, b) { return a[0] - b[0]; }).map(function (x) { return x[1]; });
+    });
+    return out;
+  }
+  function planOf(p) { return p.length ? (plansFor(cutAt(p.slice(0, -1)))[p[p.length - 1]] || {}) : {}; }
+  function firstPlate(p) {
+    var q = p.slice(), n = cutAt(q), guard = 0;
+    while (kidsOf(n).length && guard++ < 12) { q.push(kidsOf(n)[0]); n = cutAt(q); }
+    return q.length ? planOf(q).img : null;
+  }
+  function plate(name) { if (!PLATES[name]) { var i = new Image(); i.src = PLATE_AT + name + '.jpg'; PLATES[name] = i; } return PLATES[name]; }
+  function everyMoment(p, fn) { var ks = kidsOf(cutAt(p)); if (!ks.length) { if (p.length) fn(p); return; } ks.forEach(function (d) { everyMoment(p.concat([d]), fn); }); }
+  function setBg(name, dim) {
+    if (!name) { clearBg(); return; }
+    var el = bgFlip ? $('bgA') : $('bgB'), old = bgFlip ? $('bgB') : $('bgA'); bgFlip = !bgFlip;
+    el.style.backgroundImage = 'url(' + PLATE_AT + name + '.jpg)'; el.style.filter = dim ? 'brightness(.45) saturate(.8)' : 'none';
+    el.classList.add('on'); old.classList.remove('on');
+  }
+  function clearBg() { $('bgA').classList.remove('on'); $('bgB').classList.remove('on'); }
+  function wLater(fn, ms) { wTimers.push(setTimeout(fn, ms)); }
+  function wclear() { wTimers.forEach(clearTimeout); wTimers = []; Sound.hush(); if (mem) stopMemory(); }
+  function nextPath(p) {
+    var ks = kidsOf(cutAt(p)); if (ks.length) return p.concat([ks[0]]);
     var q = p.slice();
-    while (q.length && nodeAt(q) === undefined) q.pop();
-    path = q;
-    setMode('walk');
-    elWalk.hidden = false;
-    render();
-    layoutRing();
-    if (straight) { cam = walkCam(); move = null; } else { cam.z = 9; moveTo(walkCam(), 1.8, easeOut); }
-    requestAnimationFrame(function () { requestAnimationFrame(function () { elWalk.classList.add('on'); }); });
-    veil = straight ? 0 : 1;
+    while (q.length) { var last = q.pop(), sib = kidsOf(cutAt(q)), i = sib.indexOf(last); if (i < sib.length - 1) return q.concat([sib[i + 1]]); }
+    return null;
   }
-  function go(p) {
-    if (mode !== 'walk' || nodeAt(p) === undefined) return;
-    var deeper = p.length > path.length;
-    path = p;
-    Sound.bell(deeper ? p.length : -1);
-    if (CALM) { render(); layoutRing(); return; }
-    elWalk.classList.add('turn');
-    setTimeout(function () { render(); layoutRing(); elWalk.classList.remove('turn'); }, 260);
-    pulse = now();
+  function sayChain(ids, start) {
+    var t = start;
+    ids.forEach(function (id) { wLater(function () { Sound.say(id, 0, { gain: 1.15 }); wHeard.push(id); }, t * 1000); t += Sound.dur(id) + 0.5; });
+    return t;
   }
-  function render() {
-    var n = nodeAt(path), line = lineOf(n), kids = branches(n), parts = headOf(line), addr = address(path);
-    $('addr').textContent = addr;
-    $('trail').textContent = path.length ? path.join(' · ') : '';
-    $('at').textContent = addr || 'The film';
-    $('phead').textContent = parts.head; $('phead').hidden = !parts.head;
-    $('pbody').textContent = parts.tail || (line ? '' : 'Nothing is written here yet.');
-    $('paper').scrollTop = 0;
-    $('up').disabled = !path.length;
-    elRing.textContent = '';
-    hubEl = document.createElement('span');
-    hubEl.className = 'hub' + (isScene(path) ? ' scene' : '');
-    hubEl.textContent = path.length ? String(path[path.length - 1]) : '';
-    elRing.appendChild(hubEl);
-    kids.forEach(function (d) {
-      var child = path.concat([d]), b = document.createElement('button');
-      b.type = 'button'; b.className = 'node' + (isScene(child) ? ' scene' : ''); b.dataset.d = String(d);
-      var lab = labelOf(lineOf(n[String(d)]));
-      b.setAttribute('aria-label', d + ', ' + lab);
-      b.appendChild(document.createTextNode(String(d)));
-      var l = document.createElement('span'); l.className = 'lab' + (lab.split(/\s+/).some(function (w) { return w.length > 9; }) ? ' tight' : ''); l.textContent = lab; b.appendChild(l);
-      b.addEventListener('click', function () { go(child); });
-      elRing.appendChild(b);
-    });
-    if (!kids.length) { var leaf = document.createElement('p'); leaf.className = 'leafline'; leaf.textContent = 'Nothing lies beneath this line.'; elRing.appendChild(leaf); }
-    var want = '#' + (addr || '0');
-    if (location.hash !== want) history.replaceState(null, '', want);
+  function pipsNow() { Sound.pip(660, 0.1, 0.15); var i; for (i = 0; i < 9; i++) Sound.pip(990, 0.9 + i * 0.11, 0.09); for (i = 0; i < 81; i++) Sound.pip(1320, 2.1 + i * 0.028, 0.05, 0.05); }
+  function big(title, sub) {
+    elBig.textContent = title;
+    if (sub) { var s = document.createElement('small'); s.textContent = sub; elBig.appendChild(s); }
+    elBig.style.opacity = 1;
   }
-  function layoutRing() {
-    if (elWalk.hidden) return;
-    var r = elRing.getBoundingClientRect(), s = stage.getBoundingClientRect();
-    var node = wide ? 58 : 48, labH = wide ? 46 : 36, labW = wide ? 150 : 92;
-    var rx = Math.min(r.width / 2 - Math.max(node, labW) / 2 - 2, wide ? 300 : 190);
-    var ry = Math.min((r.height - node - labH) / 2 - 4, wide ? 270 : 180);
-    rx = Math.max(rx, 70); ry = Math.max(ry, 60);
-    if (wide) { rx = Math.min(rx, ry * 1.18); ry = Math.min(ry, rx); }
-    var cx = r.width / 2, cy = node / 2 + 2 + ry;
-    if (r.height > 2 * ry + node + labH + 8) cy = (r.height - labH) / 2;
-    ringBox = { cx: r.left - s.left + cx, cy: r.top - s.top + cy, rx: rx, ry: ry };
-    if (hubEl) { hubEl.style.left = cx + 'px'; hubEl.style.top = cy + 'px'; }
-    Array.prototype.forEach.call(elRing.querySelectorAll('.node'), function (b) {
-      var a = -Math.PI / 2 + (Number(b.dataset.d) - 1) * TAU / 9;
-      b.style.left = (cx + Math.cos(a) * rx).toFixed(1) + 'px'; b.style.top = (cy + Math.sin(a) * ry).toFixed(1) + 'px';
-    });
-  }
-  var veil = 0, pulse = -9;
-  function drawWalk(t) {
-    drawSky(t, 0.5);
-    ctx.fillStyle = 'rgba(3,5,12,.34)'; ctx.fillRect(0, 0, W, H);
-    var b = ringBox, n = nodeAt(path), kids = branches(n), root = !path.length, hot = root || isScene(path);
-    var breath = 0.5 + 0.5 * Math.sin(t * 0.9), beat = Math.exp(-(t - pulse) * 2.4);
-    ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(200,212,255,.2)';
-    ctx.beginPath(); ctx.ellipse(b.cx, b.cy, b.rx, b.ry, 0, 0, TAU); ctx.stroke();
-    for (var i = 0; i < kids.length; i++) {
-      var a = -Math.PI / 2 + (kids[i] - 1) * TAU / 9;
-      var g = ctx.createLinearGradient(b.cx, b.cy, b.cx + Math.cos(a) * b.rx, b.cy + Math.sin(a) * b.ry);
-      g.addColorStop(0, hot ? 'rgba(226,38,92,.5)' : 'rgba(220,228,255,.42)'); g.addColorStop(1, 'rgba(220,228,255,.06)');
-      ctx.strokeStyle = g; ctx.beginPath(); ctx.moveTo(b.cx, b.cy); ctx.lineTo(b.cx + Math.cos(a) * b.rx, b.cy + Math.sin(a) * b.ry); ctx.stroke();
+  function goWalk(p) {
+    if (cutAt(p) === undefined) return;
+    wclear(); wEnded = false; wpath = p; wNode = cutAt(p); wT0 = performance.now(); wHeard = [];
+    var ks = kidsOf(wNode), line = story(wNode), dwell;
+    elTrail.textContent = elBig.getAttribute('data-title');
+    if (p.length) { var b = document.createElement('b'); b.textContent = cutAddress(p); elTrail.appendChild(b); }
+    var want = '#' + cutAddress(p); if (location.hash !== want) history.replaceState(null, '', want);
+    if (ks.length) { /* the film, a chapter or a scene: its name, over the first place it opens onto */
+      wPlan = {};
+      setBg(firstPlate(p), true);
+      var tt = p.length ? titleOf(line) : { title: elBig.getAttribute('data-title'), sub: elBig.getAttribute('data-sub') };
+      big(tt.title, tt.sub); elSheet.classList.remove('on');
+      dwell = tt.sub ? 7.5 : 3.8;
+    } else { /* a moment */
+      wPlan = planOf(p);
+      elBig.style.opacity = 0; elLine.textContent = line;
+      if (wPlan.burst === 'video') {
+        clearBg(); elSheet.classList.remove('on'); primeClip(); startMemory({ src: 'video' });
+        wLater(function () { elSheet.classList.add('on'); }, 9000); dwell = 16;
+      } else if (wPlan.burst === 'img' && wPlan.img) {
+        var name = wPlan.img; clearBg(); elSheet.classList.add('on');
+        startMemory({ src: 'img', el: plate(name), digits: false, onLand: function () { setBg(name); } });
+        dwell = Math.max(9, line.length * 0.06 + 3);
+      } else {
+        setBg(wPlan.img); wLater(function () { elSheet.classList.add('on'); }, 500);
+        var vt = wPlan.say && wPlan.say.length ? sayChain(wPlan.say, 1.2) : 0;
+        dwell = Math.max(5.5, line.length * 0.055 + 2, vt + 1.5);
+      }
+      if (wPlan.burst && wPlan.say && wPlan.say.length) sayChain(wPlan.say, 4);
+      if (wPlan.fx === 'pips') wLater(pipsNow, 800);
     }
-    var r = (wide ? 74 : 56) * (1 + 0.1 * breath + 0.5 * beat);
-    ctx.globalAlpha = 0.84 + 0.16 * breath;
-    ctx.drawImage(hot ? SPR_FILM : SPR[1], b.cx - r, b.cy - r, r * 2, r * 2);
-    ctx.globalAlpha = 1;
-    if (veil > 0) { ctx.globalAlpha = veil; ctx.fillStyle = '#1a0510'; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1; veil = Math.max(0, veil - 0.022); }
+    acts(ks);
+    if (auto) wLater(function () { var q = nextPath(wpath); if (q) goWalk(q); else endWalk(); }, dwell * 1000);
+  }
+  function endWalk() {
+    wclear(); wEnded = true; wNode = null; wPlan = {}; elSheet.classList.remove('on'); clearBg();
+    var first = (/^[^.]+\./.exec(story(cutAt(wpath.slice(0, 1)))) || [''])[0];
+    big(first ? 'End of ' + first.charAt(0).toLowerCase() + first.slice(1) : 'The end, for now.', elBig.getAttribute('data-end'));
+    elActs.textContent = '';
+    btn('Walk again', function () { auto = true; goWalk([]); }, 'red');
+    btn('Back to the dial', toDial); btn('Back to the sky', function () { toSky(true); }, 'out');
+  }
+  function btn(label, fn, cls, digit) {
+    var b = document.createElement('button'); b.type = 'button'; if (cls) b.className = cls;
+    if (digit) { var d = document.createElement('span'); d.className = 'd'; d.textContent = digit; b.appendChild(d); b.setAttribute('data-d', digit); }
+    b.appendChild(document.createTextNode(label));
+    b.addEventListener('click', function (e) { e.stopPropagation(); fn(); });
+    elActs.appendChild(b); return b;
+  }
+  function carry() {
+    auto = !auto;
+    if (auto) { var q = nextPath(wpath); if (q) goWalk(q); else endWalk(); }
+    else { wTimers.forEach(clearTimeout); wTimers = []; acts(kidsOf(wNode)); }
+  }
+  function acts(ks) {
+    elActs.textContent = '';
+    btn(auto ? 'Pause' : 'Carry on ▸', carry, auto ? '' : 'red').id = 'carry';
+    ks.forEach(function (d) {
+      var w = story(wNode[String(d)]).replace(/[‘’'"“”]/g, '').split(/[.:,]/)[0].split(/\s+/).slice(0, 4).join(' ');
+      btn(w, function () { goWalk(wpath.concat([d])); }, '', String(d));
+    });
+    if (wpath.length) btn('Up a level', function () { goWalk(wpath.slice(0, -1)); }).id = 'up';
+    btn('Back to the dial', toDial).id = 'todial';
+    btn('Back to the sky', function () { toSky(true); }, 'out').id = 'out';
+  }
+  function startWalk(p, flown) {
+    var q = p.slice();
+    while (q.length && cutAt(q) === undefined) q.pop();
+    setMode('walk');
+    walking = true; auto = true; veil = flown ? 1 : 0; move = null;
+    elWalk.hidden = false;
+    if (cutRoot() === undefined) { big(elBig.getAttribute('data-title'), ''); elActs.textContent = ''; btn('Back to the sky', function () { toSky(true); }, 'out'); return; }
+    primeClip();
+    everyMoment([], function (m) { var pl = planOf(m).img; if (pl) plate(pl); });
+    goWalk(q);
+  }
+  function leaveWalk() {
+    wclear(); walking = false; wNode = null; wPlan = null; clearBg();
+    elBig.style.opacity = 0; elSheet.classList.remove('on'); elWalk.hidden = true;
+  }
+  /* the effects of light, drawn over the place */
+  function drawWalkFx(nowMs) {
+    if (!wNode || !wPlan || !wPlan.fx) return;
+    var t = (nowMs - wT0) / 1000, fx = wPlan.fx, g, k, r;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    if (fx === 'nosignal') {
+      var a = (Math.sin(nowMs / 420) > -0.5 ? 1 : 0.6) * Math.min(1, t);
+      ctx.font = '600 ' + Math.round(Math.min(W, H) * 0.06) + 'px "Cormorant Garamond",serif';
+      ctx.fillStyle = 'rgba(190,220,255,' + (0.55 * a) + ')'; ctx.shadowColor = 'rgba(150,200,255,.9)'; ctx.shadowBlur = 18;
+      ctx.fillText('NO SIGNAL', W * 0.5, H * 0.36); ctx.shadowBlur = 0;
+    }
+    if (fx === 'point' || fx === 'crimson') {
+      k = Math.min(1, Math.max(0, (t - 2) / 2)); var col = fx === 'crimson' && t > 5 ? '255,80,95' : '255,214,150'; r = 10 + 40 * k;
+      g = ctx.createRadialGradient(W / 2, H * 0.3, 0, W / 2, H * 0.3, r * 2); g.addColorStop(0, 'rgba(' + col + ',' + k + ')'); g.addColorStop(1, 'rgba(' + col + ',0)');
+      ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = g; ctx.beginPath(); ctx.arc(W / 2, H * 0.3, r * 2, 0, 7); ctx.fill(); ctx.globalCompositeOperation = 'source-over';
+    }
+    if (fx === 'digits') {
+      var n = Math.min(10, Math.floor(Math.max(0, t - 1.4) / 0.42));
+      ctx.font = '600 ' + Math.round(Math.min(W * 0.075, H * 0.07)) + 'px "Cormorant Garamond",serif';
+      ctx.fillStyle = '#ffe2a8'; ctx.shadowColor = 'rgba(255,200,120,.9)'; ctx.shadowBlur = 20;
+      ctx.fillText(DIGITS.slice(0, n).split('').join(' '), W / 2, H * 0.3); ctx.shadowBlur = 0;
+      if (wPlan._n !== n) { wPlan._n = n; if (n > 0) Sound.pip(880 * Math.pow(2, (+DIGITS[n - 1]) / 24), 0, 0.12); }
+    }
+    if (fx === 'ship') {
+      k = Math.min(1, t / 6); var y = H * 0.47 - k * H * 0.06;
+      g = ctx.createRadialGradient(W * 0.58, y, 0, W * 0.58, y, 30); g.addColorStop(0, 'rgba(255,240,220,' + (0.9 * Math.min(1, t)) + ')'); g.addColorStop(1, 'rgba(255,240,220,0)');
+      ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = g; ctx.beginPath(); ctx.arc(W * 0.58, y, 30, 0, 7); ctx.fill(); ctx.globalCompositeOperation = 'source-over';
+    }
+    if (fx === 'gold') {
+      k = Math.min(1, t / 5);
+      g = ctx.createRadialGradient(W / 2, H * 0.45, 0, W / 2, H * 0.45, Math.max(W, H) * 0.8); g.addColorStop(0, 'rgba(60,40,10,' + (0.15 * k) + ')'); g.addColorStop(1, 'rgba(255,190,100,' + (0.42 * k) + ')');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    }
+    if (fx === 'rain') {
+      ctx.strokeStyle = 'rgba(200,215,240,.18)'; ctx.lineWidth = 1;
+      for (var i = 0; i < 70; i++) { var x = (i * 97.3 + nowMs * 0.05) % W, yy = (i * 53.1 + nowMs * 0.9) % H; ctx.beginPath(); ctx.moveTo(x, yy); ctx.lineTo(x - 3, yy + 16); ctx.stroke(); }
+    }
+    if (fx === 'pips') { /* a pulse of light with the count: one, nine, eighty-one */
+      [[0.9, 1], [1.7, 0.8], [2.9, 1.3]].forEach(function (pp) {
+        var age = t - pp[0]; if (age < 0 || age > 2.4) return;
+        r = (30 + age * 150) * pp[1]; ctx.strokeStyle = 'rgba(255,226,170,' + (0.5 * (1 - age / 2.4)) + ')'; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.arc(W / 2, H * 0.34, r, 0, 7); ctx.stroke();
+      });
+    }
+  }
+  function drawWalk() {
+    var nowMs = performance.now();
+    ctx.globalCompositeOperation = 'source-over'; ctx.clearRect(0, 0, W, H);
+    Sound.walkMix(wPlan && wPlan.fx === 'gold');
+    drawWalkFx(nowMs);
+    if (mem) drawMemory(nowMs);
+    if (veil > 0) { ctx.globalAlpha = veil; ctx.fillStyle = '#1a0510'; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1; veil = Math.max(0, veil - 0.02); }
   }
 
-  /* ── sound, made here, and only after a tap ── */
+  /* ── sound: made here, with the voice files, and only after a tap ── */
   var Sound = (function () {
-    var ac = null, master, hissG, hissF, toneG, whistle, padG, crackG, noise, on = false;
+    var ac = null, master, hissG, hissF, toneG, whistle, padG, crackG, noise, stLP, stG, on = false;
+    var VOICE_AT = stage.getAttribute('data-voices'), BUF = {}, WAIT = null, active = [], epoch = 0, heard = [];
+    var LINES = ['aoife_diary', 'aoife_o1', 'aoife_o2', 'oisin_diary', 'oisin_thought', 'archive', 'brid_diary', 'brid_o1', 'visitor', 'ines_diary', 'ferry_1', 'ferry_2', 'ferry_3', 'ferry_4', 'mara_thought',
+      'w_clock', 'w_room', 'w_keep', 'w_gate', 'w_dial', 'w_ask', 'w_page', 'w_night', 'w_books'];
+    var GHOSTS = ['g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8', 'g9', 'g10', 'g11', 'g12'];
     function build() {
       var AC = window.AudioContext || window.webkitAudioContext;
       ac = new AC();
@@ -1015,13 +1150,33 @@
       var src2 = ac.createBufferSource(); src2.buffer = noise; src2.loop = true;
       var hp = ac.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 3000;
       crackG = ac.createGain(); crackG.gain.value = 0; src2.connect(hp); hp.connect(crackG); crackG.connect(master); src2.start(0, 0.3);
+      /* the one filter every station voice passes through, tied to the needle */
+      stLP = ac.createBiquadFilter(); stLP.type = 'lowpass'; stLP.frequency.value = 4000;
+      stG = ac.createGain(); stG.gain.value = 0; stLP.connect(stG); stG.connect(master);
+    }
+    /* a phone keeps its audio asleep until a tap: wake it inside that tap, and play one silent sample to open the way */
+    function unlock() {
+      try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) { /* not offered here */ }
+      try {
+        if (ac.state !== 'running' && ac.resume) { var p = ac.resume(); if (p && p.catch) p.catch(function () {}); }
+        var s = ac.createBufferSource(); s.buffer = ac.createBuffer(1, 1, 22050); s.connect(ac.destination); s.start(0);
+      } catch (e) { /* nothing more to try */ }
+    }
+    function load() {
+      if (WAIT) return;
+      WAIT = {};
+      LINES.concat(GHOSTS).forEach(function (id) {
+        WAIT[id] = fetch(VOICE_AT + id + '.mp3').then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.arrayBuffer(); })
+          .then(function (ab) { return new Promise(function (res, rej) { ac.decodeAudioData(ab, res, rej); }); })
+          .then(function (b) { BUF[id] = b; return b; }).catch(function () { return null; });
+      });
     }
     function start() {
       if (!(window.AudioContext || window.webkitAudioContext)) return false;
       try { if (!ac) build(); } catch (e) { ac = null; return false; }
-      if (ac.state === 'suspended') ac.resume();
+      unlock();
       master.gain.setTargetAtTime(1, ac.currentTime, 0.3);
-      on = true; return true;
+      on = true; load(); return true;
     }
     function stop() { if (ac) master.gain.setTargetAtTime(0, ac.currentTime, 0.12); on = false; }
     function pip(freq, when, vol, dur) {
@@ -1032,15 +1187,45 @@
       g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + 0.005); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
       o.start(t); o.stop(t + dur + 0.05);
     }
+    function play(id, when, o) {
+      var src = ac.createBufferSource(), g = ac.createGain(), node = g; src.buffer = BUF[id]; g.gain.value = o.gain == null ? 1 : o.gain; src.connect(g);
+      if (ac.createStereoPanner) { var p = ac.createStereoPanner(); p.pan.value = o.pan || 0; node.connect(p); node = p; }
+      node.connect(o.close ? master : stLP);
+      src.start(ac.currentTime + (when || 0)); active.push(src); heard.push(id);
+    }
     return {
       start: start, stop: stop, pip: pip,
+      wake: function () { if (on && ac && ac.state !== 'running') unlock(); },
       isOn: function () { return on; },
       state: function () { return ac ? ac.state : 'none'; },
-      /* the plain bed of hiss under the opening, the sky and the walk */
+      loaded: function () { return Object.keys(BUF).length; },
+      heard: function () { return heard.slice(); },
+      dur: function (id) { return BUF[id] ? BUF[id].duration : 2.5; },
+      /* a voice line: at once if it is ready; if it is still arriving, as soon as it lands, unless the moment has passed */
+      say: function (id, when, o) {
+        if (!on || !id) return;
+        o = o || {};
+        if (BUF[id]) { play(id, when, o); return; }
+        var e = epoch;
+        if (WAIT && WAIT[id]) WAIT[id].then(function (b) { if (b && on && e === epoch) play(id, 0, o); });
+      },
+      hush: function () { epoch++; active.forEach(function (s) { try { s.stop(); } catch (e) { /* already ended */ } }); active = []; },
+      /* a ghost transmission in the static: a random fragment through a narrow band, at the level given */
+      ghost: function (level) {
+        if (!on) return;
+        var id = GHOSTS[Math.floor(Math.random() * GHOSTS.length)]; if (!BUF[id]) return;
+        var src = ac.createBufferSource(); src.buffer = BUF[id]; src.playbackRate.value = 0.94 + Math.random() * 0.12;
+        var bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 700 + Math.random() * 1800; bp.Q.value = 0.8 + Math.random() * 2;
+        var g = ac.createGain(), node = g; g.gain.value = level; src.connect(bp); bp.connect(g);
+        if (ac.createStereoPanner) { var p = ac.createStereoPanner(); p.pan.value = Math.random() * 1.6 - 0.8; node.connect(p); node = p; }
+        node.connect(master); src.start(); heard.push('ghost:' + id);
+      },
+      station: function (gain, lp) { if (!on) return; var t = ac.currentTime; stG.gain.setTargetAtTime(gain, t, 0.05); stLP.frequency.setTargetAtTime(lp, t, 0.05); },
+      /* the plain bed of hiss under the opening and the sky */
       bed: function (level, freq) {
         if (!on) return; var t = ac.currentTime;
         hissG.gain.setTargetAtTime(level, t, 0.5); hissF.frequency.setTargetAtTime(clamp(freq, 300, 4000), t, 0.3);
-        toneG.gain.setTargetAtTime(0, t, 0.1); padG.gain.setTargetAtTime(0, t, 0.3);
+        toneG.gain.setTargetAtTime(0, t, 0.1); padG.gain.setTargetAtTime(0, t, 0.3); stG.gain.setTargetAtTime(0, t, 0.2);
       },
       /* the dial's mix: hiss between stations, the whistle as one nears, the pad for the Archive */
       mix: function (hiss, tone, toneFreq, pad) {
@@ -1048,6 +1233,12 @@
         hissF.frequency.setTargetAtTime(1800, t, 0.2);
         hissG.gain.setTargetAtTime(hiss, t, 0.05); toneG.gain.setTargetAtTime(tone, t, 0.05);
         whistle.frequency.setTargetAtTime(toneFreq, t, 0.05); padG.gain.setTargetAtTime(pad, t, 0.4);
+      },
+      /* in the walk the voices are clear, over a breath of hiss */
+      walkMix: function (gold) {
+        if (!on) return; var t = ac.currentTime;
+        stG.gain.setTargetAtTime(1, t, 0.1); stLP.frequency.setTargetAtTime(9000, t, 0.1); hissF.frequency.setTargetAtTime(1800, t, 0.2);
+        hissG.gain.setTargetAtTime(0.012, t, 0.2); toneG.gain.setTargetAtTime(0, t, 0.1); padG.gain.setTargetAtTime(gold ? 0.03 : 0, t, 0.4);
       },
       pipK: function (k) { pip(1000, 0, k === 2 ? 0.035 : 0.11, k === 2 ? 0.07 : 0.16); },
       bell: function (depth) { pip(depth < 0 ? 392 : 660 * Math.pow(0.84, depth), 0, 0.07, 1.3); },
@@ -1073,14 +1264,23 @@
     };
   })();
   window.theApproach = {
-    sound: Sound.state, mode: function () { return mode; },
-    lives: function () { return LIVES.map(function (L) { return { f: L.f, band: L.band, who: L.who, kind: L.kind, date: L.date || '', text: L.text || '', over: L.over || [], thought: L.thought || '', digits: L.digits || '' }; }); },
+    sound: Sound.state, mode: function () { return mode; }, soundOn: Sound.isOn, voices: Sound.loaded, heard: Sound.heard,
+    lives: function () { return LIVES.map(function (L) { return { f: L.f, band: L.band, who: L.who, kind: L.kind, date: L.date || '', text: L.text || '', over: L.over || [], thought: L.thought || '', digits: L.digits || '', voice: L.voice || '', overV: L.overV || [], thoughtV: L.thoughtV || '' }; }); },
     on: function () { return cur ? cur.band : ''; },
-    memory: function () { return mem ? { t: (performance.now() - mem.t0) / 1000, particles: mem.P ? mem.P.length : -1, real: !!mem.real, clip: vid.currentTime, paused: vid.paused } : null; }
+    memory: function () { return mem ? { t: (performance.now() - mem.t0) / 1000, src: mem.src, particles: mem.P ? mem.P.length : -1, real: !!mem.real, clip: vid.currentTime, paused: vid.paused } : null; },
+    walk: function () { return walking ? { path: wpath.join(''), address: cutAddress(wpath), auto: auto, ended: wEnded, kids: kidsOf(wNode), plate: (wPlan && wPlan.img) || '', fx: (wPlan && wPlan.fx) || '', burst: (wPlan && wPlan.burst) || '', say: (wPlan && wPlan.say) || [] } : null; }
   };
   function soundLabel() { elSound.textContent = Sound.isOn() ? 'Sound off' : (Sound.state() === 'none' ? 'Tune in' : 'Sound on'); elSound.setAttribute('aria-pressed', String(Sound.isOn())); }
   elSound.hidden = !(window.AudioContext || window.webkitAudioContext);
-  elSound.addEventListener('click', function () { if (Sound.isOn()) Sound.stop(); else Sound.start(); if (mem && mem.real) vid.muted = !Sound.isOn(); soundLabel(); });
+  /* the first tap anywhere in the film starts the sound, inside that tap; after that the corner turns it off and on */
+  var tapped = false;
+  function tap(e) {
+    if (e.target && e.target.closest && e.target.closest('#sound')) return;
+    if (!tapped) { tapped = true; Sound.start(); soundLabel(); } else Sound.wake();
+  }
+  ['pointerup', 'touchend', 'click', 'keydown'].forEach(function (ev) { stage.addEventListener(ev, tap, true); });
+  elSound.addEventListener('click', function () { tapped = true; if (Sound.isOn()) Sound.stop(); else Sound.start(); if (mem && mem.real) vid.muted = !Sound.isOn(); soundLabel(); });
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) Sound.wake(); });
 
   /* ── the frame ── */
   var visible = true, raf = 0;
@@ -1091,9 +1291,13 @@
     stepCam(t);
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     if (mode === 'opening') drawOpening(t);
-    else if (mode === 'walk') { drawWalk(t); Sound.bed(0.006, 900); }
+    else if (mode === 'walk') drawWalk();
     else if (mode === 'dial') { f += (target - f) * 0.18; drawDial(t); }
-    else { drawSky(t, 1); Sound.bed(0.012, 1100); }
+    else {
+      drawSky(t, ease((t - skyT0) / 1.6));
+      if (mode === 'fly' && move) { var k = easeIn((t - move.t0) / move.dur); ctx.globalAlpha = k * k; ctx.fillStyle = '#1a0510'; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1; }
+      Sound.bed(0.012, 1100);
+    }
     elNeedle.style.left = (f * 100) + '%';
     raf = requestAnimationFrame(frame);
   }
@@ -1102,39 +1306,39 @@
   if (window.IntersectionObserver) new IntersectionObserver(function (es) { visible = es[0].isIntersecting; wake(); }).observe(stage);
   window.addEventListener('resize', resize);
   if (window.ResizeObserver) new ResizeObserver(resize).observe(stage);
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { if (mode === 'walk') layoutRing(); });
 
   /* ── hands: buttons and keys ── */
-  $('tune').hidden = false;
-  $('tune').addEventListener('click', function () { Sound.start(); soundLabel(); toDial(); });
+  $('walkin').hidden = false; $('tune').hidden = false;
+  $('walkin').addEventListener('click', enterFilm);
+  $('tune').addEventListener('click', toDial);
   elEnter.addEventListener('click', enterFilm);
-  $('up').addEventListener('click', function () { if (path.length) go(path.slice(0, -1)); });
-  $('out').addEventListener('click', function () { Sound.bell(-1); toDial(); });
+  $('tosky').addEventListener('click', function () { toSky(true); });
   elSkip.addEventListener('click', endOpening);
   window.addEventListener('hashchange', function () {
-    var p = parseHash();
-    if (p && film && address(p) !== address(path)) { if (mode === 'walk') go(p); else openWalk(p, true); }
+    var p = hashPath();
+    if (p && film && (mode !== 'walk' || p.join('') !== wpath.join(''))) { if (mode === 'walk') goWalk(p); else startWalk(p, false); }
   });
   document.addEventListener('keydown', function (e) {
     var el = e.target;
     if (e.metaKey || e.ctrlKey || e.altKey || (el && (/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || el.isContentEditable))) return;
     if (el && el.closest && !el.closest('#film') && el !== document.body) return;
     if (mode === 'walk') {
-      if (/^[1-9]$/.test(e.key)) { var p = path.concat([Number(e.key)]); if (nodeAt(p) !== undefined) { e.preventDefault(); go(p); } }
-      else if (e.key === 'Backspace') { e.preventDefault(); if (path.length) go(path.slice(0, -1)); }
+      if (/^[1-8]$/.test(e.key)) { var p = wpath.concat([Number(e.key)]); if (!wEnded && cutAt(p) !== undefined) { e.preventDefault(); goWalk(p); } }
+      else if (e.key === 'Backspace') { e.preventDefault(); if (wpath.length) goWalk(wpath.slice(0, -1)); }
       else if (e.key === 'Escape') { e.preventDefault(); toDial(); }
-    } else if (mode === 'dial' || mode === 'sky') {
+    } else if (mode === 'dial') {
       /* the arrow keys tune */
-      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); if (mode === 'sky') toDial(); target = clamp(target + (e.key === 'ArrowRight' ? 0.01 : -0.01), 0, 1); }
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); target = clamp(target + (e.key === 'ArrowRight' ? 0.01 : -0.01), 0, 1); }
+      else if (e.key === 'Escape') { e.preventDefault(); toSky(true); }
     } else if (mode === 'opening' && e.key === 'Escape') endOpening();
   });
 
   /* ── begin ── */
   resize();
   buildScale();
-  var first = parseHash();
-  if (first) { pendingPath = first; setMode('fly'); cam = restCam(); }
-  else if (store.get(SEEN) || CALM) toSky();
+  var first = hashPath();
+  if (first) { pendingPath = first; setMode('fly'); cam = restCam(); skyT0 = now() - 9; }
+  else if (store.get(SEEN) || CALM) toSky(false);
   else { setMode('opening'); opened = now(); elSkip.hidden = false; }
   readAll();
   wake();
