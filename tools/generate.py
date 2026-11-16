@@ -859,6 +859,12 @@ def generate(source, out, site=SITE, root='', pictures=None, record_path=None, p
                 res.notes.append('%s is not carried, because %s' % (path, e))
                 if os.path.exists(os.path.join(out, name)):
                     files[name] = ('copy', os.path.join(out, name))
+            # what the page plays, kept beside it: the repository's own folder of that name (the film's clips)
+            beside = os.path.join(REPO, path.strip('/'))
+            for dirpath, _, filenames in os.walk(beside):
+                for fn in sorted(filenames):
+                    src = os.path.join(dirpath, fn)
+                    files[path.strip('/') + '/' + os.path.relpath(src, beside).replace(os.sep, '/')] = ('copy', src)
         urls = ['%s%s' % (site, p.path) for p in pages if p.path in live]
         files['sitemap.xml'] = ('<?xml version="1.0" encoding="UTF-8"?>\n'
                                 '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +

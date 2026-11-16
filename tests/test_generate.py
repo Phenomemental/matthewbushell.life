@@ -521,6 +521,14 @@ class TheFilmPage(Base):
         for attr, url in re.findall(r'\b(href|src)="(/[^"]*)"', h):
             self.assertTrue(url.startswith(ROOT + '/'), '%s="%s"' % (attr, url))
 
+    def test_its_clip_is_carried_beside_it(self):
+        self.run_with(blocks())
+        h = self.read(self.FILE)
+        self.assertIn('src="%s/the-approach/clips/gate.mp4"' % ROOT, h)
+        self.assertIn('the-approach/clips/gate.mp4', self.run_.files())
+        src = os.path.join(fixture.REPO, 'the-approach', 'clips', 'gate.mp4')
+        self.assertEqual(os.path.getsize(os.path.join(self.run_.out, 'the-approach', 'clips', 'gate.mp4')), os.path.getsize(src))
+
     def test_it_is_in_no_menu_and_no_sitemap(self):
         self.run_with(blocks())
         self.assertNotIn('the-approach', self.read('sitemap.xml'))

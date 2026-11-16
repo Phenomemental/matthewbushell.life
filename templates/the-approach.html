@@ -13,7 +13,7 @@
 <meta name="theme-color" content="#03050c">
 <link rel="icon" href="{{root}}/assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&amp;family=La+Belle+Aurore&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&amp;family=La+Belle+Aurore&amp;family=Homemade+Apple&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{{root}}/assets/door.css">
 <link rel="stylesheet" href="{{root}}/assets/site.css">
 {{count}}
@@ -24,8 +24,6 @@
   position:relative;height:100vh;height:100svh;min-height:560px;overflow:hidden;background:var(--night);color:var(--star);
   font-family:'Cormorant Garamond',Garamond,'Times New Roman',serif;font-weight:500;-webkit-font-smoothing:antialiased;user-select:none;-webkit-user-select:none}
 .film canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-.film.looking canvas{touch-action:none;cursor:grab}
-.film.looking.dragging canvas{cursor:grabbing}
 .film button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .film button:focus-visible{outline:2px solid var(--ember);outline-offset:3px}
 .film [hidden]{display:none!important}
@@ -50,31 +48,14 @@
 .topline{margin:clamp(14px,2.4vh,22px) auto 0;max-width:19em;font-size:clamp(21px,2.5vw,29px);font-style:italic;line-height:1.3;color:rgba(244,241,234,.92);text-shadow:0 0 18px #000,0 0 40px #000;text-wrap:balance}
 .go{margin-top:clamp(22px,3.8vh,38px);min-height:54px;padding:0 34px;border:1px solid var(--ember);border-radius:28px;background:rgba(194,29,78,.2);font-size:22px;letter-spacing:.06em;color:#fff;box-shadow:0 0 40px rgba(194,29,78,.3);transition:background .4s ease}
 .go:hover{background:rgba(194,29,78,.5)}
-.front .quiet{display:block;margin:8px auto 0}
 .nojs{margin:18px auto 0;max-width:24em;font-style:italic;color:rgba(238,242,255,.75)}
 
-/* looking around the sky */
-.lookbar{position:absolute;z-index:5;left:0;right:0;bottom:calc(14px + env(safe-area-inset-bottom));padding:0 14px;text-align:center}
-.starname{margin:0 0 10px;min-height:1.4em;font-size:20px;font-style:italic;color:rgba(238,242,255,.9);text-shadow:0 0 14px #000,0 0 30px #000}
-.lookbar .row{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
 
-/* the radio broadcasts and the snippets of scenes, at the edges */
-.air{position:absolute;inset:0;z-index:3;pointer-events:none;overflow:hidden}
-.cast{position:absolute;max-width:min(64vw,300px);opacity:0;transition:opacity 2.2s ease;font-size:clamp(18px,1.5vw,21px);line-height:1.3;font-style:italic;color:rgba(232,236,250,.84);text-shadow:0 0 12px #000,0 0 26px #000}
-.cast.on{opacity:1}
-.cast .hz{display:block;margin-bottom:2px;font-style:normal;font-size:.68em;letter-spacing:.2em;color:rgba(255,160,180,.85)}
-.snip{position:absolute;width:158px;opacity:0;transition:opacity 2.4s ease;border:1px solid rgba(238,242,255,.22);border-radius:3px;background:linear-gradient(180deg,rgba(14,20,40,.72),rgba(4,6,14,.72));box-shadow:0 8px 30px rgba(0,0,0,.5);padding:9px 10px 11px;box-sizing:border-box}
-.snip.on{opacity:1}
-.snip .no{display:flex;align-items:center;gap:6px;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:rgba(238,242,255,.6)}
-.snip .no::before{content:'';width:7px;height:7px;border-radius:50%;border:1.5px solid var(--ember)}
-.snip .frag{display:block;margin-top:14px;min-height:38px;font-size:15px;line-height:1.25;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,241,234,.9);animation:waver 5.5s ease-in-out infinite}
-@keyframes waver{0%,100%{opacity:.9}22%{opacity:.5}31%{opacity:.84}58%{opacity:.42}70%{opacity:.8}}
 
 /* the notice when Pscale can't be read */
-.notice{position:absolute;z-index:7;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom));margin:0;width:max-content;max-width:calc(100% - 28px);padding:4px 8px 4px 18px;box-sizing:border-box;display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center;
+.notice{position:absolute;z-index:8;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom));margin:0;width:max-content;max-width:calc(100% - 28px);padding:4px 8px 4px 18px;box-sizing:border-box;display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center;
   border:1px solid rgba(238,242,255,.25);border-radius:26px;background:rgba(3,5,12,.82);font-size:19px;font-style:italic}
 .notice .quiet{color:var(--ember);text-decoration:underline;text-underline-offset:3px}
-.film.walking .notice,.film.looking .notice{bottom:auto;top:calc(58px + env(safe-area-inset-top))}
 
 /* the walk: phone first. The ring in the upper half, the paper sheet rising from the bottom. */
 .walk{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;box-sizing:border-box;
@@ -127,23 +108,59 @@
   .paper h2{font-size:38px;margin:8px 0 14px}
   .paper .body{font-size:22px;line-height:1.5}
   .wrow{grid-area:row;padding-top:6px}
-  .cast{max-width:270px}
-  .snip{width:190px}
 }
 @media (max-height:700px) and (max-width:899px){.front{top:30%}.ring{min-height:200px}.node .lab{font-size:13px}}
-@media (prefers-reduced-motion:reduce){.cardline,.front,.walk,.cast,.snip,.ring,.paper{transition:none}.snip .frag{animation:none}}
+@media (prefers-reduced-motion:reduce){.cardline,.front,.walk,.ring,.paper{transition:none}}
 
 /* the site's own sheet beneath the film: the reader tools and the footer, in the site's look */
 .under .sheet{max-width:860px}
 .under .tools{margin-top:0}
+
+/* the dial, in brass and amber, across the foot; its crimson needle is the viewer's own */
+.fdial{position:absolute;z-index:5;left:0;right:0;bottom:0;height:calc(118px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);box-sizing:border-box;
+  background:linear-gradient(to top,rgba(30,18,6,.96),rgba(30,18,6,.75) 70%,rgba(30,18,6,0));touch-action:none;cursor:ew-resize;opacity:0;pointer-events:none;transition:opacity 1.6s ease}
+.fdial.on{opacity:1;pointer-events:auto}
+.scale{position:absolute;left:5%;right:5%;bottom:calc(40px + env(safe-area-inset-bottom));height:44px;border-top:1px solid rgba(199,154,82,.5);border-bottom:1px solid rgba(199,154,82,.25);background:linear-gradient(to bottom,rgba(255,190,90,.10),rgba(255,190,90,.03));border-radius:4px}
+.ftick{position:absolute;top:0;width:1px;background:rgba(232,201,138,.5)}
+.num{position:absolute;top:14px;transform:translateX(-50%);font-size:13px;color:rgba(232,201,138,.75);letter-spacing:.05em}
+.needle{position:absolute;top:-10px;width:2px;height:64px;background:#c8384a;box-shadow:0 0 10px #c8384a;transform:translateX(-1px)}
+.hint{position:absolute;left:0;right:0;bottom:calc(12px + env(safe-area-inset-bottom));margin:0;text-align:center;font-style:italic;font-size:15px;color:rgba(232,201,138,.7)}
+
+/* a station coming in: its band and who it is, then its own way of arriving */
+.station{position:absolute;z-index:4;top:calc(60px + env(safe-area-inset-top));left:0;right:0;margin:0;text-align:center;font-size:14px;letter-spacing:.22em;color:#c79a52;text-transform:uppercase;opacity:0;transition:opacity .6s;pointer-events:none}
+.fwho{position:absolute;z-index:4;top:calc(82px + env(safe-area-inset-top));left:0;right:0;margin:0;padding:0 16px;text-align:center;font-style:italic;font-size:17px;color:#8e97aa;opacity:0;transition:opacity .6s;pointer-events:none}
+.diary{position:absolute;z-index:4;left:50%;top:44%;transform:translate(-50%,-50%);width:min(520px,86%);font-family:"Homemade Apple",cursive;font-weight:400;font-size:clamp(15px,3.6vw,19px);line-height:1.9;color:#f3e7cf;
+  text-shadow:0 0 12px rgba(255,214,150,.55),0 0 2px rgba(255,230,190,.9);opacity:0;transition:opacity .8s;pointer-events:none;white-space:pre-wrap}
+.diary .date{display:block;font-family:"Cormorant Garamond",serif;font-size:15px;letter-spacing:.16em;color:#e8c98a;margin-bottom:10px;text-shadow:none}
+.diary .fhold{display:block;position:relative}
+.diary .ghost{visibility:hidden}
+.diary .live{position:absolute;left:0;top:0;right:0}
+.centre{position:absolute;z-index:4;left:50%;top:42%;transform:translate(-50%,-50%);width:min(620px,88%);margin:0;text-align:center;font-size:clamp(22px,5vw,34px);line-height:1.3;white-space:pre-line;opacity:0;transition:opacity 1s;pointer-events:none}
+.thought{position:absolute;z-index:4;left:50%;top:44%;transform:translate(-50%,-50%) scale(.6);width:min(640px,90%);margin:0;text-align:center;font-style:italic;font-size:clamp(24px,5.6vw,40px);line-height:1.25;color:#ece5d6;opacity:0;filter:blur(10px);pointer-events:none}
+.over{position:absolute;z-index:4;font-style:italic;font-size:clamp(17px,3.8vw,22px);line-height:1.3;color:#dfe6ff;text-shadow:0 0 10px rgba(160,190,255,.6);max-width:70%;opacity:0;transition:opacity 1.2s,transform 6s linear;pointer-events:none}
+
+/* the real scene. On a phone it is a band above the dial, wide enough to keep the face whole */
+.clip{position:absolute;z-index:1;left:0;top:13%;width:100%;height:57%;object-fit:cover;opacity:0;transition:opacity 1.4s ease;pointer-events:none;
+  -webkit-mask-image:linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);mask-image:linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent)}
+.clip.on{opacity:1}
+.go.walkin{position:absolute;z-index:6;left:50%;bottom:calc(138px + env(safe-area-inset-bottom));transform:translateX(-50%);margin:0;white-space:nowrap;background:rgba(60,10,26,.72);opacity:0;pointer-events:none;transition:opacity 1.8s ease,background .4s ease}
+.go.walkin.on{opacity:1;pointer-events:auto}
+.film:not(.walking) .notice{bottom:calc(128px + env(safe-area-inset-bottom))}
+@media (min-width:900px) and (min-height:560px){
+  .scale{left:14%;right:14%}
+  .station{top:20px}.fwho{top:44px}
+  .clip{top:0;height:100%;-webkit-mask-image:none;mask-image:none}
+}
+@media (prefers-reduced-motion:reduce){.fdial,.diary,.centre,.over,.clip,.station,.fwho{transition:none}}
 </style>
 </head>
 <body>
 <main class="film" id="film">
 <canvas id="sky" aria-hidden="true"></canvas>
+<video class="clip" id="clip" src="{{root}}/the-approach/clips/gate.mp4" playsinline preload="metadata" aria-label="Tom at his radio"></video>
 
 <div class="corner">
-  <button type="button" class="quiet" id="sound" aria-pressed="false" hidden>Sound on</button>
+  <button type="button" class="quiet" id="sound" aria-pressed="false" hidden>Tune in</button>
   <button type="button" class="quiet ringed" id="skip" hidden>Skip</button>
 </div>
 
@@ -157,19 +174,21 @@
 <div class="front" id="front">
   <h1>The Approach</h1>
   <p class="topline">We kept our lives in this shape. Keep one of us.</p>
-  <button type="button" class="go" id="enter" hidden>Enter the film</button>
-  <button type="button" class="quiet" id="look" hidden>Look around</button>
-  <noscript><p class="nojs">This page reads the film live from Pscale, and needs JavaScript to walk it.</p></noscript>
+  <button type="button" class="go" id="tune" hidden>Tune in</button>
+  <noscript><p class="nojs">This page reads the film live from Pscale, and needs JavaScript to tune it.</p></noscript>
 </div>
 
-<div class="air" id="air" aria-hidden="true"></div>
+<p class="station" id="station" role="status"></p>
+<p class="fwho" id="who"></p>
+<div class="diary" id="diary"></div>
+<p class="centre" id="centre"></p>
+<p class="thought" id="thought"></p>
 
-<div class="lookbar" id="lookbar" hidden>
-  <p class="starname" id="starname" role="status"></p>
-  <div class="row">
-    <button type="button" class="step" id="enter2">Enter the film</button>
-    <button type="button" class="step" id="unlook">Back to the title</button>
-  </div>
+<button type="button" class="go walkin" id="enter">Walk into the film</button>
+
+<div class="fdial" id="dial">
+  <div class="scale" id="scale"><div class="needle" id="needle"></div></div>
+  <p class="hint" id="hint">drag the dial · tune between the lives</p>
 </div>
 
 <div class="walk" id="walk" hidden>
@@ -185,7 +204,7 @@
   </article>
   <div class="wrow">
     <button type="button" class="step" id="up">Up a level</button>
-    <button type="button" class="step" id="out">Back to the sky</button>
+    <button type="button" class="step" id="out">Back to the dial</button>
   </div>
 </div>
 
@@ -222,7 +241,8 @@
 </div>
 
 <script>
-/* The Approach, walked. Plain JavaScript, no libraries. It reads Pscale and writes nothing to it. */
+/* The Approach: the opening, the universe, the dial and the walk. Plain JavaScript, no libraries.
+   It reads Pscale and writes nothing to it. The dial is built from the approved sketch, between the stations. */
 (function () {
   'use strict';
   var WIRE = 'https://beach.happyseaurchin.com/.well-known/pscale-beach';
@@ -232,11 +252,11 @@
   var TAU = Math.PI * 2;
 
   var $ = function (id) { return document.getElementById(id); };
-  var stage = $('film'), canvas = $('sky'), ctx = canvas.getContext('2d');
+  var stage = $('film'), canvas = $('sky'), ctx = canvas.getContext('2d', { willReadFrequently: true });
   if (!ctx) return;
   document.documentElement.classList.add('js');
-  var elCard = $('card'), elFront = $('front'), elAir = $('air'), elWalk = $('walk'), elRing = $('ring');
-  var elSound = $('sound'), elSkip = $('skip'), elNotice = $('notice'), elLookbar = $('lookbar'), elStarname = $('starname');
+  var elCard = $('card'), elFront = $('front'), elWalk = $('walk'), elRing = $('ring');
+  var elSound = $('sound'), elSkip = $('skip'), elNotice = $('notice');
   var CARDS = Array.prototype.map.call(document.querySelectorAll('#cards li'), function (li) { return li.textContent; });
   var CALM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -320,34 +340,6 @@
   }
   function isScene(path) { return path.length === 2 && path[0] === 4; }
 
-  /* the scenes' spoken lines, for the broadcasts, and their words, for the snippets */
-  var casts = [], snips = [];
-  function filmArrived() {
-    casts = []; snips = [];
-    var seen = {};
-    function collect(n, depth) {
-      if (depth > 8 || sealed(n)) return;
-      if (typeof n === 'string') {
-        var re = /"([^"\n]{2,150})"|“([^”\n]{2,150})”/g, m;
-        while ((m = re.exec(n))) { var q = (m[1] || m[2]).trim(); if (!seen[q]) { seen[q] = 1; casts.push(q); } }
-      } else if (n && typeof n === 'object') {
-        collect(n._, depth + 1);
-        for (var d = 1; d <= 9; d++) if (n[String(d)] != null) collect(n[String(d)], depth + 1);
-      }
-    }
-    for (var s = 1; s <= 9; s++) {
-      var scene = nodeAt([4, s]);
-      if (scene == null) continue;
-      collect(scene, 0);
-      var parts = headOf(lineOf(scene));
-      var name = parts.head || ('Scene ' + s);
-      var bits = parts.tail.replace(/"[^"]*"|“[^”]*”/g, ' ').split(/[.;:,()]+/).map(function (x) { return x.trim(); })
-        .filter(function (x) { var n = x.split(/\s+/).length; return n >= 2 && n <= 6 && x.length <= 40 && !/\d{4}|json|chapter|scene|cards?\b/i.test(x); });
-      if (!bits.length) bits = [name];
-      snips.push({ at: '4.' + s, name: name, bits: bits });
-    }
-    if (pendingPath) { var p = pendingPath; pendingPath = null; openWalk(p, true); }
-  }
 
   /* ── the sky: every block a star, placed by a stable hash of its name ── */
   var stars = [], dust = [], filmStar = place(FILM);
@@ -402,6 +394,7 @@
     wide = W >= 900 && H >= 560;
     if (mode === 'sky' && !move) cam = restCam();
     if (mode === 'walk') { layoutRing(); if (!move) cam = walkCam(); }
+    buildScale(); layoutClip();
   }
   function unit() { return Math.max(W, H) * 0.56; }
   function sx(wx) { return cam.ax * W + (wx - cam.x) * cam.z * unit(); }
@@ -505,7 +498,7 @@
     if (T < 13.2) return lerp(3.4, 12.6, ease(ramp(T, 9.0, 13.2)));
     return lerp(12.6, 7.14, easeOut(ramp(T, 13.2, 16.4)));
   }
-  function drawDial(T, a) {
+  function drawTuner(T, a) {
     if (a <= 0) return;
     var cy = H * (wide ? 0.66 : 0.63), w = Math.min(W * 0.88, 760), h = wide ? 92 : 78, x0 = W / 2 - w / 2, f = dialAt(T), ppm = wide ? 150 : 104;
     ctx.save();
@@ -575,12 +568,12 @@
     drawSky(t, ease(pull));
     if (pull < 1) { ctx.globalAlpha = 1 - ease(pull); ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1; }
     drawScreens(T, ease(ramp(T, 1.0, 3.0)) * (1 - ease(ramp(T, 8.0, 10.0))));
-    drawDial(T, ease(ramp(T, 8.8, 10.6)) * (1 - ease(ramp(T, 19.0, 21.4))));
+    drawTuner(T, ease(ramp(T, 8.8, 10.6)) * (1 - ease(ramp(T, 19.0, 21.4))));
     drawPips(T, pull);
     var c = -1;
     for (var i = 0; i < CARD_AT.length; i++) if (T >= CARD_AT[i][0] && T < CARD_AT[i][1]) c = i;
     showCard(c);
-    while (pipNext < PIPS.length && T >= PIPS[pipNext].t) { var p = PIPS[pipNext++]; if (T - p.t < 0.3) Sound.pip(p.k); }
+    while (pipNext < PIPS.length && T >= PIPS[pipNext].t) { var p = PIPS[pipNext++]; if (T - p.t < 0.3) Sound.pipK(p.k); }
     Sound.bed(T < 8.6 ? 0.018 : T < 16.4 ? 0.05 + 0.03 * Math.sin(T * 3.1) : T < 22 ? 0.024 : 0.014, 700 + (dialAt(T) - 3) * 260);
     if (T >= T_END) endOpening();
   }
@@ -588,73 +581,312 @@
     store.set(SEEN, '1');
     showCard(-1);
     elSkip.hidden = true;
-    toSky(true);
+    toSky();
   }
 
-  /* ── the universe ── */
-  var mode = 'boot', airTimer = 0, pendingPath = null;
+  /* ── the universe, and the way to the dial ── */
+  var mode = 'boot', pendingPath = null, tuned = false, tuneT0 = -99;
   function setMode(m) {
+    if (m !== 'dial' && cur) leave();
     mode = m;
-    stage.classList.toggle('looking', m === 'look');
     stage.classList.toggle('walking', m === 'walk');
+    stage.classList.toggle('tuning', m === 'dial');
     elFront.classList.toggle('on', m === 'sky');
-    elLookbar.hidden = m !== 'look';
-    if (m !== 'sky') clearAir();
+    elDial.classList.toggle('on', m === 'sky' || m === 'dial');
   }
-  function toSky(arrived) {
+  function toSky() {
     setMode('sky');
+    cam = restCam(); move = null;
+  }
+  /* into the dial: the title goes, the sky gives way to static, and the needle finds the first life */
+  function toDial() {
+    if (mode === 'dial') return;
+    var from = mode;
+    setMode('dial');
+    tuneT0 = from === 'sky' ? now() : now() - 9;
     elWalk.classList.remove('on');
     setTimeout(function () { if (mode !== 'walk') elWalk.hidden = true; }, 900);
-    if (arrived) { cam = restCam(); move = null; } else moveTo(restCam(), 2.2, ease);
-    airTimer = now() + 2.5;
+    if (!tuned) { tuned = true; target = FIRST; primeClip(); }
     if (location.hash) history.replaceState(null, '', location.pathname + location.search);
   }
-  function lookAround() {
-    setMode('look');
-    elStarname.textContent = stars.length ? stars.length + 1 + ' blocks on Pscale tonight. Drag to move, tap a star for its name.' : '';
-    moveTo({ x: cam.x, y: cam.y, z: cam.z * 0.8, ax: 0.5, ay: 0.46 }, 1.6, ease);
+
+  /* ── the kept lives, read live from the story at 1.61 to 1.69 ── */
+  var LIVES = [], FIRST = 0.06, DIGITS = '2048313271';
+  function quoted(s) {
+    var out = [], re = /"([^"]*)"|“([^”]*)”/g, m;
+    while ((m = re.exec(s))) (m[1] || m[2] || '').split(/\s+\/\s+/).forEach(function (x) { if (x.trim()) out.push(x.trim()); });
+    return out;
+  }
+  function parseLife(raw) {
+    var line = String(raw).replace(/\s*\((?:AHEAD|BEHIND)\b[^)]*\)/g, '');
+    var parts = line.split(/\s—\s/);
+    if (parts.length < 3) return null;
+    var rest = parts.slice(2).join(' — '), how = rest.split(/["“]/)[0].toLowerCase(), head = how.split(/[.:(]/)[0];
+    var L = { band: parts[0].trim(), who: parts[1].trim() };
+    L.kind = /memory that bursts/.test(how) ? 'memory' : /^\s*diary/.test(head) ? 'diary' : /^\s*overheard/.test(head) ? 'overheard' :
+      /^\s*(a )?thought/.test(head) ? 'thought' : /archive/.test(head) ? 'archive' : /visitor/.test(head) ? 'visitor' : 'centre';
+    var dm = /Date:\s*(\d{10})\s*,\s*([^.]*)\./.exec(rest);
+    if (dm) L.date = dm[1] + ' · ' + dm[2].trim();
+    var marks = [], re = /(Diary|Overheard|Thought):\s*/g, m, sec = {};
+    while ((m = re.exec(rest))) marks.push({ k: m[1].toLowerCase(), a: m.index, b: re.lastIndex });
+    marks.forEach(function (mk, i) { sec[mk.k] = quoted(rest.slice(mk.b, i + 1 < marks.length ? marks[i + 1].a : rest.length)); });
+    var all = quoted(marks.length ? rest.slice(0, marks[0].a) : rest);
+    if (L.kind === 'diary') { L.text = (sec.diary || all).join('\n'); L.over = sec.overheard; L.thought = sec.thought && sec.thought.join(' '); }
+    else if (L.kind === 'overheard') L.over = sec.overheard || all;
+    else if (L.kind === 'thought') L.text = (sec.thought || all).join(' ');
+    else if (L.kind === 'archive') L.text = all.join(' ');
+    else if (L.kind === 'memory') { L.digits = (/\b(\d{10})\b/.exec(line) || [])[1] || DIGITS; L.who = L.who.replace(/,\s*/, ' · '); }
+    else L.text = all.join('\n');
+    if (L.kind !== 'memory' && !L.text && !(L.over && L.over.length)) return null;
+    return L;
+  }
+  function filmArrived() {
+    LIVES = [];
+    for (var d = 1; d <= 9; d++) { var n = nodeAt([1, 6, d]); if (n != null && !sealed(n)) { var L = parseLife(lineOf(n)); if (L) LIVES.push(L); } }
+    LIVES.forEach(function (L, i) { L.f = LIVES.length > 1 ? FIRST + i * (0.88 / (LIVES.length - 1)) : 0.5; });
+    if (pendingPath) { var p = pendingPath; pendingPath = null; openWalk(p, true); }
   }
 
-  /* broadcasts and snippets, drifting at the edges while the title stands */
-  var SLOTS_WIDE = [[5, 12, 0], [4, 56, 0], [6, 76, 0], [5, 16, 1], [4, 60, 1], [6, 80, 1]];
-  var SLOTS_TALL = [[5, 9, 0, 'top'], [5, 78, 1, 'low'], [5, 80, 0, 'low']];   /* on a phone, one above the title and one below it */
-  var slotBusy = {}, airCount = 0;
-  function clearAir() { Array.prototype.forEach.call(elAir.children, function (e) { e.classList.remove('on'); }); }
-  function freeSlot(low) {
-    var slots = wide ? SLOTS_WIDE : SLOTS_TALL, open = [];
-    var key = function (j) { return (wide ? 'w' : 't') + (slots[j][3] || j); };
-    for (var i = 0; i < slots.length; i++) if (!slotBusy[key(i)] && (!low || wide || slots[i][1] > 50)) open.push(i);
-    if (!open.length || Object.keys(slotBusy).length >= (wide ? 3 : 2)) return null;
-    var i2 = open[Math.floor(Math.random() * open.length)];
-    return { key: key(i2), s: slots[i2] };
+  /* ── the dial ── */
+  var elDial = $('dial'), elScale = $('scale'), elNeedle = $('needle');
+  var elStation = $('station'), elWho = $('who'), elDiary = $('diary'), elCentre = $('centre'), elThought = $('thought'), elEnter = $('enter');
+  var f = 0, target = 0, dragging = false, px = -1, py = -1;
+  function buildScale() {
+    elScale.querySelectorAll('.ftick,.num').forEach(function (e) { e.remove(); });
+    var n = wide ? 80 : 40, big = wide ? 10 : 5, i;
+    for (i = 0; i <= n; i++) { var t = document.createElement('div'); t.className = 'ftick'; t.style.left = (i / n * 100) + '%'; t.style.height = (i % big ? (wide && i % 2 ? 5 : 8) : 16) + 'px'; elScale.appendChild(t); }
+    ['88', '92', '96', '100', '104', '108'].forEach(function (l, j, a) { var e = document.createElement('div'); e.className = 'num'; e.style.left = (j / (a.length - 1) * 100) + '%'; e.textContent = l; elScale.appendChild(e); });
   }
-  function airNext() {
-    if (!casts.length && !snips.length) return;
-    var asSnip = !casts.length || (snips.length && airCount % 3 === 2);
-    var slot = freeSlot(asSnip); if (!slot) return;
-    var n = airCount++, el = document.createElement('div');
-    if (asSnip) {
-      var sc = snips[Math.floor(n / 3) % snips.length];
-      el.className = 'snip';
-      var no = document.createElement('span'); no.className = 'no'; no.textContent = sc.at + ' ' + sc.name;
-      var fr = document.createElement('span'); fr.className = 'frag'; fr.textContent = sc.bits[(n * 7) % sc.bits.length];
-      el.appendChild(no); el.appendChild(fr);
-    } else {
-      var line = casts[(n * 5 + 2) % casts.length];
-      el.className = 'cast';
-      var hz = document.createElement('span'); hz.className = 'hz';
-      hz.textContent = (3.5 + (hash(line) % 10850) / 1000).toFixed(3) + ' MHz';
-      var said = document.createElement('span'); said.textContent = '“' + line + '”';
-      el.appendChild(hz); el.appendChild(said);
-      Sound.crackle();
+  function setFromX(x) { var r = elScale.getBoundingClientRect(); target = clamp((x - r.left) / r.width, 0, 1); }
+  elDial.addEventListener('pointerdown', function (e) {
+    if (mode !== 'sky' && mode !== 'dial') return;
+    if (mode === 'sky') toDial();
+    dragging = true;
+    try { elDial.setPointerCapture(e.pointerId); } catch (err) { /* no capture, no matter */ }
+    setFromX(e.clientX); e.preventDefault();
+  });
+  elDial.addEventListener('pointermove', function (e) { if (dragging) setFromX(e.clientX); });
+  elDial.addEventListener('pointerup', function () { dragging = false; });
+  elDial.addEventListener('pointercancel', function () { dragging = false; });
+  function point(e) { var r = stage.getBoundingClientRect(); px = e.clientX - r.left; py = e.clientY - r.top; }
+  stage.addEventListener('pointermove', point);
+  stage.addEventListener('pointerdown', point);
+
+  /* the station you are on */
+  var cur = null, lockT = 0, timers = [];
+  function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
+  function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+  function strengthOf(L) { return Math.max(0, 1 - Math.abs(f - L.f) / 0.045); }
+  function nearest() { var b = null, bs = 0; for (var i = 0; i < LIVES.length; i++) { var s = strengthOf(LIVES[i]); if (s > bs) { bs = s; b = LIVES[i]; } } return [b, bs]; }
+
+  function typeInto(el, text, date, speed) {
+    speed = speed || 42;
+    el.textContent = '';
+    if (date) { var d = document.createElement('span'); d.className = 'date'; d.textContent = date; el.appendChild(d); }
+    /* the whole page holds its place from the first stroke, so nothing around it shifts as it is written */
+    var hold = document.createElement('span'); hold.className = 'fhold';
+    var ghost = document.createElement('span'); ghost.className = 'ghost'; ghost.textContent = text;
+    var span = document.createElement('span'); span.className = 'live';
+    hold.appendChild(ghost); hold.appendChild(span); el.appendChild(hold);
+    var i = 0, mine = cur;
+    var step = function () { if (cur !== mine) return; span.textContent = text.slice(0, ++i); if (i < text.length) later(step, text[i - 1] === '\n' ? 600 : speed + Math.random() * 40); };
+    step();
+  }
+  function overheard(lines, start, beside) {
+    lines.forEach(function (l, i) {
+      later(function () {
+        var e = document.createElement('div'); e.className = 'over'; e.textContent = l;
+        var left = i % 2 === 0, drift = -30;
+        e.style.left = left ? '7%' : 'auto'; e.style.right = left ? 'auto' : '7%'; e.style.textAlign = left ? 'left' : 'right';
+        if (beside && wide) {
+          /* a wide screen: out at the sides, clear of the page being written */
+          e.style.top = (18 + ((i * 17) % 46)) + '%';
+          e.style.maxWidth = Math.max(180, (W - beside.offsetWidth) / 2 - W * 0.07 - 28) + 'px';
+        } else if (beside) {
+          /* a phone: above the page, then below it */
+          var s = stage.getBoundingClientRect(), r = beside.getBoundingClientRect();
+          if (left) e.style.bottom = (s.bottom - r.top + 12) + 'px'; else e.style.top = (r.bottom - s.top + 44) + 'px';
+        } else e.style.top = (18 + ((i * 17) % 46)) + '%';
+        stage.appendChild(e);
+        requestAnimationFrame(function () { requestAnimationFrame(function () { e.style.opacity = 0.95; e.style.transform = 'translateY(' + drift + 'px)'; }); });
+        Sound.crackle();
+        later(function () { e.style.opacity = 0; setTimeout(function () { e.remove(); }, 1300); }, 4200);
+      }, start + i * 2600);
+    });
+  }
+  function showThought(t, over) {
+    var th = elThought;
+    if (over) over.style.opacity = 0;
+    th.textContent = t; th.style.transition = 'none'; th.style.opacity = 0; th.style.filter = 'blur(12px)'; th.style.transform = 'translate(-50%,-50%) scale(.55)';
+    requestAnimationFrame(function () { requestAnimationFrame(function () {
+      th.style.transition = CALM ? 'opacity 1s' : 'opacity 2.5s, filter 5s ease, transform 9s ease';
+      th.style.opacity = 1; th.style.filter = 'blur(0px)'; th.style.transform = 'translate(-50%,-50%) scale(1.08)';
+    }); });
+    for (var i = 0; i < 8; i++) Sound.thump(0.4 + i * 0.95);
+  }
+  function enter(L) {
+    cur = L; clearTimers(); lockT = performance.now();
+    elStation.textContent = L.band; elWho.textContent = L.who; elStation.style.opacity = 1; elWho.style.opacity = 1;
+    if (L.kind === 'diary') {
+      elDiary.style.opacity = 1; typeInto(elDiary, L.text, L.date);
+      if (L.over && L.over.length) overheard(L.over, 4500, elDiary);
+      if (L.thought) later(function () { showThought(L.thought, elDiary); }, L.text.length * 60 + 1800);
     }
-    el.style.top = 'calc(' + slot.s[1] + '% + env(safe-area-inset-top))';
-    if (slot.s[2]) { el.style.right = slot.s[0] + '%'; el.style.textAlign = 'right'; } else el.style.left = slot.s[0] + '%';
-    elAir.appendChild(el);
-    slotBusy[slot.key] = 1;
-    requestAnimationFrame(function () { requestAnimationFrame(function () { if (mode === 'sky') el.classList.add('on'); }); });
-    setTimeout(function () { el.classList.remove('on'); }, 7600);
-    setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); delete slotBusy[slot.key]; }, 10400);
+    if (L.kind === 'overheard') overheard(L.over, 300, null);
+    if (L.kind === 'archive' || L.kind === 'centre') {
+      elCentre.style.color = '#ffe3a8'; elCentre.style.textShadow = '0 0 18px rgba(255,200,110,.6)'; elCentre.textContent = L.text; elCentre.style.opacity = 1;
+    }
+    if (L.kind === 'visitor') {
+      Sound.pip(660, 0.2, 0.15); var i;
+      for (i = 0; i < 9; i++) Sound.pip(990, 1.2 + i * 0.12, 0.09);
+      for (i = 0; i < 81; i++) Sound.pip(1320, 2.6 + i * 0.03, 0.05, 0.05);
+      later(function () { elCentre.style.color = '#f2f4ff'; elCentre.style.textShadow = '0 0 22px rgba(170,190,255,.6)'; elCentre.textContent = L.text; elCentre.style.opacity = 1; }, 5600);
+    }
+    if (L.kind === 'thought') showThought(L.text, null);
+    if (L.kind === 'memory') startMemory(L);
+  }
+  function leave() {
+    cur = null; clearTimers();
+    [elStation, elWho, elDiary, elCentre].forEach(function (e) { e.style.opacity = 0; });
+    stage.querySelectorAll('.over').forEach(function (e) { e.style.opacity = 0; setTimeout(function () { e.remove(); }, 1300); });
+    elThought.style.transition = 'opacity .6s'; elThought.style.opacity = 0;
+    stopMemory();
+  }
+
+  /* ── the memory: it leaves the book as light, then the real scene plays ── */
+  var vid = $('clip'), CLIP_AT = 9.6, mem = null, clipReady = false;
+  function clipSeek() { try { if (Math.abs(vid.currentTime - CLIP_AT) > 0.05) vid.currentTime = CLIP_AT; } catch (e) { /* not yet loaded */ } }
+  vid.addEventListener('loadedmetadata', clipSeek);
+  vid.addEventListener('seeked', function () { clipReady = true; });
+  function primeClip() {
+    /* asked for at the first touch of the dial, so the scene is waiting when the memory comes */
+    vid.preload = 'auto'; vid.muted = true;
+    var p = vid.play();
+    if (p && p.then) p.then(function () { if (!(mem && mem.real)) { vid.pause(); clipSeek(); } }).catch(function () {});
+  }
+  function clipBox() {
+    var s = stage.getBoundingClientRect(), r = vid.getBoundingClientRect();
+    return { x: r.left - s.left, y: r.top - s.top, w: r.width, h: r.height, ox: wide ? 0.6 : 0.58, oy: wide ? 0.35 : 0.3 };
+  }
+  function layoutClip() { var b = clipBox(); vid.style.objectPosition = (b.ox * 100) + '% ' + (b.oy * 100) + '%'; }
+  function startMemory(L) { mem = { t0: performance.now(), P: null, dig: L.digits || DIGITS }; clipSeek(); }
+  function stopMemory() {
+    if (!mem) return;
+    mem = null; vid.classList.remove('on'); vid.pause(); clipSeek();
+    elEnter.classList.remove('on');
+  }
+  function sampleFrame() {
+    var oc = document.createElement('canvas'), sw = 200, sh = 112; oc.width = sw; oc.height = sh;
+    var o = oc.getContext('2d'), d;
+    try { o.drawImage(vid, 0, 0, sw, sh); d = o.getImageData(0, 0, sw, sh).data; } catch (e) { return null; }
+    /* fitted to where the scene will stand, as the clip itself is */
+    var b = clipBox(), sc = Math.max(b.w / sw, b.h / sh), ox = b.x + (b.w - sw * sc) * b.ox, oy = b.y + (b.h - sh * sc) * b.oy, pts = [];
+    for (var y = 0; y < sh; y++) for (var x = 0; x < sw; x++) {
+      var i = (y * sw + x) * 4, r = d[i], g = d[i + 1], bl = d[i + 2], lum = (r * 0.3 + g * 0.59 + bl * 0.11) / 255;
+      if (Math.random() > 0.3 + 0.7 * Math.min(1, lum * 2.4)) continue;
+      var tx = ox + (x + Math.random()) * sc, ty = oy + (y + Math.random()) * sc;
+      if (tx < b.x || tx > b.x + b.w || ty < b.y || ty > b.y + b.h) continue;
+      var a = Math.random() * 6.283, sp = (Math.random() + Math.random()) * 1.1;
+      pts.push({ tx: tx, ty: ty, r: r, g: g, b: bl, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp * 0.8, s: Math.random() * 6.28, dl: Math.random() * 0.8 });
+    }
+    return pts;
+  }
+  var SPLAT = [[0, 0, 1], [1, 0, 0.55], [0, 1, 0.55], [1, 1, 0.3]];
+  function drawMemory(nowMs) {
+    var t = Math.max(0, (nowMs - mem.t0) / 1000), x0 = W / 2, y0 = H * 0.42, DIG = mem.dig, g, i, k;
+    if (t < 3.6) { /* the walk down ten digits */
+      var n = Math.min(10, Math.floor(t / 0.34) + 1), gap = Math.min(54, H * 0.36 / 9);
+      ctx.globalCompositeOperation = 'lighter';
+      for (i = 0; i < n; i++) {
+        var y = y0 + (i - (n - 1)) * gap, here = i === n - 1, r = here ? 18 : 7, c = i === 9 ? '255,90,100' : '255,214,150';
+        g = ctx.createRadialGradient(x0, y, 0, x0, y, r * 2.4); g.addColorStop(0, 'rgba(' + c + ',1)'); g.addColorStop(1, 'rgba(' + c + ',0)');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x0, y, r * 2.4, 0, 7); ctx.fill();
+        if (here) for (k = 0; k < 10; k++) { if (k === +DIG[i]) continue; ctx.fillStyle = 'rgba(160,185,255,.5)'; ctx.fillRect(x0 + (k - DIG[i]) * 30, y + Math.abs(k - DIG[i]) * 2, 2, 2); }
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.fillStyle = 'rgba(232,201,138,' + (here ? 1 : 0.5) + ')'; ctx.font = '600 22px "Cormorant Garamond",serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+        ctx.fillText(DIG[i], x0 + 26, y + 7);
+        ctx.globalCompositeOperation = 'lighter';
+        if (i > 0) { ctx.strokeStyle = 'rgba(255,214,150,.35)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x0, y - gap); ctx.lineTo(x0, y); ctx.stroke(); }
+      }
+      ctx.globalCompositeOperation = 'source-over';
+      if (mem.lastN !== n) { mem.lastN = n; Sound.pip(880 * Math.pow(2, (+DIG[n - 1]) / 24), 0, 0.14); }
+      return;
+    }
+    if (t < 4.6) { /* the last page flares crimson */
+      k = t - 3.6; var rr = 20 + 120 * k * k;
+      g = ctx.createRadialGradient(x0, y0, 0, x0, y0, rr); g.addColorStop(0, 'rgba(255,240,235,1)'); g.addColorStop(0.25, 'rgba(255,80,95,.9)'); g.addColorStop(1, 'rgba(255,80,95,0)');
+      ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x0, y0, rr, 0, 7); ctx.fill(); ctx.globalCompositeOperation = 'source-over';
+      if (!mem.P) mem.P = sampleFrame() || [];
+      if (!mem.boom) { mem.boom = 1; Sound.boom(); }
+      return;
+    }
+    /* the burst and the gathering */
+    var P = mem.P || [], tb = t - 4.6, WW = canvas.width, HH = canvas.height, img = ctx.getImageData(0, 0, WW, HH), D = img.data;
+    var leanX = px >= 0 ? px : x0, leanY = py >= 0 ? py : y0;
+    for (i = 0; i < P.length; i++) {
+      var p = P[i], spray = (1 - Math.exp(-tb * 1.8)) / 1.8 * 260, ox = x0 + p.vx * spray, oy = y0 + p.vy * spray;
+      var ga = Math.min(1, Math.max(0, (tb - 0.5 - p.dl * 0.6) / 2.6)); ga = ga * ga * (3 - 2 * ga);
+      var sw = (1 - ga) * 30; ox += Math.sin(p.s + t * 2.2) * sw; oy += Math.cos(p.s * 1.3 + t * 1.9) * sw;
+      /* the viewer's finger draws the light toward it while it gathers */
+      var pull = (1 - ga) * 0.18; ox += (leanX - ox) * pull; oy += (leanY - oy) * pull;
+      var X = ((ox + (p.tx - ox) * ga) * DPR) | 0, Y = ((oy + (p.ty - oy) * ga) * DPR) | 0;
+      if (X < 0 || Y < 0 || X >= WW - 1 || Y >= HH - 1) continue;
+      var cr = 255 * (1 - ga) + p.r * ga * 1.3, cg = 205 * (1 - ga) + p.g * ga * 1.3, cb = 150 * (1 - ga) + p.b * ga * 1.3;
+      for (k = 0; k < 4; k++) { var q = ((Y + SPLAT[k][1]) * WW + X + SPLAT[k][0]) * 4, w = 0.9 * SPLAT[k][2]; D[q] += cr * w; D[q + 1] += cg * w; D[q + 2] += cb * w; D[q + 3] = 255; }
+    }
+    ctx.putImageData(img, 0, 0);
+    if (tb > 2.4 && !mem.bells) { mem.bells = 1; for (i = 0; i < 18; i++) Sound.pip(1200 * Math.pow(2, Math.floor(Math.random() * 12) / 12), Math.random() * 2.6, 0.04, 1.2); }
+    if (tb > 3.6 && !mem.real) {
+      mem.real = 1; clipSeek(); vid.muted = !Sound.isOn();
+      var pl = vid.play(); if (pl && pl.catch) pl.catch(function () { vid.muted = true; var p2 = vid.play(); if (p2 && p2.catch) p2.catch(function () {}); });
+      vid.classList.add('on');
+      var mine = mem; setTimeout(function () { if (mem === mine) elEnter.classList.add('on'); }, 2200);
+    }
+  }
+
+  function drawDial(t) {
+    var nowMs = performance.now(), nb = nearest(), L = nb[0], s = nb[1], g, i;
+    /* lock and unlock */
+    if (L && s > 0.62) { if (cur !== L) { leave(); enter(L); } } else if (cur && (!L || s < 0.45)) leave();
+    var real = mem && mem.real;
+    Sound.mix(0.02 + 0.22 * (1 - (cur ? Math.min(1, s * 1.3) : s)) * (real ? 0 : 1), s > 0.15 && s < 0.6 ? 0.025 : 0, 500 + (1 - s) * 1500, cur && cur.kind === 'archive' ? 0.035 : 0);
+    /* picture: the sky gives way to the dark between stations */
+    var k = ease((t - tuneT0) / 1.6);
+    if (k < 1) drawSky(t, 1 - k);
+    ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = k; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1;
+    /* stations' worlds, faint behind */
+    if (cur && cur.kind === 'archive') {
+      var ka = Math.min(1, (nowMs - lockT) / 6000);
+      g = ctx.createRadialGradient(W / 2, H * 0.42, 0, W / 2, H * 0.42, Math.max(W, H) * 0.75);
+      g.addColorStop(0, 'rgba(70,48,18,' + (0.5 * ka) + ')'); g.addColorStop(1, 'rgba(255,196,110,' + (0.35 * ka) + ')'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+      /* small true things vanishing one by one */
+      for (i = 0; i < 120; i++) {
+        if (i / 120 < ka * 1.2) continue;
+        var x = (Math.sin(i * 12.9898) * 43758.5453 % 1 + 1) % 1 * W, y = (Math.sin(i * 78.233) * 12543.1 % 1 + 1) % 1 * H * 0.8;
+        ctx.fillStyle = 'rgba(220,230,255,.55)'; ctx.fillRect(x, y, 2, 2);
+      }
+    }
+    if (cur && cur.kind === 'visitor') {
+      var tv = (nowMs - lockT) / 1000, far = Math.max(W, H);
+      ctx.globalCompositeOperation = 'lighter';
+      [[1, 0.2], [9, 1.2], [81, 2.6]].forEach(function (a, j) {
+        if (tv < a[1]) return;
+        var r = (tv - a[1]) * (60 + j * 50) % far;
+        ctx.strokeStyle = 'rgba(170,190,255,' + Math.max(0, 0.6 - r / far) + ')'; ctx.lineWidth = 1 + j * 0.5; ctx.beginPath(); ctx.arc(W / 2, H * 0.42, r, 0, 7); ctx.stroke();
+      });
+      ctx.globalCompositeOperation = 'source-over';
+    }
+    if (cur && cur.kind === 'diary') { g = ctx.createRadialGradient(W / 2, H * 0.44, 0, W / 2, H * 0.44, Math.min(W, H) * 0.6); g.addColorStop(0, 'rgba(80,58,30,.35)'); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); }
+    if (cur && cur.kind === 'thought') { g = ctx.createRadialGradient(W / 2, H * 0.44, 0, W / 2, H * 0.44, Math.min(W, H) * 0.7); g.addColorStop(0, 'rgba(20,30,70,.5)'); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); }
+    if (mem) drawMemory(nowMs);
+    /* static, strongest between stations */
+    var grain = Math.floor((1 - s) * (real ? 0 : 1) * 2600 * k) + (cur ? 60 : 0);
+    for (i = 0; i < grain; i++) {
+      var v = Math.random();
+      ctx.fillStyle = 'rgba(' + (200 + v * 55 | 0) + ',' + (200 + v * 55 | 0) + ',' + (210 + v * 45 | 0) + ',' + (0.08 + v * 0.25) + ')';
+      ctx.fillRect(Math.random() * W, Math.random() * H, 1.3, 1.3);
+    }
+    if (s < 0.6) { ctx.fillStyle = 'rgba(255,255,255,' + ((1 - s) * 0.03 * k) + ')'; for (var ly = (nowMs / 7) % 6; ly < H; ly += 6) ctx.fillRect(0, ly, W, 1); }
   }
 
   /* ── the walk ── */
@@ -662,9 +894,8 @@
   function walkCam() { return { x: filmStar.x, y: filmStar.y, z: 2.6, ax: ringBox.cx / W, ay: ringBox.cy / H }; }
   function enterFilm() {
     if (!film) { pendingPath = []; elNotice.hidden = false; readAll(); return; }
-    setMode('fly');
     Sound.bell(0);
-    moveTo({ x: filmStar.x, y: filmStar.y, z: 70, ax: 0.5, ay: 0.42 }, 2.6, easeIn, function () { openWalk([], false); });
+    openWalk([], false);
   }
   function openWalk(p, straight) {
     var q = p.slice();
@@ -756,58 +987,94 @@
 
   /* ── sound, made here, and only after a tap ── */
   var Sound = (function () {
-    var ac = null, master = null, hiss = null, hissF = null, on = false, noise = null;
-    function start() {
+    var ac = null, master, hissG, hissF, toneG, whistle, padG, crackG, noise, on = false;
+    function build() {
       var AC = window.AudioContext || window.webkitAudioContext;
-      if (!AC) return false;
-      if (!ac) {
-        ac = new AC();
-        master = ac.createGain(); master.gain.value = 0; master.connect(ac.destination);
-        noise = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate);
-        var d = noise.getChannelData(0); for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-        var src = ac.createBufferSource(); src.buffer = noise; src.loop = true;
-        hissF = ac.createBiquadFilter(); hissF.type = 'bandpass'; hissF.frequency.value = 1400; hissF.Q.value = 0.5;
-        hiss = ac.createGain(); hiss.gain.value = 0;
-        src.connect(hissF); hissF.connect(hiss); hiss.connect(master); src.start();
-      }
+      ac = new AC();
+      master = ac.createGain(); master.gain.value = 0; master.connect(ac.destination);
+      var len = ac.sampleRate * 2, i; noise = ac.createBuffer(1, len, ac.sampleRate);
+      var d = noise.getChannelData(0); for (i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+      var src = ac.createBufferSource(); src.buffer = noise; src.loop = true;
+      hissF = ac.createBiquadFilter(); hissF.type = 'bandpass'; hissF.frequency.value = 1800; hissF.Q.value = 0.6;
+      hissG = ac.createGain(); hissG.gain.value = 0; src.connect(hissF); hissF.connect(hissG); hissG.connect(master); src.start();
+      /* the heterodyne whistle between stations */
+      whistle = ac.createOscillator(); whistle.type = 'sine'; whistle.frequency.value = 900;
+      toneG = ac.createGain(); toneG.gain.value = 0; whistle.connect(toneG); toneG.connect(master); whistle.start();
+      /* the Archive's warm pad */
+      padG = ac.createGain(); padG.gain.value = 0;
+      var lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 700;
+      [130.8, 164.8, 196, 261.6].forEach(function (fr, j) { var p = ac.createOscillator(); p.type = 'sawtooth'; p.frequency.value = fr * (1 + (j % 2 ? 0.003 : -0.002)); p.connect(lp); p.start(); });
+      lp.connect(padG); padG.connect(master);
+      /* crackle */
+      var src2 = ac.createBufferSource(); src2.buffer = noise; src2.loop = true;
+      var hp = ac.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 3000;
+      crackG = ac.createGain(); crackG.gain.value = 0; src2.connect(hp); hp.connect(crackG); crackG.connect(master); src2.start(0, 0.3);
+    }
+    function start() {
+      if (!(window.AudioContext || window.webkitAudioContext)) return false;
+      try { if (!ac) build(); } catch (e) { ac = null; return false; }
       if (ac.state === 'suspended') ac.resume();
-      master.gain.setTargetAtTime(1, ac.currentTime, 0.4);
+      master.gain.setTargetAtTime(1, ac.currentTime, 0.3);
       on = true; return true;
     }
-    function stop() { if (ac) master.gain.setTargetAtTime(0, ac.currentTime, 0.15); on = false; }
-    function tone(freq, vol, attack, decay) {
+    function stop() { if (ac) master.gain.setTargetAtTime(0, ac.currentTime, 0.12); on = false; }
+    function pip(freq, when, vol, dur) {
       if (!on) return;
-      var o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime;
-      o.type = 'sine'; o.frequency.value = freq;
-      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + attack); g.gain.exponentialRampToValueAtTime(0.0001, t + attack + decay);
-      o.connect(g); g.connect(master); o.start(t); o.stop(t + attack + decay + 0.05);
+      vol = vol == null ? 0.12 : vol; dur = dur == null ? 0.09 : dur;
+      var o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime + (when || 0);
+      o.frequency.value = freq; o.connect(g); g.connect(master);
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + 0.005); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.start(t); o.stop(t + dur + 0.05);
     }
     return {
-      toggle: function () { if (on) stop(); else start(); return on; },
+      start: start, stop: stop, pip: pip,
       isOn: function () { return on; },
       state: function () { return ac ? ac.state : 'none'; },
-      bed: function (level, freq) { if (!on) return; hiss.gain.setTargetAtTime(level, ac.currentTime, 0.5); hissF.frequency.setTargetAtTime(clamp(freq, 300, 4000), ac.currentTime, 0.3); },
-      pip: function (k) { tone(1000, k === 2 ? 0.035 : 0.11, 0.004, k === 2 ? 0.07 : 0.16); },
-      bell: function (depth) { tone(depth < 0 ? 392 : 660 * Math.pow(0.84, depth), 0.07, 0.01, 1.3); },
-      crackle: function () {
+      /* the plain bed of hiss under the opening, the sky and the walk */
+      bed: function (level, freq) {
+        if (!on) return; var t = ac.currentTime;
+        hissG.gain.setTargetAtTime(level, t, 0.5); hissF.frequency.setTargetAtTime(clamp(freq, 300, 4000), t, 0.3);
+        toneG.gain.setTargetAtTime(0, t, 0.1); padG.gain.setTargetAtTime(0, t, 0.3);
+      },
+      /* the dial's mix: hiss between stations, the whistle as one nears, the pad for the Archive */
+      mix: function (hiss, tone, toneFreq, pad) {
+        if (!on) return; var t = ac.currentTime;
+        hissF.frequency.setTargetAtTime(1800, t, 0.2);
+        hissG.gain.setTargetAtTime(hiss, t, 0.05); toneG.gain.setTargetAtTime(tone, t, 0.05);
+        whistle.frequency.setTargetAtTime(toneFreq, t, 0.05); padG.gain.setTargetAtTime(pad, t, 0.4);
+      },
+      pipK: function (k) { pip(1000, 0, k === 2 ? 0.035 : 0.11, k === 2 ? 0.07 : 0.16); },
+      bell: function (depth) { pip(depth < 0 ? 392 : 660 * Math.pow(0.84, depth), 0, 0.07, 1.3); },
+      thump: function (when) {
         if (!on) return;
-        var t = ac.currentTime;
-        for (var i = 0; i < 5; i++) {
-          var s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain(), at = t + i * 0.07 + Math.random() * 0.05;
-          s.buffer = noise; f.type = 'bandpass'; f.frequency.value = 1800 + Math.random() * 2200; f.Q.value = 2;
-          g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(0.05, at + 0.006); g.gain.exponentialRampToValueAtTime(0.0001, at + 0.05);
-          s.connect(f); f.connect(g); g.connect(master); s.start(at, Math.random() * 1.5, 0.08);
-        }
+        var o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime + when;
+        o.frequency.value = 52; o.connect(g); g.connect(master);
+        g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.5, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
+        o.start(t); o.stop(t + 0.35);
+      },
+      crackle: function () {
+        if (!on) return; var t = ac.currentTime;
+        crackG.gain.cancelScheduledValues(t); crackG.gain.setValueAtTime(0.05, t); crackG.gain.linearRampToValueAtTime(0, t + 1.4);
+      },
+      boom: function () {
+        if (!on) return;
+        var s = ac.createBufferSource(), len = ac.sampleRate * 2, b = ac.createBuffer(1, len, ac.sampleRate), d = b.getChannelData(0), t = ac.currentTime;
+        for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / len * 5);
+        s.buffer = b; var lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 900;
+        var g2 = ac.createGain(); g2.gain.value = 0; s.connect(lp); lp.connect(g2); g2.connect(master);
+        g2.gain.setValueAtTime(0, t + 0.9); g2.gain.linearRampToValueAtTime(0.7, t + 1.0); s.start(t + 0.9);
       }
     };
   })();
-  window.theApproach = { sound: Sound.state, mode: function () { return mode; } };
+  window.theApproach = {
+    sound: Sound.state, mode: function () { return mode; },
+    lives: function () { return LIVES.map(function (L) { return { f: L.f, band: L.band, who: L.who, kind: L.kind, date: L.date || '', text: L.text || '', over: L.over || [], thought: L.thought || '', digits: L.digits || '' }; }); },
+    on: function () { return cur ? cur.band : ''; },
+    memory: function () { return mem ? { t: (performance.now() - mem.t0) / 1000, particles: mem.P ? mem.P.length : -1, real: !!mem.real, clip: vid.currentTime, paused: vid.paused } : null; }
+  };
+  function soundLabel() { elSound.textContent = Sound.isOn() ? 'Sound off' : (Sound.state() === 'none' ? 'Tune in' : 'Sound on'); elSound.setAttribute('aria-pressed', String(Sound.isOn())); }
   elSound.hidden = !(window.AudioContext || window.webkitAudioContext);
-  elSound.addEventListener('click', function () {
-    var on = Sound.toggle();
-    elSound.textContent = on ? 'Sound off' : 'Sound on';
-    elSound.setAttribute('aria-pressed', String(on));
-  });
+  elSound.addEventListener('click', function () { if (Sound.isOn()) Sound.stop(); else Sound.start(); if (mem && mem.real) vid.muted = !Sound.isOn(); soundLabel(); });
 
   /* ── the frame ── */
   var visible = true, raf = 0;
@@ -819,12 +1086,9 @@
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     if (mode === 'opening') drawOpening(t);
     else if (mode === 'walk') { drawWalk(t); Sound.bed(0.006, 900); }
-    else {
-      drawSky(t, 1);
-      if (mode === 'fly' && move) { var k = easeIn((t - move.t0) / move.dur); ctx.globalAlpha = k * k; ctx.fillStyle = '#1a0510'; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1; }
-      Sound.bed(0.012, 1100);
-      if (mode === 'sky' && t > airTimer && !move) { airTimer = t + 3.4 + Math.random() * 1.6; airNext(); }
-    }
+    else if (mode === 'dial') { f += (target - f) * 0.18; drawDial(t); }
+    else { drawSky(t, 1); Sound.bed(0.012, 1100); }
+    elNeedle.style.left = (f * 100) + '%';
     raf = requestAnimationFrame(frame);
   }
   function wake() { if (!raf) raf = requestAnimationFrame(frame); }
@@ -834,14 +1098,12 @@
   if (window.ResizeObserver) new ResizeObserver(resize).observe(stage);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { if (mode === 'walk') layoutRing(); });
 
-  /* ── hands: buttons, keys, and the sky under the mouse or a finger ── */
-  $('enter').hidden = false; $('look').hidden = false;
-  $('enter').addEventListener('click', enterFilm);
-  $('enter2').addEventListener('click', enterFilm);
-  $('look').addEventListener('click', lookAround);
-  $('unlook').addEventListener('click', function () { toSky(false); });
+  /* ── hands: buttons and keys ── */
+  $('tune').hidden = false;
+  $('tune').addEventListener('click', function () { Sound.start(); soundLabel(); toDial(); });
+  elEnter.addEventListener('click', enterFilm);
   $('up').addEventListener('click', function () { if (path.length) go(path.slice(0, -1)); });
-  $('out').addEventListener('click', function () { Sound.bell(-1); toSky(false); });
+  $('out').addEventListener('click', function () { Sound.bell(-1); toDial(); });
   elSkip.addEventListener('click', endOpening);
   window.addEventListener('hashchange', function () {
     var p = parseHash();
@@ -854,69 +1116,19 @@
     if (mode === 'walk') {
       if (/^[1-9]$/.test(e.key)) { var p = path.concat([Number(e.key)]); if (nodeAt(p) !== undefined) { e.preventDefault(); go(p); } }
       else if (e.key === 'Backspace') { e.preventDefault(); if (path.length) go(path.slice(0, -1)); }
-      else if (e.key === 'Escape') { e.preventDefault(); toSky(false); }
-    } else if (mode === 'look' && e.key === 'Escape') toSky(false);
-    else if (mode === 'opening' && e.key === 'Escape') endOpening();
+      else if (e.key === 'Escape') { e.preventDefault(); toDial(); }
+    } else if (mode === 'dial' || mode === 'sky') {
+      /* the arrow keys tune */
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); if (mode === 'sky') toDial(); target = clamp(target + (e.key === 'ArrowRight' ? 0.01 : -0.01), 0, 1); }
+    } else if (mode === 'opening' && e.key === 'Escape') endOpening();
   });
-
-  var ptrs = {}, drag = null;
-  function nearest(px, py) {
-    var best = null, bd = 26 * 26, fx = sx(filmStar.x) - px, fy = sy(filmStar.y) - py;
-    if (fx * fx + fy * fy < 34 * 34) return FILM;
-    for (var i = 0; i < stars.length; i++) { var dx = sx(stars[i].x) - px, dy = sy(stars[i].y) - py, d = dx * dx + dy * dy; if (d < bd) { bd = d; best = stars[i].name; } }
-    return best;
-  }
-  canvas.addEventListener('pointerdown', function (e) {
-    if (mode === 'sky' && e.pointerType === 'mouse' && !move) lookAround();
-    if (mode !== 'look') return;
-    move = null;
-    ptrs[e.pointerId] = { x: e.clientX, y: e.clientY };
-    drag = { x: e.clientX, y: e.clientY, moved: 0, pinch: 0 };
-    try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* no capture, no matter */ }
-    stage.classList.add('dragging');
-  });
-  canvas.addEventListener('pointermove', function (e) {
-    if (mode !== 'look' || !ptrs[e.pointerId] || !drag) return;
-    var ids = Object.keys(ptrs);
-    if (ids.length >= 2) {
-      ptrs[e.pointerId] = { x: e.clientX, y: e.clientY };
-      var a = ptrs[ids[0]], b = ptrs[ids[1]], dist = Math.hypot(a.x - b.x, a.y - b.y);
-      if (drag.pinch) cam.z = clamp(cam.z * dist / drag.pinch, 0.5, 9);
-      drag.pinch = dist; drag.moved = 99;
-      return;
-    }
-    var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
-    drag.x = e.clientX; drag.y = e.clientY; drag.moved += Math.abs(dx) + Math.abs(dy);
-    ptrs[e.pointerId] = { x: e.clientX, y: e.clientY };
-    cam.x = clamp(cam.x - dx / (cam.z * unit()), -1.3, 1.3); cam.y = clamp(cam.y - dy / (cam.z * unit()), -1, 1);
-  });
-  function lift(e) {
-    if (!ptrs[e.pointerId]) return;
-    delete ptrs[e.pointerId];
-    stage.classList.remove('dragging');
-    if (drag && drag.moved < 6 && mode === 'look') {
-      var r = stage.getBoundingClientRect(), name = nearest(e.clientX - r.left, e.clientY - r.top);
-      elStarname.textContent = name ? (name === FILM ? name + ', the film' : name) : '';
-    }
-    if (!Object.keys(ptrs).length) drag = null; else if (drag) drag.pinch = 0;
-  }
-  canvas.addEventListener('pointerup', lift);
-  canvas.addEventListener('pointercancel', lift);
-  canvas.addEventListener('wheel', function (e) {
-    if (mode !== 'look') return;
-    e.preventDefault();
-    move = null;
-    var r = stage.getBoundingClientRect(), px = e.clientX - r.left, py = e.clientY - r.top;
-    var wx = cam.x + (px - cam.ax * W) / (cam.z * unit()), wy = cam.y + (py - cam.ay * H) / (cam.z * unit());
-    cam.z = clamp(cam.z * Math.exp(-e.deltaY * 0.0014), 0.5, 9);
-    cam.x = wx - (px - cam.ax * W) / (cam.z * unit()); cam.y = wy - (py - cam.ay * H) / (cam.z * unit());
-  }, { passive: false });
 
   /* ── begin ── */
   resize();
+  buildScale();
   var first = parseHash();
   if (first) { pendingPath = first; setMode('fly'); cam = restCam(); }
-  else if (store.get(SEEN) || CALM) toSky(true);
+  else if (store.get(SEEN) || CALM) toSky();
   else { setMode('opening'); opened = now(); elSkip.hidden = false; }
   readAll();
   wake();
