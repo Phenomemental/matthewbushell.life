@@ -521,29 +521,44 @@ class TheFilmPage(Base):
         for attr, url in re.findall(r'\b(href|src)="(/[^"]*)"', h):
             self.assertTrue(url.startswith(ROOT + '/'), '%s="%s"' % (attr, url))
 
-    def test_its_moments_are_carried_beside_it(self):
+    def test_its_parts_are_carried_beside_it_with_a_list_of_what_is_there(self):
+        """Version three (film:the-approach 6.46): clips, glimpses and stills beside the page, and a manifest
+        listing them, so a clip or glimpse dropped in plays with no change to the page."""
         self.run_with(blocks())
         files = self.run_.files()
-        moments = [f for f in files if re.fullmatch(r'the-approach/moments/72[1-8]{3}\.mp4', f)]
-        self.assertEqual(len(moments), 27)
-        src = os.path.join(fixture.REPO, 'the-approach', 'moments', '72111.mp4')
-        self.assertEqual(os.path.getsize(os.path.join(self.run_.out, 'the-approach', 'moments', '72111.mp4')), os.path.getsize(src))
+        here = os.path.join(fixture.REPO, 'the-approach')
+        for kind, ext in (('clips', '.mp4'), ('glimpses', '.mp4'), ('stills', '.jpg')):
+            names = sorted(fn[:-len(ext)] for fn in os.listdir(os.path.join(here, kind)) if fn.endswith(ext))
+            self.assertTrue(names, kind)
+            for n in names:
+                self.assertIn('the-approach/%s/%s%s' % (kind, n, ext), files)
+        src = os.path.join(here, 'clips', 'ch1_s2_06.mp4')
+        self.assertEqual(os.path.getsize(os.path.join(self.run_.out, 'the-approach', 'clips', 'ch1_s2_06.mp4')), os.path.getsize(src))
+        listed = json.loads(self.read('the-approach/manifest.json'))
+        self.assertEqual(sorted(listed), ['clips', 'glimpses', 'stills'])
+        self.assertIn('ch1_s2_06', listed['clips'])
+        self.assertIn('ch1_s2_07', listed['clips'])
+        self.assertEqual(len(listed['glimpses']), 8)
+        self.assertIn('ch1_s2_03', listed['stills'])
+        self.assertIn('the-approach/walk.json', files)
         h = self.read(self.FILE)
-        self.assertIn('data-moments="%s/the-approach/moments/"' % ROOT, h)
+        self.assertIn('data-parts="%s/the-approach/"' % ROOT, h)
 
-    def test_only_the_radios_voices_and_the_credits_faces_stay_and_the_retired_files_are_gone(self):
+    def test_the_moments_the_opening_and_the_narrator_are_retired(self):
         self.run_with(blocks())
         files = self.run_.files()
-        self.assertEqual(len([f for f in files if re.fullmatch(r'the-approach/voices/[a-z0-9_]+\.mp3', f)]), 27)
-        self.assertEqual([f for f in files if re.fullmatch(r'the-approach/voices/w_[a-z]+\.mp3', f)], [])
-        self.assertEqual([f for f in files if f.startswith(('the-approach/clips/', 'the-approach/plates/'))], [])
+        self.assertEqual([f for f in files if f.startswith(('the-approach/moments/', 'the-approach/plates/'))], [])
+        voices = [f for f in files if re.fullmatch(r'the-approach/voices/[a-z0-9_]+\.mp3', f)]
+        self.assertEqual(len(voices), 34)   # the radio's 27 and the walk's seven
+        self.assertEqual(sorted(f for f in voices if '/w_' in f), ['the-approach/voices/w_%s.mp3' % w for w in
+                         ('books', 'clock', 'dial', 'gate', 'keep', 'night', 'room')])
         self.assertIn('the-approach/credits/mara.jpg', files)
         self.assertIn('the-approach/credits/tom.jpg', files)
         h = self.read(self.FILE)
         self.assertIn('data-voices="%s/the-approach/voices/"' % ROOT, h)
         self.assertIn('data-credits="%s/the-approach/credits/"' % ROOT, h)
-        self.assertNotIn('the-approach/clips/', h)
-        self.assertNotIn('the-approach/plates/', h)
+        for gone in ('the-approach/moments/', 'the-approach/plates/', 'data-moments', 'id="skip"', 'Ten years ago, everything we kept online was lost.'):
+            self.assertNotIn(gone, h)
 
     def test_it_is_in_no_menu_and_no_sitemap(self):
         self.run_with(blocks())

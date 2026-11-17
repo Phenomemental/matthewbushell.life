@@ -865,6 +865,13 @@ def generate(source, out, site=SITE, root='', pictures=None, record_path=None, p
                 for fn in sorted(filenames):
                     src = os.path.join(dirpath, fn)
                     files[path.strip('/') + '/' + os.path.relpath(src, beside).replace(os.sep, '/')] = ('copy', src)
+            # and a list of what is there to play, so a clip, glimpse or still dropped in needs no change to the page
+            listed = {}
+            for kind, ext in (('clips', '.mp4'), ('glimpses', '.mp4'), ('stills', '.jpg')):
+                folder = os.path.join(beside, kind)
+                listed[kind] = sorted(fn[:-len(ext)] for fn in os.listdir(folder) if fn.endswith(ext)) if os.path.isdir(folder) else []
+            if any(listed.values()):
+                files[path.strip('/') + '/manifest.json'] = json.dumps(listed, sort_keys=True, indent=1) + '\n'
         urls = ['%s%s' % (site, p.path) for p in pages if p.path in live]
         files['sitemap.xml'] = ('<?xml version="1.0" encoding="UTF-8"?>\n'
                                 '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +

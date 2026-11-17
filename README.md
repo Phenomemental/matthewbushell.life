@@ -13,8 +13,11 @@ the beach too, at `spine:life-work` 8. It is not copied here.
   `the-approach.html` is the one page outside the page map: the film's page, carried whole to
   `/the-approach/` while the site is up, in no menu and no sitemap. It reads `film:the-approach` live in
   the reader's browser; its plan is on the beach at `film:the-approach` 6.4.
-- `the-approach/` — what the film's page plays (its `clips/`, the `plates/` behind the walk, and the `voices/`), copied beside
-  the page by the generator.
+- `the-approach/` — what the film's page plays, copied beside the page by the generator: the moving `clips/` named by
+  their cards (`ch1_s2_06.mp4`), the silent `glimpses/`, the `stills/` named by their cards, the `voices/` of the radio and
+  the walk, the `credits/` faces, and `walk.json` (the kinds of moment, a fallback for the decisions read live). The
+  generator also writes `manifest.json` there, listing the clips, glimpses and stills present, so one dropped in under its
+  card's name plays with no change to the page.
 - `assets/` — the look (`site.css`), the page's own moves (`site.js`), the mark, and the reader
   tools copied from Phenomemental/happyseaurchin-beach: `beach.js`, `door.js` (MIT), `door.css`,
   and `tools.js`.
