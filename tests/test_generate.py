@@ -521,26 +521,29 @@ class TheFilmPage(Base):
         for attr, url in re.findall(r'\b(href|src)="(/[^"]*)"', h):
             self.assertTrue(url.startswith(ROOT + '/'), '%s="%s"' % (attr, url))
 
-    def test_its_clip_is_carried_beside_it(self):
-        self.run_with(blocks())
-        h = self.read(self.FILE)
-        self.assertIn('src="%s/the-approach/clips/she_is_home_scene.mp4"' % ROOT, h)
-        self.assertIn('the-approach/clips/she_is_home_scene.mp4', self.run_.files())
-        src = os.path.join(fixture.REPO, 'the-approach', 'clips', 'she_is_home_scene.mp4')
-        self.assertEqual(os.path.getsize(os.path.join(self.run_.out, 'the-approach', 'clips', 'she_is_home_scene.mp4')), os.path.getsize(src))
-
-    def test_its_places_and_voices_are_carried_and_the_old_clip_is_gone(self):
+    def test_its_moments_are_carried_beside_it(self):
         self.run_with(blocks())
         files = self.run_.files()
-        self.assertEqual(len([f for f in files if re.fullmatch(r'the-approach/plates/plate_[a-z_]+\.jpg', f)]), 8)
-        self.assertEqual(len([f for f in files if re.fullmatch(r'the-approach/voices/[a-z0-9_]+\.mp3', f)]), 36)
-        self.assertNotIn('the-approach/voices/voices.js', files)
-        self.assertEqual(len([f for f in files if re.fullmatch(r'the-approach/clips/[a-z_]+[.]mp4', f)]), 7)
-        self.assertNotIn('the-approach/clips/gate.mp4', files)
+        moments = [f for f in files if re.fullmatch(r'the-approach/moments/72[1-8]{3}\.mp4', f)]
+        self.assertEqual(len(moments), 27)
+        src = os.path.join(fixture.REPO, 'the-approach', 'moments', '72111.mp4')
+        self.assertEqual(os.path.getsize(os.path.join(self.run_.out, 'the-approach', 'moments', '72111.mp4')), os.path.getsize(src))
         h = self.read(self.FILE)
-        self.assertIn('data-plates="%s/the-approach/plates/"' % ROOT, h)
+        self.assertIn('data-moments="%s/the-approach/moments/"' % ROOT, h)
+
+    def test_only_the_radios_voices_and_the_credits_faces_stay_and_the_retired_files_are_gone(self):
+        self.run_with(blocks())
+        files = self.run_.files()
+        self.assertEqual(len([f for f in files if re.fullmatch(r'the-approach/voices/[a-z0-9_]+\.mp3', f)]), 27)
+        self.assertEqual([f for f in files if re.fullmatch(r'the-approach/voices/w_[a-z]+\.mp3', f)], [])
+        self.assertEqual([f for f in files if f.startswith(('the-approach/clips/', 'the-approach/plates/'))], [])
+        self.assertIn('the-approach/credits/mara.jpg', files)
+        self.assertIn('the-approach/credits/tom.jpg', files)
+        h = self.read(self.FILE)
         self.assertIn('data-voices="%s/the-approach/voices/"' % ROOT, h)
-        self.assertIn('data-clips="%s/the-approach/clips/"' % ROOT, h)
+        self.assertIn('data-credits="%s/the-approach/credits/"' % ROOT, h)
+        self.assertNotIn('the-approach/clips/', h)
+        self.assertNotIn('the-approach/plates/', h)
 
     def test_it_is_in_no_menu_and_no_sitemap(self):
         self.run_with(blocks())
