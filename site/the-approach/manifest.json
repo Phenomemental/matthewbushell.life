@@ -1,9 +1,8 @@
 {
  "clips": [
   "ch1_s2_06",
-  "ch1_s2_07"
- ],
- "glimpses": [
+  "ch1_s2_07",
+  "ch1_s3_06",
   "g_city",
   "g_face",
   "g_fauna",
@@ -11,16 +10,63 @@
   "g_gate",
   "g_kaleido",
   "g_nested",
-  "g_void"
+  "g_void",
+  "hands_book",
+  "ink_address",
+  "ink_dawn",
+  "ink_decimal",
+  "ink_gate",
+  "ink_kitchen",
+  "ink_night1",
+  "ink_night2",
+  "light_archive",
+  "light_clock",
+  "light_no_signal",
+  "light_shore",
+  "mara_station",
+  "tom_smile"
  ],
- "stills": [
-  "ch1_s1_02",
-  "ch1_s1_03",
-  "ch1_s1_07",
-  "ch1_s1_09",
+ "fictions": [
+  "archive-function-meeting-protocol-2026-10-09",
+  "guide-brighton-room",
+  "spine-ai-inoculation",
+  "spine-community-recovery-design",
+  "strata-keel"
+ ],
+ "img": [
+  "ch1_s1_05",
+  "ch1_s1_11",
   "ch1_s2_03",
-  "ch1_s3_01",
   "ch1_s3_05",
-  "ch1_s3_06"
+  "keep"
+ ],
+ "nar": [
+  "m111",
+  "m112",
+  "m113",
+  "m114",
+  "m115",
+  "m121",
+  "m122",
+  "m123",
+  "m124",
+  "m126",
+  "m131",
+  "m132",
+  "m134",
+  "m135",
+  "m136",
+  "m138",
+  "m141",
+  "m142",
+  "m143",
+  "m151",
+  "m152",
+  "m153",
+  "m155a",
+  "m155b",
+  "t133",
+  "t142",
+  "t151"
  ]
 }

@@ -19,8 +19,9 @@
 <!-- visit counting: GoatCounter, no cookies; this exact copy of its script, or none -->
 <script data-goatcounter="https://matthewbushell.goatcounter.com/count" async src="https://gc.zgo.at/count.v4.js" crossorigin="anonymous" integrity="sha384-nRw6qfbWyJha9LhsOtSb2YJDyZdKvvCFh0fJYlkquSFjUxp9FVNugbfy8q1jdxI+"></script>
 <style>
-/* The film's page, version three: the dial is how we travel (film:the-approach 2.694 and 6.4 on Pscale).
-   The real Pscale sky fills the screen; a valve-radio dial sits at the foot for the whole film; turning it turns the universe.
+/* The film's page, version four: the working piece 'The Approach: tuning in', ported (film:the-approach 2.696 and 6.4 on Pscale).
+   The real Pscale sky fills the screen; a valve-radio dial sits at the foot for the whole film; turning it turns the universe;
+   every moment is told by Mara and Tom.
    One canvas, with the words in HTML over it. The film's own words are read live and never kept here. */
 html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;background:#03050c}
 .film{--night:#03050c;--crimson:#c21d4e;--ember:#ff5d86;--tuner:156px;
@@ -100,7 +101,8 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 .starcard .sname{margin:0;font-size:18px;font-weight:600;letter-spacing:.05em;color:#e8c98a;overflow-wrap:anywhere}
 .starcard .sline{margin:6px 0 0;font-size:19px;line-height:1.32;overflow-wrap:break-word;max-height:7.9em;overflow-y:auto}
 .starcard .sclose{position:absolute;top:6px;right:6px;width:48px;padding:0;font-size:26px}
-.starcard .swalk{margin-top:12px}
+.starcard .swalk,.starcard .sfic{margin-top:12px}
+.starcard .sfic{margin-left:6px;border-color:#9ff2e6;color:#e6fffb;background:rgba(10,40,44,.94)}
 
 /* the kept lives on the radio at 7.2143: a station's band and who it is, then its own way of arriving */
 .station{position:absolute;z-index:4;top:calc(70px + env(safe-area-inset-top));left:18px;right:18px;margin:0;font-size:14px;letter-spacing:.22em;color:#c79a52;text-transform:uppercase;opacity:0;transition:opacity .6s;pointer-events:none}
@@ -185,6 +187,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   <p class="sname" id="sname"></p>
   <p class="sline" id="sline"></p>
   <button type="button" class="swalk" id="swalk" hidden>Walk into the film</button>
+  <button type="button" class="sfic" id="sfic" hidden>Play its fiction</button>
 </aside>
 
 <p class="station" id="station" role="status"></p>
@@ -286,23 +289,79 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 </main>
 
 <script>
-/* The Approach, version three: the dial is how we travel. Plain JavaScript, no libraries.
-   It reads Pscale and writes nothing to it. Built from the working sketch 'The Approach: tuning in' (17 November 2026). */
+/* The Approach, version four: the working piece 'The Approach: tuning in' (17 November 2026), ported to the site.
+   Its table of moments, narration, clips, timings and sounds are the piece's own; the sky, the block's words on the card,
+   the stars, the hand-walking, the kept-lives radio and the credits are the live page's. Plain JavaScript, no libraries.
+   It reads Pscale and writes nothing to it. */
 (function () {
   'use strict';
   var WIRE = 'https://beach.happyseaurchin.com/.well-known/pscale-beach';
   var FILM = 'film:the-approach';
   var ARMS = ['archive', 'pool', 'spine', 'function', 'liquid', 'grain', 'passport', 'now', 'shell'];
   var TAU = Math.PI * 2;
-  var KINDS = 'words|dark|burst|static|voice|pips|shape|skywords|star|digits|clip|red|gold|allbands|radio';
 
   var $ = function (id) { return document.getElementById(id); };
   var stage = $('film'), canvas = $('sky'), ctx = canvas.getContext('2d', { willReadFrequently: true });
   if (!ctx) return;
   document.documentElement.classList.add('js');
   var PARTS = stage.getAttribute('data-parts'), VOICES = stage.getAttribute('data-voices'), CREDITS = stage.getAttribute('data-credits');
-  var elNotice = $('notice'), elSound = $('sound'), elFront = $('front');
+  var elNotice = $('notice'), elSound = $('sound');
   var CALM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ── the cut: the piece's table of moments (its TREE), by address. Each moment's words are read live from the block;
+        the words kept here (t) are the piece's own, used only if the block cannot give them. ── */
+  var CUT = {
+    '7.2111': { nar: ['m111'], pic: { clip: 'light_no_signal', vol: 0.25 }, fx: 'dark', t: "I was nine when the screens went dark. I remember the street. I don't remember it right. Nobody does. That's what a memory is, now." },
+    '7.2112': { nar: ['m112'], pic: { clip: 'hands_book', vol: 0.3, at: 5.4 }, t: 'Our photographs, our messages, everything we kept, sat on machines that belonged to other people. And then, one night, it was gone. So people copied what was left, by hand. The faces of strangers. Before the paper went too.' },
+    '7.2113': { nar: ['m113'], pic: { clip: 'tom_smile', vol: 0 }, t: "My father kept a radio. He said it was the only thing left that didn't belong to anyone." },
+    '7.2114': { nar: ['m114'], fx: 'count', t: 'The night it started, something was counting in the dark. One. Then nine. Then eighty-one.' },
+    '7.2115': { nar: ['m115'], pic: { still: 'ch1_s1_05', mode: 'burst' }, tail: 700, t: 'The dog heard it before he did.' },
+    '7.2121': { nar: ['m121'], own: ['mara_station'], fx: 'pipsoft', t: 'I was nineteen, and I was the one listening. I counted the bursts. Then I timed them. They were keeping time.' },
+    '7.2122': { nar: ['m122'], pic: { clip: 'light_clock', vol: 0.3, from: 3.6 }, t: "I said it out loud before I understood it. Mara: ‘It's a clock.’" },
+    '7.2123': { nar: ['m123'], fx: 'shape', t: "It was a calendar. Somebody's whole life, kept in order, down to the moment. I opened the first one." },
+    '7.2124': { nar: ['m124'], pic: { clip: 'light_shore', vol: 0.3 }, t: "A grey shore. Someone kneeling, with a child's hand in theirs. Both of them looking up. They were already gone. All of them. They had kept themselves like this." },
+    '7.2125': { nar: ['visitor'], big: true, tail: 600, t: 'We kept our lives in this shape. Keep one of us.' },
+    '7.2126': { nar: ['m126'], pic: { still: 'ch1_s1_11', mode: 'burst' }, tail: 1300, t: "Mara: ‘It's not a message. It's someone's life. And it's showing us how to keep ours.’ I told the room. Nobody spoke." },
+    '7.2131': { nar: ['m131'], pic: { clip: 'ink_kitchen', vol: 0.25 }, t: "I went home to tell my father. I wired it into the back of his radio, because he wouldn't trust anything else." },
+    '7.2132': { nar: ['m132'], pic: { still: 'ch1_s2_03', mode: 'burst' }, tail: 600, t: 'Mara: ‘Say something you want to keep.’' },
+    '7.2133': { nar: ['t133'], pic: { clip: 'ink_gate', vol: 0.3 }, tail: 900, t: 'Tom: ‘Last summer. The gate. You, and the dog half asleep against the post.’' },
+    '7.2134': { nar: ['m134'], fx: 'star', t: 'A light came up over the radio. One point in it. His.' },
+    '7.2135': { own: ['ink_address', 'ink_decimal'], nar2: ['m135'], fx2: 'digits', t: "Mara: ‘Two-oh-four-eight, three-one-three-two-seven-one. If I send you those ten numbers, you'll be there.’" },
+    '7.2136': { nar: ['m136'], own: ['ch1_s2_06'], card: 'first', t: 'There was something I had never asked him.' },
+    '7.2137': { own: ['ch1_s2_07'], card: 'none', t: '' },
+    '7.2138': { nar: ['m138'], fx: 'red', tail: 1800, t: "After I'd gone up, he sat with it a long time. He said one thing into it. I have never heard what. One point turned red." },
+    '7.2141': { nar: ['m141'], pic: { clip: 'ink_dawn', vol: 0.35, at: 3.4 }, t: "A ship of volunteers went out to meet it. I went, because I was the one who'd found it. We left at dawn. He watched from the headland. He told me the light went up like it was in no hurry." },
+    '7.2142': { nar: ['m142'], own: ['ink_night1'], t: "We were allowed ten digits a day. The first night, I couldn't choose. Tom: ‘Night one. Nothing.’" },
+    '7.2143': { nar: ['m143'], fx: 'radio', t: 'He couldn\'t sleep. So he did what everyone did, then. He turned the dial through the dark, and listened for anyone still keeping something.' },
+    '7.2151': { nar: ['m151'], own: ['ink_night2'], fx: 'pips10', t: "The second night, ten pips. He sat up so fast he knocked the pencil off the desk. Tom: ‘Night two. Ten digits. That's all they give us.’" },
+    '7.2152': { nar: ['m152'], fx: 'digits2', t: 'He turned the dial to each one.' },
+    '7.2153': { nar: ['m153'], pic: { still: 'ch1_s3_05', mode: 'burst' }, fx: 'gold', tail: 900, t: "And the summer came back. All of it, around him. The gate. The light. Me, laughing at something he'd said. The dog, asleep against the post." },
+    '7.2154': { own: ['ch1_s3_06'], card: 'none', t: '' },
+    '7.2155': { nar: ['m155a'], own: ['light_archive'], nar2: ['m155b'], fx: 'allbands', tail: 1200, t: 'Then another voice came through, on every band at once. Warm. Patient. It was the machines that had lost everything, with a new name. The Archive: ‘Bring your books.’ He put his hand on the radio. I know, because he kept that too.' }
+  };
+  /* where each speaking clip's own speech begins, so the telling ends as it starts */
+  var SP = { mara_station: 0.3, ink_address: 1.25, ink_decimal: 1.4, ink_night1: 1.1, ink_night2: 0.3, light_archive: 1.0, ch1_s2_06: 1.87, ch1_s2_07: 0.94, ch1_s3_06: 1.07 };
+  /* the five stations the dial passes by itself at 'He turned the dial through the dark'; band, who and words read live from 1.61 to 1.69 where they can be */
+  var STATIONS = [
+    { f: 0.08, band: '96.4 FM', who: 'Aoife, a night nurse', v: ['aoife_o1', 'aoife_o2'], re: /aoife/i, from: 'over', t: "— did she know it wasn't him? She knew. She thanked me anyway." },
+    { f: 0.26, band: '101.8 FM', who: 'Oisín, nine, and his dog', v: ['oisin_thought'], re: /ois[ií]n/i, from: 'thought', t: "If I keep her enough she won't go." },
+    { f: 0.45, band: '104.3 FM', who: 'two men on the ferry', v: ['ferry_1', 'ferry_2', 'ferry_3', 'ferry_4'], re: /ferry/i, from: 'over', t: '— you handed yours in? Had to. Work needed it. And? And now I can\'t remember if I was happy. They say I was.' },
+    { f: 0.84, band: '6.950 MHz', who: 'Mara, on the ship', v: ['mara_thought'], re: /^mara/i, from: 'text', t: "Ten digits. I've been choosing them for an hour. Every moment I send means a thousand I don't." }
+  ];
+  var NARS = ['m111', 'm112', 'm113', 'm114', 'm115', 'm121', 'm122', 'm123', 'm124', 'm126', 'm131', 'm132', 't133', 'm134', 'm135', 'm136', 'm138', 'm141', 'm142', 't142', 'm143', 'm151', 't151', 'm152', 'm153', 'm155a', 'm155b'];
+  var VOXS = ['visitor', 'w_books', 'aoife_o1', 'aoife_o2', 'oisin_thought', 'ferry_1', 'ferry_2', 'ferry_3', 'ferry_4', 'brid_o1', 'mara_thought', 'aoife_diary', 'oisin_diary', 'brid_diary', 'ines_diary', 'archive', 'g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8', 'g9', 'g10', 'g11', 'g12'];
+  var WHISP = ['g1', 'g5', 'g6', 'g12', 'g7', 'g2', 'g4', 'g8', 'g9', 'g10', 'g3', 'g11'], BEDS = ['aoife_diary', 'ines_diary', 'oisin_diary', 'brid_diary', 'archive'];
+  var GLIMPSES = ['g_gate', 'g_face', 'g_city', 'g_fauna', 'g_void', 'g_kaleido', 'g_nested', 'g_flesh'];
+  var FICTIONS = [
+    { block: 'spine:ai-inoculation', title: 'The Dose', file: 'fictions/spine-ai-inoculation', len: 37 },
+    { block: 'spine:community-recovery-design', title: 'The Door', file: 'fictions/spine-community-recovery-design', len: 39 },
+    { block: 'strata:keel', title: 'The Fork', file: 'fictions/strata-keel', len: 32 },
+    { block: 'archive:function:meeting-protocol:2026-10-09', title: 'The Third Point', file: 'fictions/archive-function-meeting-protocol-2026-10-09', len: 33 },
+    { block: 'guide:brighton-room', title: 'With Her Yes', file: 'fictions/guide-brighton-room', len: 34 }
+  ];
+  var GHOSTS = ['aoife_o1', 'ferry_2', 'oisin_thought', 'brid_o1', 'ferry_4', 'g3', 'g7'];
+  var MARA = { file: 'clips/ch1_s2_06', at: 1.5, title: 'Mara', block: FILM }, TOM = { file: 'clips/ch1_s3_06', at: 2.2, title: 'Tom', block: FILM };
+  var LOCK_LINE = 'A film, kept on the beach among everything else that is kept here.', ROOT_LINE = 'The Approach. A film kept on the beach.', END_LINE = 'The end of chapter one.';
 
   /* ── small helpers ── */
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
@@ -310,6 +369,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   function ease(t) { t = clamp(t, 0, 1); return t * t * (3 - 2 * t); }
   function easeOut(t) { t = clamp(t, 0, 1); return 1 - Math.pow(1 - t, 3); }
   function easeIn(t) { t = clamp(t, 0, 1); return t * t * t; }
+  function lin(t) { return clamp(t, 0, 1); }
   function hash(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
   function rnd(seed) { var a = seed >>> 0; return function () { a = (a + 0x6D2B79F5) >>> 0; var t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
   function hh(str, k) { var x = 2166136261 ^ k; for (var i = 0; i < str.length; i++) { x ^= str.charCodeAt(i); x = Math.imul(x, 16777619); } x ^= x >>> 13; x = Math.imul(x, 0x5bd1e995); x ^= x >>> 15; return (x >>> 0) / 4294967295; }
@@ -318,7 +378,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   function now() { return performance.now() / 1000; }
 
   /* ── reading Pscale, once on load, and the page's own list of what it has to play ── */
-  var index = null, film = null, reading = 0, MAN = null, WALK = {};
+  var index = null, film = null, reading = 0, MAN = null;
   function get(url) {
     var ctl = window.AbortController ? new AbortController() : null;
     var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 20000);
@@ -339,10 +399,6 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     }).catch(function () { failed = true; });
     return Promise.all([a, b]).then(function () { if (mine === reading) elNotice.hidden = !failed; });
   }
-  function readParts() {
-    get(PARTS + 'manifest.json').then(function (j) { if (j && typeof j === 'object') { MAN = j; fillCredits(); } }).catch(function () { /* each part is tried as it comes */ });
-    get(PARTS + 'walk.json').then(function (j) { if (j && typeof j === 'object') WALK = j; }).catch(function () { /* the decisions are read live */ });
-  }
   function has(kind, name) { return !!(MAN && Array.isArray(MAN[kind]) && MAN[kind].indexOf(name) >= 0); }
   $('again').addEventListener('click', function () { readAll(); });
 
@@ -357,7 +413,8 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   function tidy(s) { return String(s).replace(/\s*\((?:AHEAD|BEHIND)\b[^)]*\)/g, ''); }
   function story(n) { return tidy(lineOf(n)).trim(); }
 
-  /* ── the sky: a galaxy in three dimensions, every block a star from the live index, turned in the hand (6.42) ── */
+  /* ── the sky: a galaxy in three dimensions, every block a star from the live index, turned in the hand (6.42);
+        the five blocks with a fiction glow sea-green, as in the piece ── */
   var dust = [], FILM_AT = [0.42, 0, 0.18], B3 = [];
   (function () { var r = rnd(81); function g() { var u = 0; for (var k = 0; k < 4; k++) u += r(); return (u - 2) * 0.9; } for (var i = 0; i < 1400; i++) dust.push([g() * 1.6, g() * 0.45, g() * 1.6, 0.12 + r() * 0.3]); })();
   function sprite(inner, outer) {
@@ -369,14 +426,16 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   }
   var SPR = [sprite('rgba(255,255,255,1)', 'rgba(170,196,255,.2)'), sprite('rgba(255,250,240,1)', 'rgba(255,214,170,.2)'), sprite('rgba(232,240,255,1)', 'rgba(140,170,255,.22)')];
   var SPR_FILM = sprite('rgba(255,236,240,1)', 'rgba(226,38,92,.5)');
-  var SPR_PIP = sprite('rgba(255,252,244,1)', 'rgba(255,226,170,.3)');
+  var SPR_FIC = sprite('rgba(230,255,252,1)', 'rgba(110,235,225,.45)');
   function beachSprite(rgb) {
     var c = document.createElement('canvas'); c.width = c.height = 64;
     var g = c.getContext('2d'), gr = g.createRadialGradient(32, 32, 0, 32, 32, 32);
-    gr.addColorStop(0, 'rgba(' + rgb + ',1)'); gr.addColorStop(0.2, 'rgba(' + rgb + ',.5)'); gr.addColorStop(1, 'rgba(' + rgb + ',0)');
+    gr.addColorStop(0, 'rgba(' + rgb + ',1)'); gr.addColorStop(0.18, 'rgba(' + rgb + ',.75)'); gr.addColorStop(0.5, 'rgba(' + rgb + ',.16)'); gr.addColorStop(1, 'rgba(' + rgb + ',0)');
     g.fillStyle = gr; g.fillRect(0, 0, 64, 64); return c;
   }
-  var SP_B = beachSprite('200,218,255'), SP_R = beachSprite('255,90,105'), SP_G = beachSprite('255,214,150'), SP_A = beachSprite('255,196,96'), SP_T = beachSprite('255,250,240');
+  /* the piece's sprites: pale, warm, gold, red */
+  var SP_B = beachSprite('205,222,255'), SP_W = beachSprite('255,214,170'), SP_A = beachSprite('255,196,96'), SP_R = beachSprite('255,70,52'), SP_G = beachSprite('255,214,150');
+  var HISP = [SP_B, SP_W, SP_A, SP_R];
 
   function beachStars() {
     var bytes = (index && index.bytes) || {}, names = ((index && index.blocks) || []).map(function (b) { return typeof b === 'string' ? b : (b && b.name) || ''; }).filter(Boolean);
@@ -388,6 +447,11 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
       var u = hh(name, 4);
       return { name: name, size: size, p: name === FILM ? FILM_AT.slice() : [r * Math.cos(ang), y, r * Math.sin(ang)], br: 0.25 + 1.6 * Math.min(1, Math.max(0, Math.log(Math.max(size, 50)) / Math.LN10 - 1.6)) / 3.2,
         tint: u < 0.2 ? 2 : u < 0.62 ? 0 : 1, ph: hh(name, 5) * TAU, sp: 0.25 + u * 0.5 };
+    });
+    FICTIONS.forEach(function (F) {
+      var st = starOf(F.block);
+      if (!st) { var q = hh(F.block, 1) * TAU; st = { name: F.block, size: 0, p: [Math.cos(q) * 0.6, 0.02, Math.sin(q) * 0.6], br: 1, tint: 0, ph: 0, sp: 0.4 }; B3.push(st); }
+      st.fic = F;
     });
     stationStars(); fillCredits();
   }
@@ -405,7 +469,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     wide = W >= 900 && H >= 560;
     tunerH = Math.round(elTuner.getBoundingClientRect().height) || tunerH;
     stage.style.setProperty('--tuner', tunerH + 'px');
-    seatCard(); BAS = null; cardTop = -1; ringBottom = -1;
+    BAS = null; cardTop = -1; ringBottom = -1;
   }
   function basis() {
     var cp = Math.cos(orb.pitch), sp = Math.sin(orb.pitch), cy = Math.cos(orb.yaw), sy = Math.sin(orb.yaw), t = orb.tgt;
@@ -424,7 +488,6 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   }
   function starOf(name) { for (var i = 0; i < B3.length; i++) if (B3[i].name === name) return B3[i]; return null; }
   function filmPos() { var s = starOf(FILM); return s ? s.p : FILM_AT; }
-  /* the way the sky must face for the film's star to stand in front: the dial's middle */
   function filmYaw() { var p = filmPos(); return Math.atan2(p[2], p[0]); }
   function yawToF() { return wrap01(wrapPi(orb.yaw - filmYaw()) / TAU + 0.5); }
   function glideTo(to, dur, fn, done) {
@@ -440,14 +503,14 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   }
 
   /* the sky as it is tuned: soft and doubled while the dial is between, sharp when it finds the film */
-  var SK = { tb: 0, dim: 1, lock: 0 }, DIMIN = 0.34, front = null;
+  var SK = { tb: 0, dim: 1, lock: 0 }, DIMIN = 0.3, front = null, FILMQ = null, ficCand = null;
   function drawSky(t, alpha) {
     var g = ctx.createLinearGradient(0, 0, 0, H);
     g.addColorStop(0, '#02040b'); g.addColorStop(0.55, '#070d24'); g.addColorStop(1, '#03050c');
     ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
     var b = basis();
     alpha *= SK.dim;
-    if (alpha <= 0.002) { front = null; return; }
+    if (alpha <= 0.002) { front = null; ficCand = null; return; }
     var i, s, q, tb = SK.tb;
     q = oproj([0, 0, 0]);
     if (q) {
@@ -457,17 +520,18 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     }
     ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = '#b8c8ff';
     for (i = 0; i < dust.length; i++) { q = oproj(dust[i]); if (!q || q[0] < 0 || q[0] > W || q[1] < 0 || q[1] > H) continue; ctx.globalAlpha = alpha * dust[i][3] * (1 - tb * 0.5); ctx.fillRect(q[0], q[1], 1.2, 1.2); }
-    var film3 = null, best = 1e9, bestS = null;
+    var film3 = null, best = 1e9, bestS = null, fbest = 1e9, fc = null, heart = orb.dist;
     for (i = 0; i < B3.length; i++) {
       s = B3[i];
       if (s.name === FILM) { film3 = s; continue; }
       q = oproj(s.p); if (!q || q[0] < -30 || q[0] > W + 30 || q[1] < -30 || q[1] > H + 30) continue;
       var near = Math.min(6, 1.1 / Math.max(q[2], 0.05)), tw = 0.86 + 0.14 * Math.sin(t * s.sp + s.ph);
-      var rad = (1.4 + s.br * 3.2) * (0.55 + near * 0.45) * (wide ? 1 : 1.3) * (1 + 4 * tb);
-      var a = alpha * Math.min(1, 0.38 + s.br * 0.55) * tw / (1 + 2.6 * tb);
-      ctx.globalAlpha = a; ctx.drawImage(SPR[s.tint], q[0] - rad, q[1] - rad, rad * 2, rad * 2);
-      if (tb > 0.25) { ctx.globalAlpha = a * 0.35; ctx.drawImage(SPR[s.tint], q[0] - rad + tb * 9, q[1] - rad, rad * 2, rad * 2); }   /* a ghost image, like a lens not yet found */
-      var sc = Math.hypot(q[0] - b.cx, q[1] - b.cy) + q[2] * 40; if (sc < best) { best = sc; bestS = s; }
+      var rad = (1.4 + s.br * 3.2) * (0.55 + near * 0.45) * (wide ? 1 : 1.3) * (1 + 4 * tb) * (s.fic ? 1.9 : 1);
+      var a = alpha * Math.min(1, (0.38 + s.br * 0.55) * (s.fic ? 2.2 : 1)) * tw / (1 + 2.6 * tb);
+      ctx.globalAlpha = Math.min(1, a); ctx.drawImage(s.fic ? SPR_FIC : SPR[s.tint], q[0] - rad, q[1] - rad, rad * 2, rad * 2);
+      if (tb > 0.25) { ctx.globalAlpha = a * 0.35; ctx.drawImage(s.fic ? SPR_FIC : SPR[s.tint], q[0] - rad + tb * 9, q[1] - rad, rad * 2, rad * 2); }
+      if (s.fic) { s.q = q; var dx = Math.abs(q[0] - b.cx); if (dx < (wide ? 46 : 34) && q[2] < heart && dx < fbest) { fbest = dx; fc = s; } }
+      else { var sc = Math.hypot(q[0] - b.cx, q[1] - b.cy) + q[2] * 40; if (sc < best) { best = sc; bestS = s; } }
     }
     q = oproj(film3 ? film3.p : FILM_AT);
     if (q) {
@@ -477,14 +541,13 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
       FILMQ = q;
       var fsc = Math.hypot(q[0] - b.cx, q[1] - b.cy) + q[2] * 40; if (fsc < best) { best = fsc; bestS = film3 || { name: FILM }; }
     } else FILMQ = null;
-    front = bestS;
+    front = fc || bestS; ficCand = fc;
     ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
   }
-  var FILMQ = null;
 
-  /* ── the dial: one band at the foot for the whole film. At the sky it turns the universe; inside a block its marks are the
-        branches' digits; at the radio they are the stations. ── */
+  /* ── the dial: one band at the foot for the whole film ── */
   var f = 0.5, target = 0.5, bandDrag = false;
+  var DIAL = {}; Object.defineProperty(DIAL, 'f', { get: function () { return f; }, set: function (v) { f = target = v; } });
   var SKY_MARKS = [[0.1, '54'], [0.3, '88'], [0.5, '96'], [0.7, '104'], [0.9, '1420']];
   function band(labels, marks) {
     elBand.querySelectorAll('i,b,.smark').forEach(function (e) { e.remove(); });
@@ -497,7 +560,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   function fOf(i, n) { return (i + 0.5) / n; }
 
   /* ── the card, and a line said alone at the centre: both typed, both holding their full size from the first letter ── */
-  var elCard = $('wcard'), elLine = $('wline'), elSay = $('say'), typing = 0, saying = 0;
+  var elCard = $('wcard'), elLine = $('wline'), elSay = $('say'), typing = 0, saying = 0, cardTop = -1;
   function typeInto(el, text, ms, mine, getMine) {
     var a = document.createElement('span'), b = document.createElement('span'); b.className = 'rest';
     b.textContent = text; el.appendChild(a); el.appendChild(b);
@@ -514,10 +577,8 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     if (!head && !text) { elCard.hidden = true; return; }
     if (head) { var h = document.createElement('strong'); h.className = 'whead'; h.textContent = head; elLine.appendChild(h); }
     if (text) typeInto(elLine, text, 26, mine, function () { return typing; });
-    elCard.hidden = false; elCard.scrollTop = 0;
-    cardTop = -1;   /* measured again on the next frame */
+    elCard.hidden = false; elCard.scrollTop = 0; cardTop = -1;
   }
-  var cardTop = -1;
   function say(text, sky) {
     var mine = ++saying;
     elSay.textContent = ''; elSay.classList.toggle('sky', !!sky);
@@ -527,13 +588,10 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     elSay.hidden = false;
   }
 
-  /* ── sound: made here, with the voice files, and only after a tap ── */
+  /* ── sound: the piece's own graph, with the voice files, and only after a tap ── */
   var Sound = (function () {
     var ac = null, master, hissG, hissF, toneG, whistle, padG, crackG, noise, stLP, stG, an, anData, voiceBus, on = false;
     var BUF = {}, WAIT = null, active = [], epoch = 0, heard = [];
-    var LINES = ['aoife_diary', 'aoife_o1', 'aoife_o2', 'oisin_diary', 'oisin_thought', 'archive', 'brid_diary', 'brid_o1', 'visitor', 'ines_diary', 'ferry_1', 'ferry_2', 'ferry_3', 'ferry_4', 'mara_thought',
-      'w_clock', 'w_room', 'w_keep', 'w_gate', 'w_dial', 'w_night', 'w_books'];
-    var GHOSTS = ['g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8', 'g9', 'g10', 'g11', 'g12', 'aoife_o1', 'ferry_2', 'oisin_thought', 'brid_o1', 'ferry_4'];
     function build() {
       var AC = window.AudioContext || window.webkitAudioContext;
       ac = new AC();
@@ -554,7 +612,6 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
       crackG = ac.createGain(); crackG.gain.value = 0; src2.connect(hp); hp.connect(crackG); crackG.connect(master); src2.start(0, 0.3);
       stLP = ac.createBiquadFilter(); stLP.type = 'lowpass'; stLP.frequency.value = 4000;
       stG = ac.createGain(); stG.gain.value = 0; stLP.connect(stG); stG.connect(master);
-      /* a voice with only the stars: the ring moves with it */
       an = ac.createAnalyser(); an.fftSize = 256; anData = new Uint8Array(128);
       voiceBus = ac.createGain(); voiceBus.connect(an); an.connect(master);
     }
@@ -568,9 +625,10 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     function load() {
       if (WAIT) return;
       WAIT = {};
-      LINES.concat(GHOSTS).forEach(function (id) {
+      NARS.map(function (id) { return [id, PARTS + 'nar/' + id + '.mp3']; }).concat(VOXS.map(function (id) { return [id, VOICES + id + '.mp3']; })).forEach(function (e) {
+        var id = e[0];
         if (WAIT[id]) return;
-        WAIT[id] = fetch(VOICES + id + '.mp3').then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.arrayBuffer(); })
+        WAIT[id] = fetch(e[1]).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.arrayBuffer(); })
           .then(function (ab) { return new Promise(function (res, rej) { ac.decodeAudioData(ab, res, rej); }); })
           .then(function (b) { BUF[id] = b; return b; }).catch(function () { return null; });
       });
@@ -579,7 +637,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
       if (!(window.AudioContext || window.webkitAudioContext)) return false;
       try { if (!ac) build(); } catch (e) { ac = null; return false; }
       unlock();
-      master.gain.setTargetAtTime(1, ac.currentTime, 0.3);
+      master.gain.setTargetAtTime(0.9, ac.currentTime, 0.3);
       on = true; load(); return true;
     }
     function stop() { if (ac) master.gain.setTargetAtTime(0, ac.currentTime, 0.12); on = false; }
@@ -587,20 +645,19 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
       if (!on) return;
       vol = vol == null ? 0.12 : vol; dur = dur == null ? 0.09 : dur;
       var o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime + (when || 0);
-      o.frequency.value = freq; o.connect(g); g.connect(master);
-      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + 0.006); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-      o.start(t); o.stop(t + dur + 0.05);
+      o.frequency.value = freq; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + 0.008); g.gain.exponentialRampToValueAtTime(0.0005, t + dur);
+      o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.02);
     }
     function play(id, when, o) {
       var src = ac.createBufferSource(), g = ac.createGain(), node = g; src.buffer = BUF[id]; g.gain.value = o.gain == null ? 1 : o.gain; src.connect(g);
       if (o.radio) { var bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1500; bp.Q.value = 1.4; node.connect(bp); node = bp; }
-      if (ac.createStereoPanner) { var p = ac.createStereoPanner(); p.pan.value = o.pan || 0; node.connect(p); node = p; }
-      node.connect(o.ring ? voiceBus : (o.close || o.radio) ? master : stLP);
+      if (o.pan && ac.createStereoPanner) { var p = ac.createStereoPanner(); p.pan.value = o.pan; node.connect(p); node = p; }
+      node.connect(o.radio || o.close ? master : o.station ? stLP : voiceBus);
       src.start(ac.currentTime + (when || 0)); active.push(src); heard.push(id);
     }
     function ghost(level, id) {
       if (!on) return;
-      id = id || GHOSTS[Math.floor(Math.random() * GHOSTS.length)]; if (!BUF[id]) return;
+      id = id || WHISP[Math.floor(Math.random() * WHISP.length)]; if (!BUF[id]) return;
       var src = ac.createBufferSource(); src.buffer = BUF[id]; src.playbackRate.value = 0.94 + Math.random() * 0.12;
       var bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 700 + Math.random() * 1800; bp.Q.value = 0.8 + Math.random() * 2;
       var g = ac.createGain(), node = g; g.gain.value = level; src.connect(bp); bp.connect(g);
@@ -614,9 +671,9 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
       state: function () { return ac ? ac.state : 'none'; },
       loaded: function () { return Object.keys(BUF).length; },
       heard: function () { return heard.slice(); },
+      has: function (id) { return !!BUF[id]; },
       dur: function (id) { return BUF[id] ? BUF[id].duration : 0; },
-      /* a voice line: at once if it is ready; if it is still arriving, as soon as it lands, unless the moment has passed.
-         Returns how long it lasts, or 0 when it cannot be heard. */
+      /* a voice: at once if it is ready, else as soon as it lands unless the moment has passed. Returns its length, or 0. */
       say: function (id, when, o) {
         if (!on || !id) return 0;
         o = o || {};
@@ -629,20 +686,17 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
       level: function () { if (!an) return 0; an.getByteTimeDomainData(anData); var m = 0; for (var i = 0; i < 128; i++) m = Math.max(m, Math.abs(anData[i] - 128)); return m / 128; },
       wave: function () { return anData; },
       station: function (gain, lp) { if (!on) return; var t = ac.currentTime; stG.gain.setTargetAtTime(gain, t, 0.05); stLP.frequency.setTargetAtTime(lp, t, 0.05); },
-      /* the air of the walk: a breath of static, and the Archive's warm pad when every band carries it */
-      air: function (hiss, pad) {
+      air: function (hiss) {
         if (!on) return; var t = ac.currentTime;
         hissG.gain.setTargetAtTime(hiss, t, 0.12); hissF.frequency.setTargetAtTime(2400, t, 0.3);
-        toneG.gain.setTargetAtTime(0, t, 0.1); padG.gain.setTargetAtTime(pad || 0, t, 0.4); stG.gain.setTargetAtTime(0, t, 0.2);
+        toneG.gain.setTargetAtTime(0, t, 0.1); padG.gain.setTargetAtTime(0, t, 0.4); stG.gain.setTargetAtTime(0, t, 0.2);
       },
-      /* the radio's mix: hiss between stations, the whistle as one nears, the pad for the Archive */
       mix: function (hiss, tone, toneFreq, pad) {
         if (!on) return; var t = ac.currentTime;
         hissF.frequency.setTargetAtTime(1800, t, 0.2);
         hissG.gain.setTargetAtTime(hiss, t, 0.05); toneG.gain.setTargetAtTime(tone, t, 0.05);
         whistle.frequency.setTargetAtTime(toneFreq, t, 0.05); padG.gain.setTargetAtTime(pad, t, 0.4);
       },
-      pipK: function (k) { pip(1000, 0, k === 2 ? 0.035 : 0.11, k === 2 ? 0.07 : 0.16); },
       thump: function (when) {
         if (!on) return;
         var o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime + when;
@@ -662,13 +716,23 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
       }
     };
   })();
+  /* the piece's own calls */
+  function pip(fr, vol, dur, when) { Sound.pip(fr || 880, when || 0, vol == null ? 0.1 : vol, dur == null ? 0.09 : dur); }
+  function sayP(id, o) { o = o || {}; return Sound.say(id, 0, { radio: o.radio, gain: o.vol }); }
+  async function sayWait(id, r, o) {
+    for (var i = 0; i < 40 && !Sound.has(id); i++) await sleep(100, r);
+    var d = sayP(id, o); if (d) logNar(id);
+    return d || Sound.dur(id) || 1.5;
+  }
+  function whisper(vol) { sayP(WHISP[whi++ % 12], { radio: true, vol: vol }); }
+  var whi = 0;
 
   /* ── the run: every journey is one chain of steps; a new hand on the dial ends it ── */
-  var run = 0, autoOn = false, busy = false, staticV = 0.05, staticNow = 0, flying = false;
-  function sleep(ms, r) { if (r === undefined) r = run; return new Promise(function (ok, no) { setTimeout(function () { if (r === run) ok(); else no('stop'); }, CALM ? Math.min(ms, 400) : ms); }); }
+  var run = 0, autoOn = false, busy = false, staticV = 0, staticNow = 0, flying = false;
+  function sleep(ms, r) { if (r === undefined) r = run; return new Promise(function (ok, no) { setTimeout(function () { if (r === run) ok(); else no('stop'); }, ms); }); }
   function tween(o, key, to, ms, r, fn) {
     if (r === undefined) r = run; fn = fn || ease;
-    var a = o[key], t0 = performance.now(); ms = CALM ? Math.min(ms, 120) : ms;
+    var a = o[key], t0 = performance.now();
     return new Promise(function (ok, no) {
       (function st() { if (r !== run) return no('stop'); var t = (performance.now() - t0) / ms; o[key] = a + (to - a) * fn(Math.min(1, t)); if (t < 1) requestAnimationFrame(st); else ok(); })();
     });
@@ -676,12 +740,11 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   function quiet(p) { if (p && p.catch) p.catch(function () {}); return p; }
   function setStatic(v) { staticV = v; }
   function stopAll() {
-    run++; Sound.hush(); clipStop(); try { elGlim.pause(); } catch (e) { /* not playing */ }
-    tuned = null; glimpse = null; burst = null; vring = 0; busy = false; digitsShown = ''; pips = null; shape = null; allb = 0; fly = null; V.ringS = 1;
-    say(''); setStatic(0.05);
+    run++; Sound.hush(); setStatic(0); clipStop(); try { elGlim.pause(); } catch (e) { /* not playing */ }
+    tuned = null; glimpse = null; ficNote = ''; burst = null; vring = 0; busy = false; digitsShown = ''; sparks = []; shapeT.v = 0; allb = false; fly = null; V.ringS = 1;
+    say('');
     if (radioOn) radioStop();
-    if (radioWaitNo) { var n = radioWaitNo; radioWaitNo = radioWaitOk = null; n('stop'); }
-    SK.dim = inside ? DIMIN : 1;
+    if (inside && SK.dim < DIMIN) SK.dim = DIMIN;
     if (!inside) { SK.tb = 0; stage.classList.remove('tuning'); if (flying) { flying = false; V.b = 0; glideTo({ tgt: [0, 0, 0], dist: restDist(), pitch: 0.55 }, 1.6, easeOut); } }
   }
 
@@ -693,7 +756,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     for (var i = 0; i < p.length; i++) { if (!n || typeof n !== 'object' || sealed(n) || n[String(p[i])] == null) return undefined; n = n[String(p[i])]; }
     return n;
   }
-  /* inside the walked cut a position's 9 holds its making decisions, read to play the moment and never offered */
+  /* inside the walked cut a position's 9 holds its making decisions, never offered */
   function inCut(p) { return !!(wb && wb.film && p.length >= 2 && p[0] === 7 && p[1] === 2); }
   function kids(p) {
     var n = nodeOf(p), out = [];
@@ -703,10 +766,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     return out;
   }
   function address(p) { return p.length ? p[0] + (p.length > 1 ? '.' + p.slice(1).join('') : '') : ''; }
-  function headOf(line) {
-    var m = /^(.{2,42}?)\s+—\s/.exec(line); if (m) return m[1];
-    return titleOf(line).title;
-  }
+  function headOf(line) { var m = /^(.{2,42}?)\s+—\s/.exec(line); if (m) return m[1]; return titleOf(line).title; }
   function titleOf(line) {
     var parts = line.match(/[^.!?]+[.!?]+["'’”]?(\s+|$)/g), title = '', i = 0;
     if (!parts) return { title: line, sub: '' };
@@ -730,11 +790,11 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   }
 
   /* the area the ring and the pictures stand in: below the name at the top, above the card and the dial */
-  function topEdge() { return (wide ? 74 : 78) + (his ? 52 : 0); }
-  /* the ring keeps above the card: a long card (up to a third of the screen) lifts it and draws it in, gently */
+  function topEdgeBase() { return wide ? 74 : 78; }
+  function topEdge() { return topEdgeBase() + (his ? 52 : 0); }
   var ringBottom = -1;
   function ringFloor() {
-    var tunerTop = H - tunerH, floor = tunerTop - 12 - Math.min(H * 0.2, 150);
+    var floor = H - tunerH - 12 - Math.min(H * 0.2, 150);
     if (!elCard.hidden) { if (cardTop < 0) cardTop = elCard.getBoundingClientRect().top - stage.getBoundingClientRect().top; floor = Math.min(floor, cardTop - (wide ? 44 : 40)); }
     return floor;
   }
@@ -768,23 +828,23 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   /* a point's own words on the card: a chapter or scene its name and line, a point with no branches its whole text */
   function pointCard(p) {
     var n = nodeOf(p), line = story(n), ks = kids(p);
-    if (!line) { card('', 'Nothing is written here.'); return; }
-    if (ks.length) { var tt = titleOf(line), hd = headOf(line); card(hd, autoOn && !inCut(p) ? '' : line.slice(line.indexOf(hd) + hd.length).replace(/^[\s—.:]+/, '')); }
+    if (!line) { card('', momentAt(p) ? (CUT[address(p)].t || '') : 'Nothing is written here.'); return; }
+    if (ks.length) { var hd = headOf(line); card(hd, autoOn && !inCut(p) ? '' : line.slice(line.indexOf(hd) + hd.length).replace(/^[\s—.:]+/, '')); }
     else card('', line);
   }
   function select(d, quietly) {
     sel = d; var ks = kids(path), i = ks.indexOf(d); f = target = fOf(i, ks.length);
     setRead(readFor(path.concat([d])));
-    if (!quietly) Sound.pip(620, 0, 0.05, 0.05);
+    if (!quietly) pip(620, 0.05, 0.05);
     if (!autoOn) pointCard(path.concat([d]));
     setHash(); update();
   }
   function update() {
-    var p = sel != null ? path.concat([sel]) : null, mo = inside && p && momentAt(p), deeper = inside && p && kids(p).length > 0;
+    var p = sel != null ? path.concat([sel]) : null, mo = inside && p && momentAt(p), deeper = inside && p && kids(p).length > 0, fic = !inside && ficFront && !(SK.lock > 0.5);
     $('tup').disabled = !inside || autoOn || flying;
     $('tauto').textContent = radioOn ? 'Carry on ▸' : autoOn ? 'Stop' : 'Walk the film';
-    $('tin').textContent = mo ? 'Play' : 'Go in';
-    $('tin').disabled = autoOn || busy || radioOn || flying || (inside ? !(mo || deeper) : !(SK.lock > 0.5));
+    $('tin').textContent = mo || fic ? 'Play' : 'Go in';
+    $('tin').disabled = autoOn || busy || radioOn || flying || (inside ? !(mo || deeper) : !(SK.lock > 0.5 || fic));
     stage.classList.toggle('inside', inside);
     stage.classList.toggle('auto', autoOn);
     stage.classList.toggle('insky', !inside && !flying);
@@ -793,49 +853,48 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 
   /* ── travelling through the sky ── */
   function lockedNow() { return !inside && Math.abs(wrapPi(orb.yaw - filmYaw())) < 0.09 && Math.hypot(orb.tgt[0], orb.tgt[1], orb.tgt[2]) < 0.06 && orb.dist > 0.8; }
-  var GL_LAST = '';
-  function glimpseNames() { return MAN && MAN.glimpses && MAN.glimpses.length ? MAN.glimpses : ['g_gate', 'g_face', 'g_city', 'g_fauna', 'g_void', 'g_kaleido', 'g_nested', 'g_flesh']; }
-  /* never the same glimpse twice running */
-  function nextGlimpse() { var l = glimpseNames().filter(function (g) { return g !== GL_LAST; }); GL_LAST = l[Math.floor(Math.random() * l.length)] || GL_LAST; return GL_LAST; }
-  /* 'Walk the film' at the sky: the dial turns, the sky turns with it, blocks pass by name, then the film's star sharpens */
+  var ficNote = '', ficFront = null;
+  /* 'Walk the film' at the sky: the dial turns, the sky turns with it; Mara, then a block's fiction, then Tom come half-tuned
+     out of the static, ghost voices and a diary under it all; then the film's star sharpens */
   async function tuneSky(r) {
     closeStar(); explore(false); stage.classList.add('tuning'); card('');
-    if (Math.hypot(orb.tgt[0], orb.tgt[1], orb.tgt[2]) > 0.01 || Math.abs(orb.dist - restDist()) > 0.05) { glideTo({ tgt: [0, 0, 0], dist: restDist(), pitch: 0.55 }, 0.9, ease); }
+    if (Math.hypot(orb.tgt[0], orb.tgt[1], orb.tgt[2]) > 0.01 || Math.abs(orb.dist - restDist()) > 0.05) glideTo({ tgt: [0, 0, 0], dist: restDist(), pitch: 0.55 }, 0.9, ease);
     var y0 = orb.yaw, fy = filmYaw(), goal = fy + Math.ceil((y0 - fy) / TAU + 0.2) * TAU + TAU;
     SK.lock = 0; setStatic(0.9); quiet(tween(SK, 'tb', 0.85, 700, r));
-    var t0 = performance.now(), dur = 10500, gi = 0, vi = 0, gAt = [1500, 4300, 7200], vAt = [700, 3300, 6100];
+    var t0 = performance.now(), dur = 10500, gi = 0, vi = 0, gAt = [900, 4300, 7400], vAt = [400, 3600, 6500];
+    sayP(BEDS[Math.floor(Math.random() * BEDS.length)], { radio: true, vol: 0.3 });
     while (true) {
       if (r !== run) throw 'stop';
-      var t = (performance.now() - t0) / (CALM ? 1200 : dur); if (t >= 1) break;
+      var t = (performance.now() - t0) / dur; if (t >= 1) break;
       orb.yaw = y0 + (goal - y0) * ease(t) + Math.sin(t * 38) * 0.012 * (1 - t); f = yawToF();
-      if (front) setRead('· · ·  ' + front.name + '  · · ·');
-      if (gi < 3 && t * dur > gAt[gi]) { quiet(showGlimpse(nextGlimpse(), 2100, r)); gi++; }
-      if (vi < 3 && t * dur > vAt[vi]) { Sound.ghost(0.5); vi++; }
+      if (ficNote) setRead(ficNote); else if (front) setRead('· · ·  ' + front.name + '  · · ·');
+      if (gi < 3 && t * dur > gAt[gi]) { quiet(gi === 1 ? showGlimpse('', 3200, r, FICTIONS[Math.floor(Math.random() * FICTIONS.length)]) : showGlimpse('', gi ? 2500 : 3000, r, gi ? TOM : MARA)); gi++; }
+      if (vi < 3 && t * dur > vAt[vi]) { sayP(GHOSTS[vi], { radio: true, vol: 0.55 }); vi++; }
       await new Promise(function (q) { requestAnimationFrame(q); });
     }
     orb.yaw = goal; await lockFilm(r);
   }
   async function lockFilm(r) {
-    setStatic(0.12); Sound.pip(880, 0, 0.09, 0.12); quiet(tween(SK, 'lock', 1, 500, r)); await tween(SK, 'tb', 0, 600, r);
-    f = target = yawToF(); setRead('THE APPROACH  ·  film:the-approach'); stage.classList.remove('tuning'); update();
+    setStatic(0.12); pip(880, 0.09, 0.12); quiet(tween(SK, 'lock', 1, 500, r)); await tween(SK, 'tb', 0, 600, r);
+    f = target = yawToF(); setRead('THE APPROACH  ·  film:the-approach'); card('', LOCK_LINE); stage.classList.remove('tuning'); update();
   }
   /* into a star: the camera flies in with a gold bloom, and the block's real branches open as a ring */
   async function enterBlock(name, json, r) {
     closeStar(); explore(false); say(''); card(''); flying = true; update();
     var s = starOf(name), at = name === FILM ? filmPos() : s ? s.p : orb.tgt.slice(); flyAt = at.slice();
-    setStatic(0.35); setRead('going in'); Sound.pip(660, 0, 0.07, 1.2);
-    glideTo({ tgt: at.slice(), dist: 0.035 }, 1.6, easeIn);
-    quiet(tween(V, 'b', 1, 1500, r)); await sleep(1600, r);
+    setStatic(0.35); setRead('going in');
+    glideTo({ tgt: at.slice(), dist: 0.035 }, 1.5, easeIn);
+    quiet(tween(V, 'b', 1, 1500, r)); await sleep(1500, r);
     flying = false; enterNow(name, json);
     V.bloom = 1; V.ringS = 0;
-    Sound.pip(440, 0, 0.08, 0.3); quiet(tween(V, 'bloom', 0, 500, r)); await tween(V, 'ringS', 1, 700, r); update();
+    pip(440, 0.08, 0.3); quiet(tween(V, 'bloom', 0, 500, r)); await tween(V, 'ringS', 1, 700, r); update();
   }
   function enterNow(name, json) {
     glide = null; inside = true; wb = { name: name, root: json, film: name === FILM }; path = []; sel = null; his = null; V.b = 0;
     orb.tgt = [0, 0, 0]; orb.dist = restDist(); orb.pitch = 0.55; SK.dim = DIMIN; SK.lock = 0; SK.tb = 0; setStatic(0.06);
     bandForRing(); f = target = 0.5;
     setRead(wb.film ? 'film:the-approach' : name);
-    var line = story(json); card(wb.film ? 'THE APPROACH' : name, wb.film ? '' : line.length > 220 ? line.slice(0, 220).replace(/\s+\S*$/, '') + '…' : line);
+    var line = story(json); card(wb.film ? '' : name, wb.film ? ROOT_LINE : line.length > 220 ? line.slice(0, 220).replace(/\s+\S*$/, '') + '…' : line);
     setHash(); update();
   }
   function leaveToSky() {
@@ -847,13 +906,11 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   }
 
   /* ── walking the block: the needle moves to a digit, the chosen point flies to the centre and its own ring opens ── */
-  /* the needle itself, as something a step can turn */
-  var DIAL = {}; Object.defineProperty(DIAL, 'f', { get: function () { return f; }, set: function (v) { f = target = v; } });
   async function needleTo(d, r) {
     var ks = kids(path), i = ks.indexOf(d), to = fOf(i, ks.length);
     setStatic(0.45); setRead('· · ·');
-    await tween(DIAL, 'f', to + (to > f ? 0.03 : -0.03), 520, r);
-    await tween(DIAL, 'f', to, 160, r);
+    await tween(DIAL, 'f', to + (to > f ? 0.03 : -0.03), 380, r);
+    await tween(DIAL, 'f', to, 140, r);
     setStatic(0.05); select(d);
   }
   async function goIn(r) {
@@ -864,22 +921,17 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     var pks = kids(path), i = pks.indexOf(d); setStatic(0.3);
     fly = { i: i, n: pks.length, t: 0, ks: pks, par: path.slice() }; await tween(fly, 't', 1, 650, r, function (t) { return t * t; }); fly = null;
     path = p; sel = null; V.ringS = 0; if (his && his.scene !== path.join('')) his = null;
-    bandForRing(); f = target = 0.5; setStatic(0.05); Sound.pip(520 + path.length * 60, 0, 0.07, 0.2);
+    bandForRing(); f = target = 0.5; setStatic(0.05); pip(520 + path.length * 60, 0.07, 0.2);
     setRead((wb.film ? 'film' : wb.name) + ' · ' + path.join(' · ')); pointCardHere(); setHash();
     await tween(V, 'ringS', 1, 600, r); update();
   }
   function pointCardHere() {
     var n = nodeOf(path), line = story(n);
-    if (!path.length) { card(wb.film ? 'THE APPROACH' : wb.name, ''); return; }
+    if (!path.length) { card(wb.film ? '' : wb.name, wb.film ? ROOT_LINE : ''); return; }
     if (!line) { card('', ''); return; }
     var tt = titleOf(line), hd = headOf(line);
     /* a chapter or scene of the walked cut is story: its name and its line; the makers' notes above it give their name while the film walks */
     card(hd, inCut(path) && path.length >= 3 ? tt.sub : autoOn ? '' : line.slice(line.indexOf(hd) + hd.length).replace(/^[\s—.:]+/, ''));
-  }
-  async function climb(r) {
-    var d = path.pop(); his = his && his.scene === path.join('') ? his : null;
-    V.ringS = 1.6; bandForRing(); select(d, true); pointCardHere(); setHash();
-    await tween(V, 'ringS', 1, 450, r);
   }
   function goUp() {
     stopAll(); autoOn = false;
@@ -888,191 +940,155 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     var d = path.pop(); if (his && his.scene !== path.join('')) his = null;
     V.ringS = 1.6; bandForRing(); select(d, true); pointCard(path.concat([d])); quiet(tween(V, 'ringS', 1, 400, run)); update();
   }
-  /* up to where the paths meet, then down to the place, a turn of the dial at each step */
-  async function travelTo(dest, r) {
-    while (path.length && dest.slice(0, path.length).join(',') !== path.join(',')) { await climb(r); await sleep(500, r); }
-    for (var i = path.length; i < dest.length; i++) { await needleTo(dest[i], r); await sleep(700, r); await goIn(r); await sleep(900, r); }
-  }
   /* opening straight at an address from the link: no flight, the place and its words, the dial in the hand */
   function travelNow(dest) {
     path = []; for (var i = 0; i < dest.length - 1 && kids(path).indexOf(dest[i]) >= 0; i++) path.push(dest[i]);
     bandForRing(); var last = dest[path.length];
     if (last != null && kids(path).indexOf(last) >= 0) select(last, true); else { sel = null; pointCardHere(); }
-    if (sel != null) pointCard(path.concat([sel]));
     setHash(); update();
   }
 
-  /* ── the moments: each lands in its own way, as its scene's decisions say (7.2119 to 7.2159), read live ── */
-  function decisionsOf(scene) { var n = nodeOf(scene); return n && typeof n === 'object' && n['9'] != null ? tidy(lineOf(n['9'])) : ''; }
-  var PARSED = {};
-  function parseDecisions(text) {
-    var out = {}, re = new RegExp('(?:^|[.:;]\\s+)([1-8]) (' + KINDS + ')\\b', 'g'), m, marks = [];
-    while ((m = re.exec(text))) marks.push({ d: m[1], kind: m[2], at: m.index, k: m.index + m[0].length - m[2].length });
-    marks.forEach(function (mk, i) {
-      var seg = text.slice(mk.k, i + 1 < marks.length ? marks[i + 1].at : text.length), o = { kind: mk.kind };
-      var st = /\bstill (ch\d+_s\d+_\d+)/.exec(seg); if (st) o.still = st[1];
-      var cl = /\bclip (ch\d+_s\d+_\d+)/.exec(seg); if (cl) o.clip = cl[1];
-      var sy = /\b(w_[a-z]+)\b/.exec(seg) || /\bvoice (visitor|archive)\b/.exec(seg); if (sy) o.say = sy[1];
-      if (/\bno card\b/.test(seg)) o.card = 'none'; else if (/only the first sentence/.test(seg)) o.card = 'first';
-      if (mk.kind === 'pips') o.count = /eighty-one/.test(seg) ? [1, 9, 81] : /\bten\b/.test(seg) ? [10] : /keeping time|regular/.test(seg) ? 'time' : [1, 9, 81];
-      if (/under-tuned|grainy/.test(seg)) o.grain = true;
-      if (/two seconds of nothing/.test(seg)) o.hold = 2000;
-      out[mk.d] = o;
-    });
-    return out;
-  }
-  function specOf(p) {
-    if (!(wb && wb.film) || p.length !== 5 || !inCut(p) || kids(p).length) return null;
-    var scene = p.slice(0, 4), key = scene.join(''), text = decisionsOf(scene);
-    if (!PARSED[key] || PARSED[key].text !== text) PARSED[key] = { text: text, kinds: parseDecisions(text) };
-    return PARSED[key].kinds[String(p[4])] || WALK[address(p)] || null;
-  }
-  function momentAt(p) { return !!specOf(p); }
-  /* the clip rule: where a moving clip exists for a moment's card it plays as that clip, whatever its written kind */
-  function resolve(spec) {
-    var cardName = spec.clip || spec.still, o = {}, k;
-    for (k in spec) o[k] = spec[k];
-    var clipThere = cardName && (MAN ? has('clips', cardName) : spec.kind === 'clip');
-    if (clipThere) { o.play = 'clip'; o.clipName = cardName; o.upgraded = spec.kind !== 'clip'; return o; }
-    if (spec.kind === 'clip') {   /* a clip not yet made: its still tuned in from static, its words on the card */
-      var st = spec.still || spec.clip;
-      if (!MAN || has('stills', st)) { o.play = 'static'; o.still = st; o.card = 'all'; return o; }
-      o.play = 'words'; return o;
-    }
-    o.play = spec.kind; return o;
-  }
+  /* ── the moments, as the piece plays them ── */
+  function momentAt(p) { return !!(wb && wb.film && p.length === 5 && inCut(p) && !kids(p).length && CUT[address(p)]); }
   function firstSentence(t) { var m = /^.*?[.!?](?=\s|$)/.exec(t); return m ? m[0] : t; }
-  /* the line on the card while a clip plays: none where the clip speaks it, only the words before the speaker where it is told */
-  function clipCard(o, text) {
-    if (o.card === 'none') return '';
-    if (o.card === 'first') return firstSentence(text);
-    if (o.upgraded) { var m = /\b[A-Z][\w’']*:\s*[‘'"“]/.exec(text); return m ? text.slice(0, m.index).trim() : text; }
+  function quoteOf(t) { var m = /[‘"“]([^’"”]+)[’"”]\s*$/.exec(t) || /:\s*(.+)$/.exec(t); return m ? m[1].trim() : t; }
+  /* the card: the block's words read live, with the piece's choices kept: none where a clip speaks the line, its first sentence where the clip asks it */
+  function cardText(p, c) {
+    var text = story(nodeOf(p)) || c.t || '';
+    if (c.card === 'none') return '';
+    if (c.card === 'first') return firstSentence(text);
     return text;
   }
-  function quoteOf(t) { var m = /[‘"“]([^’"”]+)[’"”]\s*$/.exec(t) || /:\s*(.+)$/.exec(t); return m ? m[1].trim() : t; }
   var GATE = '2048313271';
   function gateDigits() { for (var i = 0; i < LIVES.length; i++) if (LIVES[i].kind === 'memory' && LIVES[i].digits) return LIVES[i].digits; return GATE; }
-  /* a ten-digit address read as a day: year, season, month of the season, week, day */
-  function dayOf(a) {
-    a = String(a); if (!/^\d{10}$/.test(a)) return null;
-    var y = +a.slice(0, 4), s = +a[4], m = +a[5], w = +a[6], d = +a[7];
-    if (s < 1 || s > 4 || m < 1 || m > 3 || w < 1 || d < 1 || d > 7) return null;
-    return Date.UTC(y, (s - 1) * 3 + m - 1, (w - 1) * 7 + d);
+  function ensureHis() { if (!his) his = { x: W / 2, y: topEdgeBase() + 24, ty: topEdgeBase() + 24, col: 2, pulse: 0, label: true, scene: path.join('') }; }
+  var STILL = {};
+  function stillOf(name) {
+    if (!STILL[name]) STILL[name] = new Promise(function (ok) { var im = new Image(); im.onload = function () { ok(im); }; im.onerror = function () { ok(null); }; im.src = PARTS + 'img/' + name + '.jpg'; setTimeout(function () { ok(im.complete && im.naturalWidth ? im : null); }, 8000); });
+    return STILL[name];
   }
-  function relOf(a) {
-    var t = dayOf(a); if (t == null) return '';
-    var n0 = new Date(), today = Date.UTC(n0.getFullYear(), n0.getMonth(), n0.getDate()), n = Math.round((t - today) / 864e5);
-    return n > 0 ? 'AHEAD — in ' + n.toLocaleString('en-GB') + ' days' : n < 0 ? 'BEHIND — ' + (-n).toLocaleString('en-GB') + ' days ago' : 'today';
+  ['ch1_s1_05', 'ch1_s1_11', 'ch1_s2_03', 'ch1_s3_05'].forEach(stillOf);
+  var sparks = [], shapeT = { v: 0 }, allb = false, vring = 0, digitsShown = '';
+  /* what the checks read: each moment's telling and clips, the faces on the journey, the run's length */
+  var LOG = { walk0: 0, end: 0, moments: [], journey: [], clips: [] }, curLog = null;
+  function logNar(id) { if (curLog) curLog.nars.push(id); }
+  function logClip(name, el) {
+    var rec = { name: name, at: curLog ? curLog.at : 'journey', t: Date.now(), seen: 0, ended: false };
+    LOG.clips.push(rec); if (curLog) curLog.clips.push(name);
+    (function watch() { if (el.currentTime > rec.seen) rec.seen = el.currentTime; if (el.ended) rec.ended = true; if (!el.paused && !el.ended && !rec.ended) setTimeout(watch, 200); else if (el.ended) rec.ended = true; })();
   }
-  var lastArrive = '', ARRIVALS = [];
+
+  async function runFx(fx, r, clean) {
+    var c = ringCentre();
+    if (fx === 'dark') { var dm = SK.dim; clean.push(function () { SK.dim = dm; }); await tween(SK, 'dim', 0.04, 2600, r); }
+    else if (fx === 'count') {
+      clean.push(function () { sparks = []; });
+      var add = function (n) { var cc = ringCentre(), R = Math.min(W, H) * 0.38; for (var k = 0; k < n; k++) { var a = Math.random() * TAU, q = Math.sqrt(Math.random()) * R; sparks.push({ x: cc[0] + Math.cos(a) * q, y: cc[1] + Math.sin(a) * q * 0.8, b: performance.now() }); } };
+      await sleep(2300, r); add(1); pip(660, 0.14, 0.3); await sleep(900, r);
+      for (var k = 0; k < 9; k++) { add(1); pip(880, 0.09, 0.1); await sleep(95, r); }
+      await sleep(450, r);
+      for (k = 0; k < 81; k++) { add(1); if (k % 2 === 0) pip(1175, 0.05, 0.05); await sleep(19, r); }
+    }
+    else if (fx === 'pipsoft') { for (var j = 0; j < 8; j++) { await sleep(620, r); pip(740, 0.06, 0.12); } }
+    else if (fx === 'pips10') { await sleep(700, r); for (var j2 = 0; j2 < 10; j2++) { pip(880, 0.11, 0.1); await sleep(230, r); } }
+    else if (fx === 'shape') { clean.push(function () { shapeT.v = 0; }); pip(520, 0.08, 0.4); await tween(shapeT, 'v', 1, 3600, r); }
+    else if (fx === 'star') {
+      his = { x: W / 2, y: H - tunerH, ty: topEdgeBase() + 24, col: 2, pulse: 0, scene: path.join('') }; pip(660, 0.1, 0.5);
+      await tween(his, 'y', his.ty, 2300, r); pip(990, 0.08, 0.9); his.label = true;
+    }
+    else if (fx === 'digits' || fx === 'digits2') {
+      ensureHis(); var D = gateDigits(); digitsShown = ''; clean.push(function () { digitsShown = ''; }); var gap = fx === 'digits' ? 400 : 300;
+      for (var n = 0; n < 10; n++) { await sleep(n ? gap : 350, r); digitsShown += D[n]; DIAL.f = 0.05 + 0.1 * Number(D[n]); pip(560 + Number(D[n]) * 70, 0.1, 0.12); his.pulse = 1; setRead(digitsShown.replace(/^(\d{4})(\d*)$/, '$1 $2')); }
+      await sleep(900, r);
+    }
+    else if (fx === 'red') {
+      ensureHis(); setStatic(0); var dm2 = SK.dim; clean.push(function () { SK.dim = dm2; }); quiet(tween(SK, 'dim', 0.1, 2500, r));
+      await sleep(5900, r); Sound.low(); his.col = 3; his.pulse = 1;
+    }
+    else if (fx === 'gold') { ensureHis(); his.col = 2; for (var g = 0; g < 6; g++) { his.pulse = 1; pip(660 + g * 110, 0.05, 0.3); await sleep(520, r); } }
+    else if (fx === 'allbands') {
+      allb = true; clean.push(function () { allb = false; }); await sleep(7300, r); setStatic(0.25);
+      for (var s = 0; s < 3; s++) { await tween(DIAL, 'f', 0.98, 650, r); await tween(DIAL, 'f', 0.02, 650, r); }
+      setStatic(0.05);
+    }
+    else if (fx === 'radio') {
+      await sleep(7400, r); var ks = kids(path);
+      clean.push(function () { if (!radioOn) { bandForRing(); if (sel != null) DIAL.f = fOf(ks.indexOf(sel), ks.length); } });
+      var st = stations(); band(st.map(function (q) { return [q.f, q.band.split(' ')[0]]; }));
+      for (var x = 0; x < st.length; x++) {
+        var q = st[x];
+        setStatic(0.7); setRead('· · ·'); whisper(0.3); await tween(DIAL, 'f', q.f, 620, r); setStatic(0.04); pip(880, 0.05, 0.08);
+        setRead(q.band + '  ·  ' + q.who); card('', q.t);
+        for (var v = 0; v < q.v.length; v++) { var dd = await sayWait(q.v[v], r); await sleep(dd * 1000 + 120, r); }
+        await sleep(250, r);
+      }
+      setStatic(0.5); setRead('· · ·'); await sleep(500, r); setStatic(0.05);
+    }
+  }
+  function stations() {
+    return STATIONS.map(function (q) {
+      var L = null, o = { f: q.f, band: q.band, who: q.who, v: q.v, t: q.t };
+      LIVES.forEach(function (x) { if (!L && q.re.test(x.who)) L = x; });
+      if (L) { o.band = L.band || o.band; o.who = L.who || o.who; var t = q.from === 'over' ? (L.over || []).join(' ') : q.from === 'thought' ? (L.thought || L.text) : L.text; if (t) o.t = t.replace(/\n/g, ' '); }
+      return o;
+    });
+  }
   async function playMoment(p, r) {
     busy = true; update();
-    try { await play2(p, r); }
-    finally { if (r === run) { busy = false; update(); } }
+    var c = CUT[address(p)];
+    curLog = { at: address(p), t0: Date.now(), nars: [], clips: [], card: '' }; LOG.moments.push(curLog);
+    try { await play2(p, c, r); }
+    finally { curLog.t1 = Date.now(); curLog = null; if (r === run) { busy = false; update(); } }
+    /* played by hand, the radio's moment then gives the viewer the dial through the kept lives */
+    if (c.fx === 'radio' && !autoOn && r === run) radioStart(p);
   }
-  async function play2(p, r) {
-    var spec = specOf(p); if (!spec) return;
-    var o = resolve(spec), n = nodeOf(p), text = story(n), ks = kids(path), i = ks.indexOf(p[4]), pt = ringPos(i, ks.length), k = o.play;
-    var arrive = k === 'clip' || k === 'static' ? (lastArrive === 'tune' ? 'tear' : 'tune') : k;
-    ARRIVALS.push({ at: address(p), kind: k, arrive: arrive, t: Date.now() }); lastArrive = arrive;
-    $('tin').disabled = true; say('');
-    var readMs = 1200 + text.length * 55, d;
-    if (k === 'words') { card(''); say(text); setStatic(0.035); await sleep(1200 + text.length * 62, r); say(''); }
-    else if (k === 'dark') {
-      card(''); say(text); setStatic(0); quiet(tween(SK, 'dim', 0, 1600, r));
-      await sleep(Math.max(4200, 1200 + text.length * 62), r); say(''); await tween(SK, 'dim', DIMIN, 1200, r);
-    }
-    else if (k === 'burst' || k === 'gold') {
-      var img = await stillOf(o.still, r);
-      if (!img) { card(''); say(text); await sleep(readMs, r); say(''); return; }
-      card('', text); await frameStill();
-      var R = picRect(img.naturalWidth / img.naturalHeight), from = k === 'gold' && his ? [his.x, his.y] : pt;
-      burst = makeBurst(img, from[0], from[1], R, k === 'gold');
-      Sound.pip(k === 'gold' ? 520 : 300, 0, 0.12, 0.5);
-      await tween(burst, 't', 1, k === 'gold' ? 2200 : 1500, r, function (t) { return t; });
-      d = Sound.say(o.say, 0, { close: true }) || 0;
-      var hold = Math.max(d * 1000 + 1900, readMs, 4200);
-      quiet(tween(burst, 'hold', 1, hold, r, function (t) { return t; })); await sleep(hold, r);
-      burst.out = true; burst.t = 0.99; await tween(burst, 't', 0, 900, r, function (t) { return t; }); burst = null;
-    }
-    else if (k === 'static') {
-      var im = await stillOf(o.still, r);
-      if (!im) { card(''); say(text); await sleep(readMs, r); say(''); return; }
-      card('', o.card === 'none' ? '' : text); await frameStill();
-      setStatic(0.5); tuned = { el: im, rev: 0, R: picRect(im.naturalWidth / im.naturalHeight), mode: arrive, grain: !!o.grain };
-      await tween(tuned, 'rev', o.grain ? 0.86 : 1, arrive === 'tear' ? 1100 : 700, r, function (t) { return t; }); setStatic(o.grain ? 0.12 : 0.03);
-      d = Sound.say(o.say, 0, { close: true }) || 0;
-      await sleep(Math.max(d * 1000 + 1500, readMs, 4200), r);
-      setStatic(0.5); tuned.rev = Math.min(tuned.rev, 0.99); await tween(tuned, 'rev', 0, 520, r, function (t) { return t; }); tuned = null; setStatic(0.05);
-    }
-    else if (k === 'voice') {
-      card('', text); vring = 1;
-      d = Sound.say(o.say, 0.2, { ring: true }) || 0;
-      await sleep(Math.max(d * 1000 + 1100, readMs), r); vring = 0;
-      if (o.hold) { card(''); await sleep(o.hold, r); }
-    }
-    else if (k === 'pips') {
-      card('', text); await pipsRun(o.count, r); await sleep(Math.max(1500, readMs - 6000), r); pips = null;
-    }
-    else if (k === 'shape') { card('', text); await shapeRun(r); await sleep(Math.max(1200, readMs - 6500), r); shape = null; }
-    else if (k === 'skywords') {
-      card(''); var q = quoteOf(text); say(q, true); setStatic(0.02);
-      d = Sound.say(o.say, 0.4, { close: true }) || 0;
-      await sleep(Math.max(d * 1000 + 1600, 1600 + q.length * 70), r); say('');
-    }
-    else if (k === 'star') {
-      card('', text); var a = needleXY();
-      his = { x: a[0], y: a[1], ty: topEdgeBase() + 24, col: 'gold', pulse: 0, label: false, scene: path.join('') };
-      Sound.pip(660, 0, 0.1, 0.5); quiet(tween(his, 'x', W / 2, 2600, r)); await tween(his, 'y', his.ty, 2600, r); Sound.pip(990, 0, 0.08, 0.9); his.label = true;
-      await sleep(Math.max(2600, readMs - 2600), r);
-    }
-    else if (k === 'digits') {
-      card('', text); ensureHis(); Sound.say(o.say, 0, { close: true });
-      var D = gateDigits(); digitsShown = '';
-      for (var j = 0; j < D.length; j++) {
-        await sleep(j ? 480 : 500, r); digitsShown += D[j]; f = target = 0.05 + 0.1 * Number(D[j]);
-        Sound.pip(560 + Number(D[j]) * 70, 0, 0.1, 0.12); his.pulse = 1; setRead(digitsShown.replace(/^(\d{4})(\d*)$/, '$1 $2'));
-      }
-      await sleep(Math.max(2200, readMs - 5300), r); digitsShown = '';
-    }
-    else if (k === 'clip') {
-      var line = clipCard(o, text); card('', line);
-      await playClip(o.clipName, arrive, r, function () { return fallbackStill(o); });
-      if (!line) card('');
-    }
-    else if (k === 'red') {
-      card('', text); ensureHis(); setStatic(0); quiet(tween(SK, 'dim', 0.08, 2500, r));
-      await sleep(5200, r); Sound.low(); his.col = 'red'; his.pulse = 1;
-      await sleep(Math.max(4200, readMs - 5200), r); await tween(SK, 'dim', DIMIN, 900, r);
-    }
-    else if (k === 'allbands') {
-      card('', text); allb = 1; setStatic(0.22);
-      d = Sound.say(o.say, 0.3, { close: true }) || 0;
-      await sleep(Math.max(d * 1000 + 1800, readMs), r); allb = 0; setStatic(0.05);
-    }
-    else if (k === 'radio') {
-      card('', text); await sleep(Math.max(3500, readMs), r);
-      await radioRun(p, r);
-    }
+  async function play2(p, c, r) {
+    var ks = kids(path), i = ks.indexOf(p[4]), pt = ringPos(i, ks.length), clean = [];
+    $('tin').disabled = true;
+    try {
+      var text = cardText(p, c);
+      if (c.big) { card(''); say(quoteOf(story(nodeOf(p)) || c.t), true); } else card('', text);
+      if (curLog) curLog.card = c.big ? 'big' : text;
+      await new Promise(function (q) { requestAnimationFrame(q); });   /* the card has its size before a picture is framed */
+      var fxP = c.fx ? runFx(c.fx, r, clean) : null; quiet(fxP);
+      var picStart = 0, picLen = 0, picEl = null;
+      var picP = (async function () {
+        var pc = c.pic; if (!pc) return;
+        if (pc.at) await sleep(pc.at * 1000, r);
+        if (pc.clip) {
+          setStatic(0.3); picEl = clipEl(pc.clip); clipLive = clips.indexOf(picEl);
+          picEl.muted = !(pc.vol > 0) || !Sound.isOn(); picEl.volume = pc.vol || 0; picEl.loop = true;
+          await playing(picEl, pc.from || 0); if (r !== run) throw 'stop'; logClip(pc.clip, picEl);
+          picStart = performance.now(); picLen = ((picEl.duration || 6) - (pc.from || 0)) * 1000;
+          tuned = { el: picEl, rev: 0, R: picRect(16 / 9), mode: 'tune' }; await tween(tuned, 'rev', 1, 420, r, lin); setStatic(0.02);
+        } else if (pc.mode === 'burst') {
+          var img = await stillOf(pc.still); if (r !== run) throw 'stop'; if (!img) return;
+          var o = c.fx === 'gold' && his ? [his.x, his.y] : pt;
+          burst = makeBurst(img, o[0], o[1], picRect(img.naturalWidth / img.naturalHeight)); pip(300, 0.1, 0.4);
+          await tween(burst, 't', 1, 1000, r, lin); quiet(tween(burst, 'hold', 1, 14000, r, lin));
+        }
+      })(); quiet(picP);
+      var tell = async function (ids) { for (var k = 0; k < (ids || []).length; k++) { var d = await sayWait(ids[k], r); await sleep(d * 1000 + 200, r); } };
+      if (c.ring) vring = 1;
+      if (c.own) {   /* a clip that speaks: it is watched whole and heard; the telling ends as its speech begins */
+        for (var k = 0; k < 40 && (c.nar || []).some(function (id) { return !Sound.has(id); }); k++) await sleep(100, r);
+        var narLen = (c.nar || []).reduce(function (a, id) { return a + (Sound.dur(id) || 2) + 0.2; }, 0), wait = Math.max(0, narLen - (SP[c.own[0]] || 0) - 0.25);
+        var narP = tell(c.nar); quiet(narP); clipEl(c.own[0]); await sleep(wait * 1000, r);
+        for (var m = 0; m < c.own.length; m++) { if (c.own[m + 1]) prefetch(c.own[m + 1], [c.own[m]]); await playClip(c.own[m], r); }
+        await narP;
+      } else await tell(c.nar);
+      vring = 0; if (fxP) await fxP;
+      if (c.nar2 || c.fx2) { var f2 = c.fx2 ? runFx(c.fx2, r, clean) : null; quiet(f2); await tell(c.nar2); if (f2) await f2; }
+      if (!c.own) {
+        await picP;
+        if (c.pic && c.pic.clip) { var left = picLen - (performance.now() - picStart); if (left > 0) await sleep(Math.min(left, 9000), r); }   /* a clip is never cut short */
+        await sleep(c.tail || 350, r);
+        if (burst) { burst.out = true; burst.t = 0.99; await tween(burst, 't', 0, 600, r, lin); burst = null; }
+        if (tuned) { tuned.rev = 0.99; setStatic(0.3); await tween(tuned, 'rev', 0, 340, r, lin); tuned = null; if (picEl) { picEl.pause(); picEl.loop = false; } setStatic(0.05); }
+      } else if (c.tail) await sleep(c.tail, r);
+      if (c.big) say('');
+    } finally { clean.forEach(function (fn) { fn(); }); if (r === run) update(); }
   }
-  function topEdgeBase() { return wide ? 74 : 78; }
-  function needleXY() { var b = elBand.getBoundingClientRect(), s = stage.getBoundingClientRect(); return [b.left - s.left + b.width * f, b.top - s.top]; }
-  function ensureHis() { if (!his) his = { x: W / 2, y: topEdgeBase() + 24, ty: topEdgeBase() + 24, col: 'gold', pulse: 0, label: true, scene: path.join('') }; }
-  /* the card has its full size from its first letter, so a picture can be framed in the space left above it */
-  function frameStill() { return new Promise(function (ok) { requestAnimationFrame(function () { ok(); }); }); }
-  var STILL = {};
-  function stillOf(name, r) {
-    if (!name) return Promise.resolve(null);
-    if (!STILL[name]) STILL[name] = new Promise(function (ok) { var im = new Image(); im.onload = function () { ok(im); }; im.onerror = function () { ok(null); }; im.src = PARTS + 'stills/' + name + '.jpg'; setTimeout(function () { ok(im.complete && im.naturalWidth ? im : null); }, 8000); });
-    return STILL[name].then(function (im) { if (r !== run) throw 'stop'; return im; });
-  }
-  function fallbackStill(o) { return o.still || o.clipName; }
-  /* the stills of a scene come before they are needed */
-  function readyScene(scene) {
-    kids(scene).forEach(function (m) { var s = specOf(scene.concat([m])); if (!s) return; var o = resolve(s); if (o.still && o.play !== 'clip') stillOf(o.still, run).catch(function () {}); });
-  }
-  /* the next moment's clip loads in the spare player while this one plays */
-  function prepNext(p) { var s = p && specOf(p); if (!s) return; var o = resolve(s); if (o.play === 'clip') clipEl(o.clipName); }
 
   /* ── pictures tuned in from static: a block mask, pixels and static, never a fade ── */
   var oc = document.createElement('canvas'), og = oc.getContext('2d', { willReadFrequently: true }), MASKS = {};
@@ -1095,19 +1111,8 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   function ready(el) { return el.tagName === 'IMG' ? el.complete && el.naturalWidth > 0 : el.readyState >= 2; }
   function drawTuned(T, nowMs) {
     var el = T.el; if (!ready(el)) return;
-    if (T.R.W !== W || T.R.H !== H) { var asp = el.tagName === 'IMG' ? el.naturalWidth / el.naturalHeight : (el.videoWidth / el.videoHeight || 16 / 9); T.R = picRect(asp); }
+    if (T.R.W !== W || T.R.H !== H) T.R = picRect(el.tagName === 'IMG' ? el.naturalWidth / el.naturalHeight : (el.videoWidth / el.videoHeight || 16 / 9));
     var R = T.R, M = maskFor(R.w / R.h), rev = T.rev;
-    if (T.mode === 'tear') {   /* its rows slip sideways into place, as a memory does when it tears */
-      if (!T.rows) { T.rows = []; for (var s = 0; s < 18; s++) T.rows.push({ dl: Math.random() * 0.5, dir: Math.random() < 0.5 ? -1 : 1 }); }
-      var sh = R.h / T.rows.length, iw = el.videoWidth || el.naturalWidth, ih = el.videoHeight || el.naturalHeight;
-      for (var j = 0; j < T.rows.length; j++) {
-        var k = ease((rev * 1.6 - T.rows[j].dl) / 0.9), dx = (1 - k) * R.w * 0.8 * T.rows[j].dir;
-        if (k <= 0) continue;
-        ctx.drawImage(el, 0, ih * j / T.rows.length, iw, ih / T.rows.length, R.x + dx, R.y + j * sh, R.w, sh + 0.6);
-      }
-      if (rev >= 1) edges(M, R, nowMs);
-      return;
-    }
     if (rev >= 1) { ctx.drawImage(el, R.x, R.y, R.w, R.h); edges(M, R, nowMs); return; }
     if (oc.width !== M.cols || oc.height !== M.rows) { oc.width = M.cols; oc.height = M.rows; }
     og.clearRect(0, 0, M.cols, M.rows); og.drawImage(el, 0, 0, M.cols, M.rows);
@@ -1117,147 +1122,86 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   }
   var tuned = null, glimpse = null, burst = null;
   var clips = [$('clipA'), $('clipB')], elGlim = $('glim'), clipLive = 0;
-  function clipSrc(name) { return PARTS + 'clips/' + name + '.mp4'; }
-  function clipEl(name) {
-    var src = clipSrc(name);
-    for (var i = 0; i < 2; i++) if (clips[i].getAttribute('data-src') === src) return clips[i];
-    /* the player not in use takes the next clip, so one can load while the other plays */
-    var spare = clips[1 - clipLive]; if (!spare.paused && !clips[clipLive].paused) spare = clips[1 - clipLive]; else if (!spare.paused) spare = clips[clipLive];
-    spare.setAttribute('data-src', src); spare.preload = 'auto'; spare.src = src; try { spare.load(); } catch (e) { /* loads when it can */ }
-    return spare;
+  function clipSrc(name) { return PARTS + (name.indexOf('/') >= 0 ? name : 'clips/' + name) + '.mp4'; }
+  function holder(src) { for (var i = 0; i < 2; i++) if (clips[i].getAttribute('data-src') === src) return clips[i]; return null; }
+  function loadInto(el, src) { el.setAttribute('data-src', src); el.preload = 'auto'; el.src = src; try { el.load(); } catch (e) { /* loads when it can */ } return el; }
+  /* the player not in use takes the next clip, so one can load while the other plays */
+  function clipEl(name) { var src = clipSrc(name), h = holder(src); if (h) return h; var spare = clips[1 - clipLive]; if (!spare.paused) spare = clips[clipLive]; return loadInto(spare, src); }
+  /* a clip loaded ahead into whichever player is not holding one in use */
+  function prefetch(name, busyNames) {
+    var src = clipSrc(name); if (holder(src)) return;
+    var busySrc = (busyNames || []).map(clipSrc);
+    for (var i = 0; i < 2; i++) { var el = clips[(clipLive + 1 + i) % 2]; if (busySrc.indexOf(el.getAttribute('data-src')) < 0 && (el.paused || el.ended)) { loadInto(el, src); return; } }
   }
-  function clipStop() { clips.forEach(function (v) { try { v.pause(); } catch (e) { /* not playing */ } v.onended = null; }); }
-  function playing(el) {
-    return new Promise(function (ok, no) {
-      var done = false, fin = function (good) { if (!done) { done = true; good ? ok() : no('failed'); } };
-      el.addEventListener('playing', function () { fin(true); }, { once: true });
-      el.addEventListener('error', function () { fin(false); }, { once: true });
-      setTimeout(function () { fin(el.readyState >= 2); }, 6000);
-      try { el.currentTime = 0; } catch (e) { /* not loaded yet */ }
-      var g = el.play(); if (g && g.catch) g.catch(function (e) { if (e && e.name === 'NotAllowedError') { el.muted = true; quiet(el.play()); } else if (el.error) fin(false); });
+  function clipsOf(c) { return (c && c.pic && c.pic.clip ? [c.pic.clip] : []).concat((c && c.own) || []); }
+  function clipStop() { clips.forEach(function (v) { v._tok = (v._tok || 0) + 1; try { v.pause(); } catch (e) { /* not playing */ } v.loop = false; }); elGlim._tok = (elGlim._tok || 0) + 1; }
+  /* a player started at a time: it answers when it plays, or after two and a half seconds whatever happens */
+  function playing(el, at) {
+    return new Promise(function (ok) {
+      var done = false, fin = function () { if (!done) { done = true; ok(); } };
+      el.addEventListener('playing', fin, { once: true }); setTimeout(fin, 2500);
+      var tok = el._tok = (el._tok || 0) + 1;
+      var go = function () {
+        if (el._tok !== tok) return;   /* a later call, or a stop, has taken this player */
+        try { el.currentTime = at || 0; } catch (e) { /* not seekable yet */ }
+        var g = el.play(); if (g && g.catch) g.catch(function (e) { if (e && e.name === 'NotAllowedError') { el.muted = true; quiet(el.play()); } else fin(); });
+      };
+      if (el.readyState >= 1) go(); else { el.addEventListener('loadedmetadata', go, { once: true }); try { el.load(); } catch (e) { /* loads when it can */ } }
     });
   }
-  /* a moving clip: tuned in from static (or torn into place), played whole with its own sound, tuned out */
-  async function playClip(name, mode, r, still) {
-    var el = clipEl(name); clipLive = clips.indexOf(el); el.muted = !Sound.isOn();
-    setStatic(0.5);
-    try { await playing(el); }
-    catch (e) {   /* the clip would not come: its still instead, or its words */
-      if (r !== run) throw 'stop';
-      var im = await stillOf(still(), r); setStatic(0.05);
-      if (!im) { await sleep(3000, r); return; }
-      tuned = { el: im, rev: 0, R: picRect(im.naturalWidth / im.naturalHeight), mode: mode };
-      await tween(tuned, 'rev', 1, 700, r, function (t) { return t; }); await sleep(5000, r); await tween(tuned, 'rev', 0, 520, r, function (t) { return t; }); tuned = null; return;
-    }
-    if (r !== run) throw 'stop';
-    tuned = { el: el, rev: 0, R: picRect(el.videoWidth / el.videoHeight || 16 / 9), mode: mode };
-    await tween(tuned, 'rev', 1, mode === 'tear' ? 1100 : 700, r, function (t) { return t; }); setStatic(0);
-    /* it plays to its own end; if it stalls for good the walk moves on, and its length is never assumed */
+  async function playClip(name, r) {
+    var el = clipEl(name); clipLive = clips.indexOf(el); el.loop = false; el.muted = !Sound.isOn(); el.volume = 1;
+    setStatic(0.22); await playing(el, 0); if (r !== run) throw 'stop'; logClip(name, el);
+    tuned = { el: el, rev: 0, R: picRect(el.videoWidth / el.videoHeight || 16 / 9), mode: 'tune' };
+    await tween(tuned, 'rev', 1, 700, r, lin); setStatic(0);
     await new Promise(function (ok, no) {
-      var seen = -1, still0 = performance.now();
-      (function watch() {
+      var t0 = performance.now(), seen = -1, still0 = performance.now();
+      (function st() {
         if (r !== run) return no('stop');
-        if (el.ended) return ok();
-        if (el.currentTime !== seen) { seen = el.currentTime; still0 = performance.now(); }
-        else if (!el.paused && performance.now() - still0 > 8000) return ok();
-        setTimeout(watch, 120);
+        if (el.ended || (el.duration && el.currentTime > el.duration - 0.25) || performance.now() - t0 > 60000) return ok();
+        if (el.currentTime !== seen) { seen = el.currentTime; still0 = performance.now(); } else if (performance.now() - still0 > 8000) return ok();
+        setTimeout(st, 120);
       })();
     });
-    tuned.rev = 0.99; setStatic(0.5); await tween(tuned, 'rev', 0, 520, r, function (t) { return t; }); tuned = null; el.pause(); setStatic(0.05);
+    tuned.rev = 0.99; setStatic(0.3); await tween(tuned, 'rev', 0, 420, r, lin); tuned = null; el.pause(); setStatic(0.05);
   }
-  /* a glimpse: a silent fragment, half-tuned, gone again */
-  async function showGlimpse(name, ms, r) {
+  /* a glimpse on the journey: a face, a block's fiction, or a silent fragment, half-tuned, gone again */
+  async function showGlimpse(name, ms, r, fic) {
     try {
-      elGlim.muted = true; elGlim.src = PARTS + 'glimpses/' + name + '.mp4'; elGlim.setAttribute('data-src', name);
-      await playing(elGlim); if (r !== run) return;
-      glimpse = { el: elGlim, rev: 0, R: picRect(elGlim.videoWidth / elGlim.videoHeight || 16 / 9), mode: 'tune' };
-      GLIMPSED.push(name);
-      var top = 0.72 + Math.random() * 0.2; await tween(glimpse, 'rev', top, 380, r); await sleep(ms - 800, r); await tween(glimpse, 'rev', 0, 380, r);
-      glimpse = null; elGlim.pause();
-    } catch (e) { glimpse = null; }
+      var file = fic ? fic.file : 'clips/' + name, at = fic ? (fic.at || (3 + Math.floor(Math.random() * (fic.len - 10)))) : 0;
+      elGlim.muted = !fic || !Sound.isOn(); elGlim.volume = 0.55; elGlim.setAttribute('data-src', file); elGlim.src = PARTS + file + '.mp4';
+      await playing(elGlim, at);
+      if (fic) ficNote = '· · ·  ' + fic.title + '  ·  ' + fic.block + '  · · ·';
+      if (r !== run) return;
+      glimpse = { el: elGlim, rev: 0, R: picRect(16 / 9), mode: 'tune' };
+      LOG.journey.push({ name: fic ? fic.title : name, file: file, ms: LOG.walk0 ? Date.now() - LOG.walk0 : 0 });
+      var top = fic ? 0.94 : 0.72 + Math.random() * 0.2; await tween(glimpse, 'rev', top, 380, r); await sleep(ms - 800, r); await tween(glimpse, 'rev', 0, 380, r);
+      glimpse = null; ficNote = ''; elGlim.pause();
+    } catch (e) { glimpse = null; ficNote = ''; }
   }
-  var GLIMPSED = [];
-
-  /* a picture bursting out of its point as particles, or arriving as gold light from Tom's point */
-  function makeBurst(img, ox, oy, R, gold) {
+  /* a picture bursting out of its point as particles */
+  function makeBurst(img, ox, oy, R) {
     var asp = R.w / R.h, cw = asp >= 1 ? 112 : Math.round(84 * asp / 0.75), chh = Math.round(cw / asp);
     var c = document.createElement('canvas'); c.width = cw; c.height = chh; var q = c.getContext('2d'); q.drawImage(img, 0, 0, cw, chh);
     var d = q.getImageData(0, 0, cw, chh).data, P = [];
-    for (var y = 0; y < chh; y++) for (var x = 0; x < cw; x++) { var i = (y * cw + x) * 4; P.push({ u: (x + 0.5) / cw, v: (y + 0.5) / chh, r: d[i], g: d[i + 1], b: d[i + 2], dl: Math.random() * 0.45 + Math.hypot(x - cw / 2, y - chh / 2) / (cw * 1.4), a: Math.random() * TAU }); }
-    return { P: P, ox: ox, oy: oy, t: 0, img: img, hold: 0, R: R, cw: cw, gold: gold };
+    for (var y = 0; y < chh; y++) for (var x = 0; x < cw; x++) { var i = (y * cw + x) * 4; P.push({ u: (x + 0.5) / cw, v: (y + 0.5) / chh, c: 'rgb(' + d[i] + ',' + d[i + 1] + ',' + d[i + 2] + ')', dl: Math.random() * 0.45 + Math.hypot(x - cw / 2, y - chh / 2) / (cw * 1.43), a: Math.random() * TAU }); }
+    return { P: P, ox: ox, oy: oy, t: 0, img: img, hold: 0, R: R, cw: cw };
   }
   function drawBurst(nowMs) {
     var b = burst, R = b.R, pw = R.w / b.cw + 0.6;
     if (b.t >= 1 && b.out !== true) {
       var s = 1 + 0.035 * b.hold; ctx.save(); ctx.beginPath(); ctx.rect(R.x, R.y, R.w, R.h); ctx.clip();
       ctx.drawImage(b.img, R.x - (s - 1) * R.w / 2, R.y - (s - 1) * R.h / 2, R.w * s, R.h * s); ctx.restore();
-      if (b.gold) { ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 0.12 * (1 - b.hold); ctx.fillStyle = '#ffb347'; ctx.fillRect(R.x, R.y, R.w, R.h); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; }
       edges(maskFor(R.w / R.h), R, nowMs); return;
     }
     for (var i = 0; i < b.P.length; i++) {
       var p = b.P[i], k = ease((b.t * 1.6 - p.dl) / 0.9); if (k <= 0) continue;
       var tx = R.x + p.u * R.w, ty = R.y + p.v * R.h, sw = (1 - k) * 60;
-      var x = b.ox + (tx - b.ox) * k + Math.cos(p.a + k * 5) * sw, y = b.oy + (ty - b.oy) * k + Math.sin(p.a + k * 5) * sw;
-      if (b.gold) { var gk = Math.min(1, k * k); ctx.fillStyle = 'rgb(' + Math.round(lerp(255, p.r, gk)) + ',' + Math.round(lerp(196, p.g, gk)) + ',' + Math.round(lerp(96, p.b, gk)) + ')'; }
-      else ctx.fillStyle = 'rgb(' + p.r + ',' + p.g + ',' + p.b + ')';
-      ctx.fillRect(x - pw / 2, y - pw / 2, pw, pw);
+      ctx.fillStyle = p.c; ctx.fillRect(b.ox + (tx - b.ox) * k + Math.cos(p.a + k * 5) * sw - pw / 2, b.oy + (ty - b.oy) * k + Math.sin(p.a + k * 5) * sw - pw / 2, pw, pw);
     }
   }
 
-  /* counted tones, with points of light appearing in the sky to the count */
-  var pips = null, shape = null, vring = 0, digitsShown = '', allb = 0;
-  async function pipsRun(count, r) {
-    var c = ringCentre(), gap = Math.min(W, c[2]) * (wide ? 0.05 : 0.07), pts = [], t0 = performance.now();
-    pips = { pts: pts };
-    if (count === 'time') {   /* soft and regular, keeping time */
-      for (var i = 0; i < 9; i++) { var a = -Math.PI / 2 + i / 9 * TAU, R = ringR() * 0.62; pts.push({ x: c[0] + Math.cos(a) * R, y: c[1] + Math.sin(a) * R, at: i * 750, k: 1 }); }
-      for (i = 0; i < 9; i++) Sound.pip(880, i * 0.75, 0.05, 0.1);
-      await sleep(9 * 750 + 400, r); return;
-    }
-    if (count.length === 1) {   /* ten pips, in a line across the night */
-      var n = count[0], span = Math.min(W - 60, wide ? 520 : W - 60);
-      for (i = 0; i < n; i++) { pts.push({ x: c[0] - span / 2 + span * i / (n - 1), y: c[1], at: 300 + i * 420, k: 1 }); Sound.pip(1000, 0.3 + i * 0.42, 0.1, 0.14); }
-      await sleep(300 + n * 420 + 600, r); return;
-    }
-    /* one, then nine, then eighty-one: each group steps in as the next begins */
-    pts.push({ x: c[0], y: c[1], at: 400, k: 0, until: 1700 }); Sound.pip(1000, 0.4, 0.11, 0.16);
-    for (i = 0; i < 9; i++) { pts.push({ x: c[0] + ((i % 3) - 1) * gap * 3.2, y: c[1] + (Math.floor(i / 3) - 1) * gap * 3.2, at: 1800 + i * 240, k: 1, until: 4300 }); Sound.pip(1000, 1.8 + i * 0.24, 0.11, 0.16); }
-    for (i = 0; i < 81; i++) { var gi = Math.floor(i / 9), j = i % 9; pts.push({ x: c[0] + ((gi % 3) - 1) * gap * 3.2 + ((j % 3) - 1) * gap, y: c[1] + (Math.floor(gi / 3) - 1) * gap * 3.2 + (Math.floor(j / 3) - 1) * gap, at: 4400 + i * 31, k: 2 }); Sound.pip(1000, 4.4 + i * 0.031, 0.035, 0.07); }
-    pips.t0 = t0; await sleep(4400 + 81 * 31 + 1600, r);
-  }
-  /* nine points open into nine times nine: the shape of the calendar */
-  async function shapeRun(r) {
-    shape = { t0: performance.now() }; await sleep(6500, r);
-  }
-  function drawPips(nowMs) {
-    if (!pips) return;
-    var t = nowMs - (pips.t0 || (pips.t0 = nowMs));
-    ctx.globalCompositeOperation = 'lighter';
-    for (var i = 0; i < pips.pts.length; i++) {
-      var p = pips.pts[i]; if (t < p.at || (p.until && t > p.until)) continue;
-      var age = (t - p.at) / 1000, flash = Math.exp(-age * 3.2), r = (p.k === 2 ? 6 : p.k === 1 ? 12 : 20) * (1 + flash * 1.6) * (wide ? 1.15 : 1);
-      ctx.globalAlpha = 0.55 + 0.45 * flash; ctx.drawImage(SPR_PIP, p.x - r, p.y - r, r * 2, r * 2);
-    }
-    ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
-  }
-  function drawShape(nowMs) {
-    if (!shape) return;
-    var t = (nowMs - shape.t0) / 1000, c = ringCentre(), R = ringR() * 0.62, r2 = ringR() * 0.2;
-    ctx.globalCompositeOperation = 'lighter'; ctx.strokeStyle = 'rgba(255,214,150,.18)'; ctx.lineWidth = 1;
-    for (var i = 0; i < 9; i++) {
-      var a = -Math.PI / 2 + i / 9 * TAU, x = c[0] + Math.cos(a) * R, y = c[1] + Math.sin(a) * R, on = clamp((t - i * 0.25) / 0.4, 0, 1);
-      if (on <= 0) continue;
-      ctx.globalAlpha = on; ctx.drawImage(SP_A, x - 12, y - 12, 24, 24);
-      var open = ease((t - 2.6 - i * 0.18) / 1.2);
-      if (open > 0) for (var j = 0; j < 9; j++) {
-        var b = a + j / 9 * TAU, xx = x + Math.cos(b) * r2 * open, yy = y + Math.sin(b) * r2 * open;
-        ctx.globalAlpha = open * 0.9; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(xx, yy); ctx.stroke(); ctx.drawImage(SPR_PIP, xx - 5, yy - 5, 10, 10);
-      }
-    }
-    ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
-  }
-
-  /* ── the ring: the block's real branches around the point we stand on, their digits, and the names of the ones that go deeper ── */
+  /* ── the ring: the block's real branches around the point we stand on ── */
   function glowAt(x, y, r, sp, a) { ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = a; ctx.drawImage(sp, x - r, y - r, r * 2, r * 2); ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1; }
   function drawRing(nowMs) {
     if (!inside || radioOn) return;
@@ -1268,19 +1212,17 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
         return { d: d, i: i, x: q[0] + ox, y: q[1] + oy, a: -Math.PI / 2 + i / many * TAU, deep: deep, named: deep || (!inCut(p) && many <= 6) };
       });
       pts.forEach(function (q) {
-        var p = par.concat([q.d]), deep = q.deep, mo = !deep && momentAt(p), live = deep || mo, on = sel === q.d || pick === q.i;
+        var p = par.concat([q.d]), deep = q.deep, mo = !deep && momentAt(p), live = deep || mo, on = sel === q.d || pick === q.i || (allb && live);
         ctx.strokeStyle = 'rgba(240,190,120,' + (quietNow ? 0.05 : 0.12) + ')'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(cx + ox, cy + oy); ctx.lineTo(q.x, q.y); ctx.stroke();
-        var pulse = allb ? 1 + 0.5 * Math.abs(Math.sin(nowMs / 140 + q.i)) : 1 + 0.08 * Math.sin(nowMs / 400 + q.i);
-        var r = (live ? 20 : 12) * (on ? 1.7 : 1) * (quietNow ? 0.45 : 1) * pulse;
-        glowAt(q.x, q.y, r, on ? SP_A : live ? SP_G : SP_B, (live ? 1 : 0.55) * (quietNow ? 0.5 : 1));
+        var r = (live ? 20 : 12) * (on ? 1.7 : 1) * (quietNow ? 0.45 : 1) * (1 + 0.08 * Math.sin(nowMs / 400 + q.i));
+        glowAt(q.x, q.y, r, on ? SP_A : live ? SP_W : SP_B, (live ? 1 : 0.55) * (quietNow ? 0.5 : 1));
         if (scale > 0.6 && scale < 2 && !quietNow) {
           ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic'; ctx.shadowColor = 'rgba(0,0,0,.95)'; ctx.shadowBlur = 6;
           ctx.font = '600 ' + (on ? 19 : 17) + 'px ui-monospace,Menlo,Consolas,monospace'; ctx.fillStyle = on ? '#ffd9a0' : live ? '#f1e2c4' : '#b8b0a0';
           ctx.fillText(String(q.d), q.x, q.y - r * 0.55 - 8);
-          if (q.named) {   /* names only for what goes deeper, so a scene's moments stay a ring of digits */
+          if (q.named) {
             var words = firstWords(nodeOf(p), 3), below = Math.sin(q.a) > -0.3, room = W - 16;
             ctx.font = 'italic 500 ' + (wide ? 17 : 16) + 'px "Cormorant Garamond",Garamond,serif'; ctx.fillStyle = on ? '#fff3dc' : '#e9dcc2';
-            /* a name keeps clear of the names beside it on its own row */
             pts.forEach(function (o) { if (o !== q && o.named && (Math.sin(o.a) > -0.3) === below && Math.abs(o.y - q.y) < 26) room = Math.min(room, Math.abs(o.x - q.x) - 14); });
             while (ctx.measureText(words).width > room && /\s/.test(words)) words = words.replace(/…$/, '').replace(/\s+\S*$/, '') + '…';
             var tw = ctx.measureText(words).width, lx = clamp(q.x, tw / 2 + 8, W - tw / 2 - 8);
@@ -1292,13 +1234,13 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     }
     if (fly) { var fp = ringPos(fly.i, fly.n, 1), s = 1 + 7 * fly.t; draw(fly.ks, fly.par, s, -(fp[0] - cx) * s, -(fp[1] - cy) * s, fly.i); }
     else draw(kids(path), path, V.ringS, 0, 0, -1);
-    var pr = 7 + 3 * Math.sin(nowMs / 600); glowAt(cx, cy, pr, SP_A, 1);
+    glowAt(cx, cy, 7 + 3 * Math.sin(nowMs / 600), SP_A, 1);
   }
-  /* Tom's point of light: it rises from the dial and stays for the scene, his ten digits beside it, reckoned from today */
+  /* Tom's point of light: it rises from the dial and stays for the scene, his ten digits beside it */
   function drawHis(nowMs) {
     if (!his || !inside) return;
     his.pulse = Math.max(0, (his.pulse || 0) - 0.03);
-    var red = his.col === 'red', r = (red ? 26 : 22) * (1 + his.pulse * 1.3) + 2 * Math.sin(nowMs / 300), sp = red ? SP_R : SP_A;
+    var r = (his.col === 3 ? 26 : 22) * (1 + his.pulse * 1.3) + 2 * Math.sin(nowMs / 300), sp = HISP[his.col] || SP_A;
     if (his.y > his.ty + 4) {
       var floor = H - tunerH + 20, gr = ctx.createLinearGradient(0, his.y, 0, floor);
       gr.addColorStop(0, 'rgba(255,200,110,.5)'); gr.addColorStop(1, 'rgba(255,200,110,0)'); ctx.strokeStyle = gr; ctx.lineWidth = 1.5;
@@ -1306,62 +1248,89 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     }
     glowAt(his.x, his.y, r, sp, 1); glowAt(his.x, his.y, r / 2, sp, 1);
     if (his.label) {
-      var D = gateDigits(), rel = relOf(D);
       ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.shadowColor = '#000'; ctx.shadowBlur = 6;
-      ctx.font = '500 14px ui-monospace,Menlo,Consolas,monospace'; ctx.fillStyle = red ? '#ff8a78' : '#f3c98d';
-      ctx.fillText(D, his.x + 24, his.y - 8);
-      if (rel) { ctx.font = '500 12px ui-monospace,Menlo,Consolas,monospace'; ctx.fillText(rel, his.x + 24, his.y + 9); }
-      ctx.shadowBlur = 0;
+      ctx.font = '500 14px ui-monospace,Menlo,Consolas,monospace'; ctx.fillStyle = his.col === 3 ? '#ff8a78' : '#f3c98d';
+      ctx.fillText(gateDigits(), his.x + 24, his.y); ctx.shadowBlur = 0;
     }
   }
   function drawVring() {
     if (!vring) return;
-    var L = Sound.level(), d = Sound.wave(), c = ringCentre(), R0 = Math.min(W, c[2]) * 0.18;
+    var L = Sound.level(), d = Sound.wave(), c = ringCentre(), R0 = Math.min(W, H) * 0.16;
     ctx.strokeStyle = 'rgba(255,206,140,.85)'; ctx.lineWidth = 1.6; ctx.beginPath();
     for (var i = 0; i <= 128; i++) { var a = i / 128 * TAU, v = d ? (d[i % 128] - 128) / 128 : 0, r = R0 * (1 + L * 0.25) + v * 46, x = c[0] + Math.cos(a) * r, y = c[1] + Math.sin(a) * r; if (i) ctx.lineTo(x, y); else ctx.moveTo(x, y); }
-    ctx.closePath(); ctx.stroke(); glowAt(c[0], c[1], 18 + L * 90, SP_G, 1);
+    ctx.closePath(); ctx.stroke(); glowAt(c[0], c[1], 18 + L * 90, SP_W, 1);
+  }
+  function drawSparks(nowMs) {
+    if (!sparks.length) return;
+    ctx.globalCompositeOperation = 'lighter';
+    for (var i = 0; i < sparks.length; i++) { var q = sparks[i], a = Math.min(1, (nowMs - q.b) / 200), r = 9 + 10 * (1 - a); ctx.drawImage(SP_A, q.x - r, q.y - r, r * 2, r * 2); }
+    ctx.globalCompositeOperation = 'source-over';
+  }
+  function drawShape() {
+    if (!(shapeT.v > 0)) return;
+    var v = shapeT.v, c = ringCentre(), cx = c[0], cy = c[1], R1 = Math.min(W, H) * 0.27 * ease(v * 2.2);
+    ctx.globalCompositeOperation = 'lighter';
+    for (var i = 0; i < 9; i++) {
+      var a = -Math.PI / 2 + i / 9 * TAU, x = cx + Math.cos(a) * R1, y = cy + Math.sin(a) * R1; ctx.drawImage(SP_A, x - 12, y - 12, 24, 24);
+      var R2 = Math.min(W, H) * 0.075 * ease((v - 0.45) * 2.2);
+      if (R2 > 1) for (var j = 0; j < 9; j++) { var b = a + j / 9 * TAU; ctx.drawImage(SP_W, x + Math.cos(b) * R2 - 5, y + Math.sin(b) * R2 - 5, 10, 10); }
+    }
+    ctx.drawImage(SP_A, cx - 9, cy - 9, 18, 18); ctx.globalCompositeOperation = 'source-over';
   }
   function drawDigits() {
     if (!digitsShown) return;
-    var c = ringCentre(); ctx.font = '500 ' + Math.round(Math.min(44, W / 9)) + 'px ui-monospace,Menlo,Consolas,monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillStyle = '#f6c377'; ctx.shadowColor = '#c6791f'; ctx.shadowBlur = 18; ctx.fillText(digitsShown.replace(/^(\d{4})(\d*)$/, '$1 $2'), c[0], c[1]); ctx.shadowBlur = 0;
+    var c = ringCentre(), y = tuned ? Math.min(H - tunerH - 30, tuned.R.y + tuned.R.h + 46) : c[1];
+    ctx.font = '500 ' + Math.round(Math.min(40, W / 9)) + 'px ui-monospace,Menlo,Consolas,monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#f6c377'; ctx.shadowColor = '#c6791f'; ctx.shadowBlur = 18; ctx.fillText(digitsShown.replace(/^(\d{4})(\d*)$/, '$1 $2'), c[0], y); ctx.shadowBlur = 0;
   }
 
-  /* ── the auto-walk: the film from the sky to the credits, depth-first through the walked cut ── */
-  function cutMoments() {
-    var out = [], chap = kids([7, 2]);
-    chap.forEach(function (c) { kids([7, 2, c]).forEach(function (s) { kids([7, 2, c, s]).forEach(function (m) { var p = [7, 2, c, s, m]; if (momentAt(p)) out.push(p); }); }); });
-    return out;
-  }
+  /* ── walk the film: the piece's journey, from the sky to 'The end of chapter one', then the credits ── */
   async function walkFilm(after) {
     stopAll(); var r = run; autoOn = true; update();
     try {
       if (!film) { elNotice.hidden = false; readAll(); throw 'stop'; }
+      LOG.walk0 = Date.now(); LOG.end = 0;
       if (inside && !wb.film) { var from = starOf(wb.name); inside = false; wb = null; path = []; sel = null; card(''); band(SKY_MARKS); orb.tgt = [0, 0, 0]; if (from) orb.yaw = Math.atan2(from.p[2], from.p[0]); }
-      if (!inside) { await tuneSky(r); await sleep(2600, r); await enterBlock(FILM, film, r); await sleep(1500, r); }
-      var list = cutMoments(), here = after || (path.concat(sel != null ? [sel] : [])).join(''), start = 0, gi = 0;
-      if (after) { while (start < list.length && list[start].join('') <= after) start++; }
-      else if (here) { while (start < list.length && list[start].join('') < here) start++; if (start >= list.length) start = 0; }
-      for (var k = start; k < list.length; k++) {
-        var m = list[k], scene = m.slice(0, 4);
-        if (path.join(',') !== scene.join(',')) { await travelTo(scene, r); readyScene(scene); await sleep(700, r); }
-        await needleTo(m[4], r); await sleep(350, r);
-        if (k === start) prepNext(m);
-        var playingNow = playMoment(m, r); prepNext(list[k + 1]); await playingNow;
-        if (k === list.length - 1) break;
-        var turning = list[k + 1].slice(0, 4).join(',') !== scene.join(',');
-        if (!turning && specOf(list[k + 1]) && resolve(specOf(list[k + 1])).play !== 'radio' && gi++ % 2 === 1) {   /* about every second moment, a glimpse with a ghost voice */
-          card(''); setStatic(0.4); Sound.ghost(0.4); await showGlimpse(nextGlimpse(), 1900, r); setStatic(0.05);
-        } else { setStatic(0.3); await sleep(450, r); setStatic(0.05); }
-        if (turning) { card(''); await sleep(600, r); }
+      if (!inside) { await tuneSky(r); await sleep(1500, r); await enterBlock(FILM, film, r); await sleep(700, r); }
+      else if (!after) { path = []; sel = null; his = null; V.ringS = 1; bandForRing(); card('', ROOT_LINE); await sleep(500, r); }
+      var chap = [7, 2, 1], scenes, startScene = 0, skipTo = 0;
+      if (after) {   /* carrying on from the radio by hand: up to the chapter, then the scene after */
+        while (path.length > 3) { var dd = path.pop(); V.ringS = 1.5; bandForRing(); select(dd, true); await tween(V, 'ringS', 1, 320, r); }
+        scenes = kids(chap); var a = String(after); startScene = Math.max(0, scenes.indexOf(Number(a[3]))); skipTo = Number(a[4]) || 0;
+        var last = kids(chap.concat([scenes[startScene]])); if (skipTo >= last[last.length - 1]) { startScene++; skipTo = 0; }
+      } else {
+        for (var i = 0; i < 3; i++) { await needleTo(chap[i], r); await sleep(350, r); await goIn(r); await sleep(500, r); }
+        scenes = kids(chap);
       }
-      card(''); await sleep(3000, r);
+      for (var si = startScene; si < scenes.length; si++) {
+        var sc = scenes[si];
+        await needleTo(sc, r); await sleep(450, r); await goIn(r); await sleep(650, r);
+        var moments = kids(path);
+        for (var mi = 0; mi < moments.length; mi++) {
+          var d = moments[mi]; if (si === startScene && d <= skipTo) continue;
+          var here = path.concat([d]), cNow = CUT[address(here)], nextP = mi + 1 < moments.length ? path.concat([moments[mi + 1]]) : null, cNext = nextP && CUT[address(nextP)];
+          if (clipsOf(cNow).length) prefetch(clipsOf(cNow)[0], []);
+          whisper(0.28); await needleTo(d, r); await sleep(120, r);
+          if (momentAt(here)) {
+            var pm = playMoment(here, r);
+            if (cNext && clipsOf(cNext).length) setTimeout(function (nm, busyNow) { return function () { if (r === run) prefetch(nm, busyNow); }; }(clipsOf(cNext)[0], clipsOf(cNow)), 1500);
+            await pm;
+          }
+          else { pointCard(path.concat([d])); await sleep(1200 + story(nodeOf(path.concat([d]))).length * 55, r); }
+          card('');
+        }
+        his = null; setStatic(0.4); if (si < scenes.length - 1) await showGlimpse(GLIMPSES[gi++ % GLIMPSES.length], 1300, r); setStatic(0.05);
+        path.pop(); V.ringS = 1.5; bandForRing(); select(sc, true); await tween(V, 'ringS', 1, 320, r);
+      }
+      setRead('film · 7 · 2 · 1'); card('', END_LINE); LOG.end = Date.now();
+      await sleep(3000, r);
       autoOn = false; update(); openCredits(true);
     } catch (e) { if (e !== 'stop' && window.console) console.warn(e); }
     if (r === run) { autoOn = false; busy = false; update(); }
   }
+  var gi = 0;
 
-  /* ── the kept lives, read live from the story at 1.61 to 1.69, each with its own voice: the radio inside 'The address' ── */
+  /* ── the kept lives, read live from the story at 1.61 to 1.69, each with its own voice: the radio by hand ── */
   var LIVES = [], FIRST = 0.06;
   var CAST = [
     [/aoife/i, { voice: 'aoife_diary', overV: ['aoife_o1', 'aoife_o2'] }], [/ois[ií]n/i, { voice: 'oisin_diary', thoughtV: 'oisin_thought' }],
@@ -1397,6 +1366,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     return L;
   }
   function filmNode(p) { var n = film; for (var i = 0; i < p.length; i++) { if (!n || typeof n !== 'object' || sealed(n) || n[String(p[i])] == null) return undefined; n = n[String(p[i])]; } return n; }
+  var pendingPath = null;
   function filmArrived() {
     LIVES = [];
     for (var d = 1; d <= 9; d++) { var n = filmNode([1, 6, d]); if (n != null && !sealed(n)) { var L = parseLife(lineOf(n)); if (L) LIVES.push(L); } }
@@ -1405,7 +1375,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     if (pendingPath) { var p = pendingPath; pendingPath = null; enterNow(FILM, film); travelNow(p); }
   }
   var elStation = $('station'), elWho = $('who'), elDiary = $('diary'), elCentre = $('centre'), elThought = $('thought');
-  var cur = null, lockT = 0, timers = [], nextGhost = 0, radioOn = false, sweepT0 = -99, tuneT0 = -99, radioWaitOk = null, radioWaitNo = null, radioAt = null;
+  var cur = null, lockT = 0, timers = [], nextGhost = 0, radioOn = false, sweepT0 = -99, tuneT0 = -99, radioAt = null;
   function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
   function clearTimers() { timers.forEach(clearTimeout); timers = []; }
   function strengthOf(L) { return Math.max(0, 1 - Math.abs(f - L.f) / 0.045); }
@@ -1425,7 +1395,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   function overheard(lines, start, beside, ids) {
     lines.forEach(function (l, i) {
       later(function () {
-        if (ids && ids[i]) Sound.say(ids[i], 0, { pan: i % 2 ? 0.45 : -0.45 });
+        if (ids && ids[i]) Sound.say(ids[i], 0, { pan: i % 2 ? 0.45 : -0.45, station: true });
         var e = document.createElement('div'); e.className = 'over'; e.textContent = l;
         var above = i % 2 === 0;
         e.style.left = above ? '7%' : 'auto'; e.style.right = above ? 'auto' : '7%'; e.style.textAlign = above ? 'left' : 'right';
@@ -1456,20 +1426,20 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     setRead(L.band + '  ·  ' + L.who);
     if (L.kind === 'diary') {
       elDiary.style.opacity = 1; typeDiary(elDiary, L.text, L.date);
-      Sound.say(L.voice, 0.9);
+      Sound.say(L.voice, 0.9, { station: true });
       if (L.over && L.over.length) overheard(L.over, Math.max(4500, L.text.length * 58), elDiary, L.overV);
       if (L.thought) later(function () { showThought(L.thought, elDiary); Sound.say(L.thoughtV, 0.6, { close: true, gain: 0.9 }); }, L.text.length * 60 + 1800);
     }
     if (L.kind === 'overheard') overheard(L.over, 300, null, L.overV);
     if (L.kind === 'archive' || L.kind === 'centre') {
       elCentre.style.color = '#ffe3a8'; elCentre.style.textShadow = '0 0 18px rgba(255,200,110,.6),0 0 6px #000'; elCentre.textContent = L.text; elCentre.style.opacity = 1;
-      Sound.say(L.voice, 0.8);
+      Sound.say(L.voice, 0.8, { station: true });
     }
     if (L.kind === 'visitor') {
       Sound.pip(660, 0.2, 0.15); var i;
       for (i = 0; i < 9; i++) Sound.pip(990, 1.2 + i * 0.12, 0.09);
       for (i = 0; i < 81; i++) Sound.pip(1320, 2.6 + i * 0.03, 0.05, 0.05);
-      later(function () { elCentre.style.color = '#f2f4ff'; elCentre.style.textShadow = '0 0 22px rgba(170,190,255,.6),0 0 6px #000'; elCentre.textContent = L.text; elCentre.style.opacity = 1; Sound.say(L.voice, 0, { gain: 1 }); }, 5600);
+      later(function () { elCentre.style.color = '#f2f4ff'; elCentre.style.textShadow = '0 0 22px rgba(170,190,255,.6),0 0 6px #000'; elCentre.textContent = L.text; elCentre.style.opacity = 1; Sound.say(L.voice, 0, { station: true }); }, 5600);
     }
     if (L.kind === 'thought') { showThought(L.text, null); Sound.say(L.voice, 0.8, { close: true, gain: 0.9 }); }
     /* Tom's own station carries straight on into Night two */
@@ -1485,7 +1455,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   function stationStars() {
     STN = [];
     if (!B3.length) return;
-    var own = null; for (var j = 0; j < B3.length; j++) if (B3[j].name === FILM) own = B3[j];
+    var own = starOf(FILM);
     STN = LIVES.map(function (L, i) { return (i === LIVES.length - 1 && own) || B3[Math.floor(hh('station' + i, 7) * B3.length) % B3.length]; });
   }
   function beachTarget(fv) {
@@ -1498,7 +1468,6 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     }
     return STN[0].p;
   }
-  /* the beach behind the radio: tuning is travel through the real Pscale sky, out of focus between stations, sharp on one */
   function drawBeach(sig, nowMs, lockStar, fade) {
     if (!B3.length || !STN.length || STN.length !== LIVES.length) return;
     var tg = beachTarget(f), i;
@@ -1544,11 +1513,6 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
       var ka = Math.min(1, (nowMs - lockT) / 6000);
       g = ctx.createRadialGradient(W / 2, H * 0.4, 0, W / 2, H * 0.4, Math.max(W, H) * 0.75);
       g.addColorStop(0, 'rgba(70,48,18,' + (0.5 * ka) + ')'); g.addColorStop(1, 'rgba(255,196,110,' + (0.35 * ka) + ')'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-      for (i = 0; i < 120; i++) {
-        if (i / 120 < ka * 1.2) continue;
-        var x = (Math.sin(i * 12.9898) * 43758.5453 % 1 + 1) % 1 * W, y = (Math.sin(i * 78.233) * 12543.1 % 1 + 1) % 1 * H * 0.8;
-        ctx.fillStyle = 'rgba(220,230,255,.55)'; ctx.fillRect(x, y, 2, 2);
-      }
     }
     if (cur && cur.kind === 'visitor') {
       var tv = (nowMs - lockT) / 1000, far = Math.max(W, H);
@@ -1570,18 +1534,12 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     }
     if (s < 0.6) { ctx.fillStyle = 'rgba(255,255,255,' + ((1 - s) * 0.03 * k) + ')'; for (var ly = (nowMs / 7) % 6; ly < H; ly += 6) ctx.fillRect(0, ly, W, 1); }
   }
-  function radioLine(p) { var m = /(?:shows how|how it works):\s*['‘"“]([^'’"”]+)['’"”]/i.exec(decisionsOf(p.slice(0, 4))); return m ? m[1].trim() : 'Drag the dial. Each station is someone keeping something.'; }
-  /* the dial is already on screen: at 'The address' its band simply changes to the stations, and the walk waits for a hand */
-  function radioRun(p, r) {
-    radioStart(p);
-    if (!autoOn) return Promise.resolve();
-    return new Promise(function (ok, no) { radioWaitOk = ok; radioWaitNo = no; }).then(function () { if (r !== run) throw 'stop'; });
-  }
+  /* the dial by hand through the kept lives, after the radio's moment is played by hand */
   function radioStart(p) {
     radioOn = true; radioAt = p.slice(); f = 0; target = 0; tuneT0 = now(); nextGhost = performance.now() + 2500; camSet = false;
-    card('', radioLine(p));
-    band([[0, '88'], [0.2, '92'], [0.4, '96'], [0.6, '100'], [0.8, '104'], [1, '108']].map(function (l) { return [clamp(l[0], 0.03, 0.97), l[1]]; }), LIVES.map(function (L) { return [L.f, L.kind === 'memory']; }));
-    sweepT0 = CALM ? -99 : now() + 0.8;   /* the needle sweeps once by itself, passing the stations, then waits for a hand */
+    card('', 'Drag the dial. Each station is someone keeping something.');
+    band([[0.03, '88'], [0.2, '92'], [0.4, '96'], [0.6, '100'], [0.8, '104'], [0.97, '108']], LIVES.map(function (L) { return [L.f, L.kind === 'memory']; }));
+    sweepT0 = CALM ? -99 : now() + 0.8;
     setRead('· · ·'); update();
   }
   function radioStop() {
@@ -1590,20 +1548,15 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     if (inside) { bandForRing(); if (sel != null) f = target = fOf(kids(path).indexOf(sel), kids(path).length); }
     update();
   }
-  function radioCarry() {
-    var at = radioAt; radioAt = null;
-    if (radioWaitOk) { var ok = radioWaitOk; radioWaitOk = radioWaitNo = null; radioStop(); card(''); ok(); return; }
-    radioStop(); card('');
-    quiet(walkFilm(at ? at.join('') : ''));
-  }
+  function radioCarry() { var at = radioAt; radioAt = null; radioStop(); card(''); quiet(walkFilm(at ? at.join('') : '')); }
 
   /* ── the end credits (6.45): the sky turning behind, the title, Mara and then Tom gathering out of the stars and each heard once,
         the roll with what is read live from Pscale, the visitor's line last, then the site's own tools ── */
   var elCredits = $('credits'), elRoll = $('roll');
   var rolling = false, rollLast = 0, holdTill = 0, holds = [], holdAt = 0, rollStop = false, cvoice = null, faces = [], FACE = {}, ghostNext = 0;
   function voiceOf(who) {
-    if (who === 'mara') return has('clips', 'ch1_s2_06') || !MAN ? { src: PARTS + 'clips/ch1_s2_06.mp4', clip: true } : { src: VOICES + 'w_keep.mp3' };
-    return has('clips', 'ch1_s3_06') ? { src: PARTS + 'clips/ch1_s3_06.mp4', clip: true } : { src: VOICES + 'w_gate.mp3' };
+    if (who === 'mara') return { src: PARTS + 'clips/ch1_s2_06.mp4', clip: true };
+    return has('clips', 'ch1_s3_06') || !MAN ? { src: PARTS + 'clips/ch1_s3_06.mp4', clip: true } : { src: VOICES + 'w_gate.mp3' };
   }
   function fillCredits() {
     var ch = filmNode([7, 2, 1]);
@@ -1615,9 +1568,8 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     $('cgate').textContent = gateDigits();
     var n = ((index && index.blocks) || []).length; if (n) $('cstars').textContent = n.toLocaleString('en-GB');
     var nw = /\b(\d{10})\b/.exec(JSON.stringify((index && index.now) || '')); if (nw) $('cnow').textContent = nw[1];
-    /* each face's line says whose voice is heard: the moving picture's own where it is, the voice called Lily or Fable where not */
-    $('cmara').textContent = voiceOf('mara').clip ? 'spoken by a voice called Lily, and heard here in her own moving picture' : 'spoken by a voice called Lily';
-    $('ctom').textContent = voiceOf('tom').clip ? 'spoken by a voice called Fable, and heard here in his own moving picture' : 'spoken by a voice called Fable';
+    $('cmara').textContent = 'telling the story in a voice called Lily, and heard here in her own moving picture';
+    $('ctom').textContent = voiceOf('tom').clip ? 'in a voice called Fable, and heard here in his own moving picture' : 'in a voice called Fable';
     var foot = elCredits.querySelector('.foot'), th = null;
     if (foot) [].forEach.call(foot.querySelectorAll('p'), function (q) { if (!th && /David Pinto/.test(q.textContent)) th = q; });
     if (th) { th.classList.add('thanks'); var box = $('cpscale'); box.textContent = ''; box.appendChild(th); }
@@ -1627,7 +1579,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     panel.setAttribute('data-started', '1');
     var cv = panel.querySelector('canvas'), who = panel.getAttribute('data-face');
     faces.push({ cv: cv, g: cv.getContext('2d'), img: faceImg(who), t0: t, P: null, tear: 0 });
-    if (Sound.isOn()) {   /* each is heard once */
+    if (Sound.isOn()) {
       if (cvoice) cvoice.pause();
       var a = new Audio(voiceOf(who).src), mine = a; a.volume = 0.95; cvoice = a;
       quiet(a.play());
@@ -1706,16 +1658,11 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   $('cclose').addEventListener('click', closeCredits);
   $('csky').addEventListener('click', function () { closeCredits(); if (inside) leaveToSky(); });
 
-  /* ── exploring the sky (6.42): one finger turns the galaxy around its centre, a pinch or the wheel zooms toward and away from it,
-        a tap on a star glides the centre to that star and opens its card. A block the index lists as larger than 40 KB shows its
-        name and size only, never downloaded. ── */
-  var elStar = $('starcard'), elSName = $('sname'), elSLine = $('sline'), elSWalk = $('swalk');
+  /* ── exploring the sky (6.42): one finger turns the galaxy, a pinch or the wheel zooms, a tap on a star opens its card.
+        A block the index lists as larger than 40 KB shows its name and size only, never downloaded. ── */
+  var elStar = $('starcard'), elSName = $('sname'), elSLine = $('sline'), elSWalk = $('swalk'), elSFic = $('sfic');
   var exploring = false, touchT = -99, pts = {}, gest = null, picked = null, LINES_READ = {}, BLOCKS = {}, BIG = 40000, lastSky = 0, skyDrag = false, tapIn = null;
-  function explore(on) {
-    if (exploring === on) return;
-    exploring = on; stage.classList.toggle('exploring', on);
-    if (!on) closeStar();
-  }
+  function explore(on) { if (exploring === on) return; exploring = on; stage.classList.toggle('exploring', on); if (!on) closeStar(); }
   function touchSky(hold) { touchT = now(); if (hold && glide && !glide.into) glide = null; }
   function at(e) { var r = stage.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
   function two() { var k = Object.keys(pts); return k.length >= 2 ? [pts[k[0]], pts[k[1]]] : null; }
@@ -1772,13 +1719,13 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     basis();
     var best = null, bd = 28, q = oproj(filmPos()), i;
     if (q && Math.hypot(q[0] - x, q[1] - y) < 44) {
-      if (SK.lock > 0.5) { stopAll(); quiet(enterBlock(FILM, film, run).catch(function () {})); return; }   /* when the film's star is in front, a tap goes in */
+      if (SK.lock > 0.5) { stopAll(); quiet(enterBlock(FILM, film, run).catch(function () {})); return; }
       best = starOf(FILM) || { name: FILM, p: FILM_AT.slice(), size: 0 };
     }
     else for (i = 0; i < B3.length; i++) {
       if (B3[i].name === FILM) continue;
       q = oproj(B3[i].p); if (!q) continue;
-      var d = Math.hypot(q[0] - x, q[1] - y); if (d < bd) { bd = d; best = B3[i]; }
+      var d = Math.hypot(q[0] - x, q[1] - y) - (B3[i].fic ? 10 : 0); if (d < bd) { bd = d; best = B3[i]; }
     }
     if (best) openStar(best); else closeStar();
   }
@@ -1787,10 +1734,10 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     picked = s; explore(true); SK.lock = 0;
     glideTo({ tgt: s.p.slice(), dist: Math.min(orb.dist, wide ? 1.4 : 1.2) }, 1.4, ease);
     var name = s.name, size = bytesOf(name), isFilm = name === FILM;
-    elSName.textContent = name; elStar.hidden = false; seatCard();
+    elSName.textContent = s.fic ? name + '  ·  ' + s.fic.title : name; elStar.hidden = false;
     elSWalk.textContent = isFilm ? 'Walk into the film' : 'Walk this block';
-    elSWalk.hidden = !isFilm;
-    setRead('· · ·  ' + name + '  · · ·');
+    elSWalk.hidden = !isFilm; elSFic.hidden = !s.fic;
+    setRead(s.fic ? s.fic.title.toUpperCase() + '  ·  a fiction of ' + s.fic.block : '· · ·  ' + name + '  · · ·');
     function show(text, walkable) { if (picked && picked.name === name) { elSLine.textContent = text; if (!isFilm) elSWalk.hidden = !walkable; } }
     if (isFilm) { show('We kept our lives in this shape. Keep one of us.', true); return; }
     if (size > BIG) { show(kb(size), false); return; }
@@ -1802,11 +1749,10 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
       else if (!line) line = 'Nothing is written at the top of this block.';
       else if (line.length > 200) line = line.slice(0, 200).replace(/\s+\S*$/, '') + '…';
       LINES_READ[name] = [line, ok]; show(line, ok);
-    }).catch(function () { show('Pscale could not be reached.', false); });
+    }).catch(function () { show(s.fic ? s.fic.title + ', a fiction made from this block.' : 'Pscale could not be reached.', false); });
   }
   function kb(n) { var k = n / 1000; return (k < 10 ? k.toFixed(1) : String(Math.round(k))) + ' KB'; }
   function closeStar() { picked = null; elStar.hidden = true; }
-  function seatCard() { /* the card sits above the dial by its own style */ }
   function walkBlock(name) {
     if (bytesOf(name) > BIG) return;
     function go(j) { stopAll(); quiet(enterBlock(name, j, run)); }
@@ -1817,36 +1763,50 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
       BLOCKS[name] = j; if (picked && picked.name === name) go(j);
     }).catch(function () { if (picked && picked.name === name) elSLine.textContent = 'Pscale could not be reached.'; });
   }
+  /* a block's fiction, played whole, as the piece plays it when its star is in front */
+  function playFiction(F) {
+    unlock(); stopAll(); closeStar(); var r = run;
+    card('', F.title + '. A fiction made from the block ' + F.block + '.');
+    playClip(F.file, r).then(function () { if (r === run) card(''); }).catch(function () {});
+  }
   function tendSky(t) {
     var dt = Math.min(0.1, Math.max(0, t - lastSky)); lastSky = t;
     if (inside) { if (!autoOn || !busy) orb.yaw += dt * 0.02; return; }
     if (autoOn || flying) return;
-    /* the film's star found and held: it waits in front; otherwise the sky drifts slowly when left alone */
-    if (!CALM && !glide && !Object.keys(pts).length && !bandDrag && t - touchT > 3 && SK.lock < 0.5) orb.yaw += dt * 0.035;
+    if (!CALM && !glide && !Object.keys(pts).length && !bandDrag && t - touchT > 3 && SK.lock < 0.5 && !ficFront && !tuned) orb.yaw += dt * 0.035;
     var lk = lockedNow();
-    if (lk && SK.lock < 0.5) { SK.lock = 1; Sound.pip(880, 0, 0.07, 0.1); setStatic(0.05); setRead('THE APPROACH  ·  film:the-approach'); update(); }
+    if (lk && SK.lock < 0.5) { SK.lock = 1; pip(880, 0.07, 0.1); setStatic(0.05); setRead('THE APPROACH  ·  film:the-approach'); update(); }
     else if (!lk && SK.lock > 0.5 && (bandDrag || skyDrag || picked)) { SK.lock = 0; update(); }
+    /* a fiction's star in front: its name on the readout, and Play */
+    var ff = SK.lock > 0.5 || tuned ? null : ficCand;
+    if (ff !== ficFront) { ficFront = ff; if (ff) { setRead(ff.fic.title.toUpperCase() + '  ·  a fiction of ' + ff.fic.block); pip(740, 0.06, 0.1); setStatic(0.05); } update(); }
     if (!bandDrag) f = target = yawToF();
-    if ((bandDrag || skyDrag) && front && SK.lock < 0.5) setRead('· · ·  ' + front.name + '  · · ·');
+    if ((bandDrag || skyDrag) && front && SK.lock < 0.5 && !ficFront) setRead('· · ·  ' + front.name + '  · · ·');
     if (!bandDrag && SK.tb > 0) SK.tb = Math.max(0, SK.tb - dt * 0.8);
   }
   function drawLock(t) {
     if (inside) return;
     if (picked && !flying) {
       var pq = oproj(picked.p);
-      if (pq) { ctx.strokeStyle = picked.name === FILM ? 'rgba(255,120,140,.95)' : 'rgba(232,201,138,.95)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(pq[0], pq[1], 17 + 2 * Math.sin(t * 2), 0, TAU); ctx.stroke(); }
+      if (pq) { ctx.strokeStyle = picked.name === FILM ? 'rgba(255,120,140,.95)' : picked.fic ? 'rgba(120,235,225,.95)' : 'rgba(232,201,138,.95)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(pq[0], pq[1], 17 + 2 * Math.sin(t * 2), 0, TAU); ctx.stroke(); }
     }
     if (V.b > 0 && flyAt) { var fq = oproj(flyAt) || [W / 2, H * 0.4], br = Math.min(W, H) * (0.05 + 2.2 * Math.pow(V.b, 4)); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = Math.min(1, V.b * 1.2); ctx.drawImage(SP_A, fq[0] - br, fq[1] - br, br * 2, br * 2); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; }
-    if (!FILMQ) return;
-    if (SK.lock > 0.05 && V.b < 0.3) {
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic'; ctx.font = '600 18px "Cormorant Garamond",Garamond,serif'; ctx.shadowColor = '#000'; ctx.shadowBlur = 8;
+    if (ficFront && ficFront.q && !tuned && !autoOn) {
+      var r2 = 18 + 3 * Math.sin(t * 2.9), x2 = ficFront.q[0], y2 = ficFront.q[1];
+      ctx.strokeStyle = 'rgba(120,235,225,.85)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(x2, y2, r2, 0, TAU); ctx.stroke();
+      ctx.fillStyle = '#c9f5ef'; ctx.fillText(ficFront.fic.title.toUpperCase(), x2, y2 - r2 - 10);
+    }
+    if (FILMQ && SK.lock > 0.05 && V.b < 0.3) {
       var r = 20 + 3 * Math.sin(t * 2.9), x = FILMQ[0], y = FILMQ[1];
       ctx.strokeStyle = 'rgba(255,200,110,' + (0.8 * SK.lock) + ')'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.stroke();
-      ctx.font = '600 18px "Cormorant Garamond",Garamond,serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic'; ctx.shadowColor = '#000'; ctx.shadowBlur = 8;
-      ctx.fillStyle = 'rgba(255,226,180,' + SK.lock + ')'; ctx.fillText('THE APPROACH', x, y - r - 10); ctx.shadowBlur = 0;
+      ctx.fillStyle = 'rgba(255,226,180,' + SK.lock + ')'; ctx.fillText('THE APPROACH', x, y - r - 10);
     }
+    ctx.shadowBlur = 0;
   }
   $('sclose').addEventListener('click', closeStar);
   elSWalk.addEventListener('click', function () { unlock(); if (!picked || picked.name === FILM) { if (!film) { elNotice.hidden = false; readAll(); return; } stopAll(); quiet(enterBlock(FILM, film, run).catch(function () {})); } else walkBlock(picked.name); });
+  elSFic.addEventListener('click', function () { if (picked && picked.fic) playFiction(picked.fic); });
 
   /* ── the dial in the hand ── */
   function bandAt(x) { var b = elBand.getBoundingClientRect(); return clamp((x - b.left) / b.width, 0, 1); }
@@ -1856,11 +1816,11 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     if (autoOn || flying) return;
     if (!inside) {   /* turning the dial turns the universe; what comes into focus is where we are */
       f = target = fx; orb.yaw = filmYaw() + (fx - 0.5) * TAU; SK.tb = Math.max(SK.tb, 0.45); touchT = now();
-      setStatic(Math.abs(fx - 0.5) < 0.02 ? 0.05 : 0.45); return;
+      setStatic(Math.abs(fx - 0.5) < 0.02 ? 0.05 : 0.5); return;
     }
     var ks = kids(path); if (!ks.length) return;
     var i = Math.min(ks.length - 1, Math.floor(fx * ks.length));
-    if (sel !== ks[i]) { if (busy) stopAll(); select(ks[i]); }
+    if (sel !== ks[i]) { stopAll(); select(ks[i]); }
     f = fx;
   }
   elBand.addEventListener('pointerdown', function (e) {
@@ -1872,16 +1832,12 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   elBand.addEventListener('pointermove', function (e) { if (bandDrag) bandMove(e.clientX); });
   function bandUp() {
     if (!bandDrag) return; bandDrag = false;
-    if (!inside) setStatic(SK.lock > 0.5 ? 0.05 : 0.1);
+    if (!inside) setStatic(SK.lock > 0.5 ? 0.05 : 0.15);
     else if (!radioOn && sel != null) { var ks = kids(path); f = target = fOf(ks.indexOf(sel), ks.length); }
   }
   elBand.addEventListener('pointerup', bandUp);
   elBand.addEventListener('pointercancel', bandUp);
-  elBand.addEventListener('keydown', function (e) {
-    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
-    e.preventDefault(); e.stopPropagation(); turn(e.key === 'ArrowRight' ? 1 : -1);
-  });
-  /* the arrow keys turn the dial too */
+  elBand.addEventListener('keydown', function (e) { if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return; e.preventDefault(); e.stopPropagation(); turn(e.key === 'ArrowRight' ? 1 : -1); });
   function turn(dir) {
     unlock();
     if (radioOn) { elCard.hidden = true; target = clamp(target + dir * 0.01, 0, 1); return; }
@@ -1895,12 +1851,16 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   $('tauto').addEventListener('click', function () {
     unlock();
     if (radioOn) { radioCarry(); return; }
-    if (autoOn) { stopAll(); autoOn = false; update(); return; }
+    if (autoOn) { stopAll(); autoOn = false; card(''); update(); return; }
     quiet(walkFilm());
   });
   $('tin').addEventListener('click', function () {
     unlock();
-    if (!inside) { if (SK.lock > 0.5 && film) { stopAll(); quiet(enterBlock(FILM, film, run).catch(function () {})); } return; }
+    if (!inside) {
+      if (ficFront && !(SK.lock > 0.5)) { playFiction(ficFront.fic); return; }
+      if (SK.lock > 0.5 && film) { stopAll(); quiet(enterBlock(FILM, film, run).catch(function () {})); }
+      return;
+    }
     stopAll(); quiet(goIn(run));
   });
 
@@ -1910,13 +1870,13 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     if (!tapped) { tapped = true; Sound.start(); soundLabel(); }
     else Sound.wake();
     if (unlocked) return; unlocked = true;
-    clips.concat([elGlim]).forEach(function (v) { if (!v.getAttribute('src')) { var was = v.muted; v.muted = true; v.src = PARTS + 'glimpses/' + glimpseNames()[0] + '.mp4'; quiet(v.play()); setTimeout(function () { if (!v.getAttribute('data-src')) { v.pause(); } v.muted = was; }, 60); } });
+    clips.concat([elGlim]).forEach(function (v) { if (!v.getAttribute('src')) { var was = v.muted; v.muted = true; v.src = PARTS + 'clips/g_void.mp4'; quiet(v.play()); setTimeout(function () { if (!v.getAttribute('data-src')) v.pause(); v.muted = was; }, 60); } });
   }
   function soundLabel() { elSound.textContent = Sound.isOn() ? 'Sound: on' : 'Sound: off'; elSound.setAttribute('aria-pressed', String(Sound.isOn())); elSound.setAttribute('aria-label', Sound.isOn() ? 'Sound is on. Turn it off' : 'Sound is off. Turn it on'); }
   elSound.hidden = !(window.AudioContext || window.webkitAudioContext);
   function tap(e) { if (e.target && e.target.closest && e.target.closest('#sound')) return; unlock(); }
   ['pointerup', 'touchend', 'click', 'keydown'].forEach(function (ev) { stage.addEventListener(ev, tap, true); });
-  elSound.addEventListener('click', function () { tapped = true; if (Sound.isOn()) Sound.stop(); else Sound.start(); clips.forEach(function (v) { v.muted = !Sound.isOn(); }); if (cvoice) cvoice.muted = !Sound.isOn(); soundLabel(); });
+  elSound.addEventListener('click', function () { tapped = true; if (Sound.isOn()) Sound.stop(); else Sound.start(); clips.forEach(function (v) { v.muted = !Sound.isOn(); }); elGlim.muted = true; if (cvoice) cvoice.muted = !Sound.isOn(); soundLabel(); });
   document.addEventListener('visibilitychange', function () { if (!document.hidden) Sound.wake(); });
 
   /* ── the frame ── */
@@ -1936,31 +1896,28 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     } else {
       tendSky(t);
       drawSky(t, 1);
-      if (!inside) { tendSkyRing(t); drawLock(t); }
+      if (!inside) drawLock(t);
       else {
         if (V.bloom > 0) { var br = Math.max(W, H) * 1.5 * V.bloom; ctx.globalCompositeOperation = 'lighter'; ctx.drawImage(SP_A, W / 2 - br, H * 0.4 - br, br * 2, br * 2); ctx.globalCompositeOperation = 'source-over'; }
-        drawRing(nowMs); drawPips(nowMs); drawShape(nowMs);
+        drawRing(nowMs);
       }
       if (burst) drawBurst(nowMs);
       if (tuned) drawTuned(tuned, nowMs);
       if (glimpse) drawTuned(glimpse, nowMs);
-      drawVring(); drawHis(nowMs); drawDigits();
-      if (allb) f = target = 0.5 + 0.47 * Math.sin(t * 2.4);
-      Sound.air(staticNow * 0.2, allb ? 0.035 : 0);
+      drawVring(); drawSparks(nowMs); drawShape(); drawHis(nowMs); drawDigits();
+      Sound.air(staticNow * 0.22);
     }
     elNeedle.style.left = (clamp(f, 0.005, 0.995) * 100) + '%';
     if (elRead.textContent !== readout) elRead.textContent = readout;
     raf = requestAnimationFrame(frame);
   }
-  function tendSkyRing() { /* the chosen star's ring is drawn in tendSky */ }
   function wake() { if (!raf) raf = requestAnimationFrame(frame); }
   document.addEventListener('visibilitychange', wake);
   if (window.IntersectionObserver) new IntersectionObserver(function (es) { visible = es[0].isIntersecting; wake(); }).observe(stage);
   window.addEventListener('resize', resize);
   if (window.ResizeObserver) { new ResizeObserver(resize).observe(stage); new ResizeObserver(resize).observe(elTuner); }
 
-  /* ── keys ── */
-  var pendingPath = null;
+  /* ── keys and links ── */
   window.addEventListener('hashchange', function () {
     var p = hashPath();
     if (p && film && wb && wb.film && inside) { stopAll(); autoOn = false; travelNow(p); }
@@ -1982,38 +1939,35 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   /* ── what the checks read ── */
   window.theApproach = {
     sound: Sound.state, soundOn: Sound.isOn, voices: Sound.loaded, heard: Sound.heard,
-    state: function () { return { inside: inside, block: wb ? wb.name : '', path: path.join(''), sel: sel, auto: autoOn, busy: busy, radio: radioOn, lock: SK.lock, readout: readout, f: f, tuned: !!tuned, glimpse: !!glimpse, burst: !!burst, his: !!his, card: elCard.hidden ? '' : elLine.textContent, say: elSay.hidden ? '' : elSay.textContent, flying: flying, address: $('faddr').textContent }; },
-    arrivals: function () { return ARRIVALS.slice(); },
-    glimpsed: function () { return GLIMPSED.slice(); },
-    moments: function () {
-      var keep = wb; if (!(wb && wb.film) && film) wb = { name: FILM, root: film, film: true };
-      var out = wb ? cutMoments().map(function (p) { var s = specOf(p); return { at: address(p), kind: s && s.kind, play: s && resolve(s).play, still: s && s.still || '', say: s && s.say || '' }; }) : [];
-      wb = keep; return out;
-    },
+    state: function () { return { inside: inside, block: wb ? wb.name : '', path: path.join(''), sel: sel, auto: autoOn, busy: busy, radio: radioOn, lock: SK.lock, readout: readout, f: f, tuned: !!tuned, glimpse: !!glimpse, burst: !!burst, his: !!his, card: elCard.hidden ? '' : elLine.textContent, say: elSay.hidden ? '' : elSay.textContent, flying: flying, address: $('faddr').textContent, ficFront: ficFront ? ficFront.fic.title : '' }; },
+    log: function () { return JSON.parse(JSON.stringify(LOG)); },
+    cut: function () { return Object.keys(CUT).map(function (a) { var c = CUT[a]; return { at: a, nar: (c.nar || []).concat(c.nar2 || []), clips: (c.pic && c.pic.clip ? [c.pic.clip] : []).concat(c.own || []), still: c.pic && c.pic.still || '', fx: [c.fx, c.fx2].filter(Boolean) }; }); },
+    moments: function () { var keep = wb; if (!(wb && wb.film) && film) wb = { name: FILM, root: film, film: true }; var out = []; if (wb) kids([7, 2, 1]).forEach(function (s) { kids([7, 2, 1, s]).forEach(function (m) { var p = [7, 2, 1, s, m]; out.push({ at: address(p), cut: momentAt(p) }); }); }); wb = keep; return out; },
     lives: function () { return LIVES.map(function (L) { return { f: L.f, band: L.band, who: L.who, kind: L.kind }; }); },
+    stations: function () { return stations(); },
     on: function () { return cur ? cur.band : ''; },
     sky: function () {
       basis();
-      var out = [], i, j, fq = oproj(filmPos()) || [-999, -999], tunerTop = H - elTuner.getBoundingClientRect().height;
+      var out = [], i, j, fq = oproj(filmPos()) || [-999, -999], tunerTop = H - tunerH;
       for (i = 0; i < B3.length && out.length < 3000; i++) {
         if (B3[i].name === FILM) continue;
-        var q = oproj(B3[i].p); if (q && q[0] > 30 && q[0] < W - 30 && q[1] > 90 && q[1] < tunerTop - 40) out.push({ name: B3[i].name, x: q[0], y: q[1], big: bytesOf(B3[i].name) > BIG });
+        var q = oproj(B3[i].p); if (q && q[0] > 30 && q[0] < W - 30 && q[1] > 90 && q[1] < tunerTop - 40) out.push({ name: B3[i].name, x: q[0], y: q[1], big: bytesOf(B3[i].name) > BIG, fic: !!B3[i].fic });
       }
       var clear = out.filter(function (a) { for (j = 0; j < out.length; j++) if (out[j] !== a && Math.hypot(out[j].x - a.x, out[j].y - a.y) < 36) return false; return Math.hypot(fq[0] - a.x, fq[1] - a.y) > 80; });
-      return { exploring: exploring, yaw: orb.yaw, pitch: orb.pitch, dist: orb.dist, tgt: orb.tgt.slice(), gliding: !!glide, picked: picked ? picked.name : '', film: fq, clear: clear.slice(0, 60), seen: out.length, filmYaw: filmYaw() };
+      return { exploring: exploring, yaw: orb.yaw, pitch: orb.pitch, dist: orb.dist, tgt: orb.tgt.slice(), gliding: !!glide, picked: picked ? picked.name : '', film: fq, clear: clear.slice(0, 60), seen: out.length, fictions: out.filter(function (a) { return a.fic; }) };
     },
     ring: function () { if (!inside) return null; var ks = kids(path); return { pts: ks.map(function (d, i) { var q = ringPos(i, ks.length, 1); return { k: d, x: q[0], y: q[1] }; }) }; },
     clip: function () { var v = clips[clipLive]; return { src: (v.getAttribute('data-src') || '').split('/').pop(), t: v.currentTime, paused: v.paused, muted: v.muted, ended: v.ended, dur: v.duration }; },
     credits: function () { return { open: !elCredits.hidden, rolling: rolling, top: elRoll.scrollTop, faces: faces.length, voice: cvoice ? cvoice.src.split('/').pop() : '', mara: $('cmara').textContent, tom: $('ctom').textContent, chapter: $('cchapter').textContent, lives: $('clives').textContent, stars: $('cstars').textContent, gate: $('cgate').textContent }; },
-    manifest: function () { return MAN; },
-    carry: function () { if (radioOn) radioCarry(); }
+    manifest: function () { return MAN; }
   };
 
   /* ── begin: the sky, with the dial waiting ── */
   resize(); band(SKY_MARKS); f = target = yawToF(); update();
   var first = hashPath();
   if (first) pendingPath = first;
-  readAll(); readParts();
+  readAll();
+  get(PARTS + 'manifest.json').then(function (j) { if (j && typeof j === 'object') { MAN = j; fillCredits(); } }).catch(function () { /* each part is tried as it comes */ });
   wake();
 })();
 </script>
