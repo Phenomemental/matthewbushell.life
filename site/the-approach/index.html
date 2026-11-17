@@ -21,8 +21,9 @@
 <style>
 /* The film's page: the plan is at film:the-approach 6.4 on Pscale. One canvas, with the words in HTML over it.
    The film's own words are read live and never kept here. */
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;background:#03050c}
 .film{--night:#03050c;--deep:#0a1230;--star:#eef2ff;--crimson:#c21d4e;--ember:#ff5d86;--cream:#f6f1e6;--page:#fbf7ee;--dark:#1d1a17;--soft:#5a5147;
-  position:relative;height:100vh;height:100svh;min-height:560px;overflow:hidden;background:var(--night);color:var(--star);
+  position:relative;height:100vh;height:100svh;overflow:hidden;background:var(--night);color:var(--star);
   font-family:'Cormorant Garamond',Garamond,'Times New Roman',serif;font-weight:500;-webkit-font-smoothing:antialiased;user-select:none;-webkit-user-select:none}
 .film canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 .film button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
@@ -30,10 +31,18 @@
 .film [hidden]{display:none!important}
 
 /* the corner: Sound on, Skip */
-.corner{position:absolute;z-index:6;top:calc(10px + env(safe-area-inset-top));right:calc(10px + env(safe-area-inset-right));display:flex;gap:4px}
-.quiet{min-height:44px;padding:0 14px;border:0;background:none;font-style:italic;font-size:19px;letter-spacing:.02em;color:rgba(238,242,255,.78);text-shadow:0 1px 8px #000}
-.quiet:hover{color:#fff}
-.quiet.ringed{border:1px solid rgba(238,242,255,.3);border-radius:22px;background:rgba(3,5,12,.45)}
+.corner{position:absolute;z-index:7;top:calc(8px + env(safe-area-inset-top));right:calc(8px + env(safe-area-inset-right));display:flex;gap:6px;padding:6px;border-radius:32px;background:rgba(3,5,12,.66);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.corner .btn{padding:0 15px;font-size:18px}
+
+/* every button: at least 48 pixels tall, 18 to 20 pixel text, solid and clear against the night (6.44) */
+.film .btn,.film .go,.wacts button,.starcard button,.notice button,.credits .cways .btn,.credits .cclose{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  min-height:48px;margin:0;padding:0 20px;border:1.5px solid #eadfc4;border-radius:999px;background:rgba(12,14,26,.94);color:#fff8ea;
+  font-family:'Cormorant Garamond',Garamond,serif;font-size:19px;font-weight:600;font-style:normal;letter-spacing:.03em;line-height:1.1;white-space:nowrap;
+  text-decoration:none;text-shadow:none;box-shadow:0 2px 14px rgba(0,0,0,.55);cursor:pointer;transition:background .25s ease}
+.film .btn:hover,.wacts button:hover,.starcard button:hover,.notice button:hover,.credits .cways .btn:hover,.credits .cclose:hover{background:rgba(44,50,76,.96)}
+.film .btn.red,.film .go,.wacts button.red,.starcard .swalk,.credits .cways .btn.red{background:#c21d4e;border-color:#ff8aa6;color:#fff;box-shadow:0 0 26px rgba(194,29,78,.5)}
+.film .btn.red:hover,.film .go:hover,.wacts button.red:hover,.starcard .swalk:hover,.credits .cways .btn.red:hover{background:#d72a5e}
+.film .btn[aria-pressed="true"]{border-color:#ffd58a;color:#ffe9bf}
 
 /* the title cards */
 .cardline{position:absolute;z-index:4;left:0;right:0;top:27%;transform:translateY(-50%);margin:0;padding:0 max(26px,8vw);text-align:center;
@@ -47,7 +56,6 @@
 .js .front.on{opacity:1;transform:none;pointer-events:auto}
 .front h1{margin:0;text-transform:uppercase;font-size:clamp(40px,8.6vw,104px);font-weight:500;letter-spacing:.2em;margin-right:-.2em;line-height:1.02;color:#f6f2ea;text-shadow:0 0 34px rgba(3,5,12,.95),0 0 80px rgba(194,29,78,.35)}
 .topline{margin:clamp(14px,2.4vh,22px) auto 0;max-width:19em;font-size:clamp(21px,2.5vw,29px);font-style:italic;line-height:1.3;color:rgba(244,241,234,.92);text-shadow:0 0 18px #000,0 0 40px #000;text-wrap:balance}
-.go:hover{background:rgba(194,29,78,.5)}
 .nojs{margin:18px auto 0;max-width:24em;font-style:italic;color:rgba(238,242,255,.75)}
 
 
@@ -55,28 +63,20 @@
 /* the notice when Pscale can't be read */
 .notice{position:absolute;z-index:8;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom));margin:0;width:max-content;max-width:calc(100% - 28px);padding:4px 8px 4px 18px;box-sizing:border-box;display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center;
   border:1px solid rgba(238,242,255,.25);border-radius:26px;background:rgba(3,5,12,.82);font-size:19px;font-style:italic}
-.notice .quiet{color:var(--ember);text-decoration:underline;text-underline-offset:3px}
 
 
 @media (min-width:900px) and (min-height:560px){
   .cardline{top:26%}
   .front{top:34%}
-  .corner{top:18px;right:22px}
+  .corner{top:16px;right:20px}
 }
 @media (max-height:700px) and (max-width:899px){.front{top:26%}}
 @media (prefers-reduced-motion:reduce){.cardline,.front{transition:none}}
 
-/* the site's own sheet beneath the film: the reader tools and the footer, in the site's look */
-.under .sheet{max-width:860px}
-.under .tools{margin-top:0}
+.film .go{min-height:52px;padding:0 28px;font-size:20px;letter-spacing:.05em}
 
-.go{min-height:54px;padding:0 30px;border:1px solid var(--ember);border-radius:28px;background:rgba(194,29,78,.2);font-size:22px;letter-spacing:.06em;color:#fff;box-shadow:0 0 40px rgba(194,29,78,.3);transition:background .4s ease}
-
-/* two ways in, side by side */
-.ways{display:flex;flex-wrap:wrap;justify-content:center;gap:12px 14px;margin-top:clamp(22px,3.8vh,38px)}
-.ways .go{margin-top:0}
-.go.second{background:rgba(199,154,82,.16);border-color:#c79a52;box-shadow:0 0 40px rgba(199,154,82,.22)}
-.go.second:hover{background:rgba(199,154,82,.4)}
+/* the ways in, on a soft dark band so they never sit on bare stars */
+.ways{display:inline-flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:clamp(22px,3.8vh,38px);padding:10px;border-radius:36px;background:rgba(3,5,12,.66);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 
 /* the dial, in brass and amber, across the foot; its crimson needle is the viewer's own */
 .fdial{position:absolute;z-index:5;left:0;right:0;bottom:0;height:calc(118px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);box-sizing:border-box;
@@ -133,21 +133,20 @@
 .film.walking .wshade{opacity:1}
 .walk{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;box-sizing:border-box;
   padding:0 calc(14px + env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left));pointer-events:none}
-.wtrail{position:absolute;top:calc(18px + env(safe-area-inset-top));left:18px;right:130px;margin:0;font-size:14px;letter-spacing:.2em;text-transform:uppercase;color:#e8c98a;text-shadow:0 0 8px #000,0 0 3px #000}
+.wtrail{position:absolute;top:calc(76px + env(safe-area-inset-top));left:18px;right:18px;margin:0;font-size:14px;letter-spacing:.2em;text-transform:uppercase;color:#e8c98a;text-shadow:0 0 8px #000,0 0 3px #000}
 .wtrail b{color:#ff8d9b;font-weight:600;letter-spacing:.08em;margin-left:.5em;font-size:17px}
 .wbig{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);width:min(640px,88%);margin:0;text-align:center;font-size:clamp(28px,6.4vw,44px);font-weight:500;line-height:1.22;color:#fff;text-shadow:0 0 18px rgba(0,0,0,.95),0 0 4px #000;opacity:0;transition:opacity 1.2s}
 .wbig small{display:block;font-size:.56em;font-style:italic;color:#f1eadb;margin-top:14px;line-height:1.38}
 .wcard{width:min(620px,100%);box-sizing:border-box;padding:16px 22px 16px;background:linear-gradient(180deg,#fbf7ee,#f2e9d8);color:#1d1a17;border-radius:4px;
   box-shadow:0 10px 40px rgba(0,0,0,.6),inset 0 0 0 1px rgba(133,122,106,.5),inset 0 0 0 5px #fbf7ee,inset 0 0 0 6px rgba(133,122,106,.35);
-  font-size:clamp(20px,4.9vw,23px);line-height:1.38;opacity:0;transform:translateY(12px);transition:opacity .9s,transform .9s;user-select:text;-webkit-user-select:text}
+  font-size:clamp(20px,4.9vw,23px);line-height:1.38;opacity:0;transform:translateY(12px);transition:opacity .9s,transform .9s;user-select:text;-webkit-user-select:text;max-height:30vh;overflow-y:auto;overscroll-behavior:contain}
+.wcard .whead{display:block;font-weight:600;letter-spacing:.04em;margin-bottom:4px}
 .wcard.on{opacity:1;transform:none;pointer-events:auto}
 .wcard p{margin:0}
-.wacts{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:12px;pointer-events:auto;max-width:680px}
-.wacts button{min-height:44px;padding:0 15px;border:1px solid rgba(232,201,138,.5);border-radius:999px;background:rgba(10,10,14,.74);font-size:17px;color:#fff;white-space:nowrap}
-.wacts button:hover{background:rgba(60,76,130,.7)}
-.wacts button.red{background:rgba(200,56,74,.4);border-color:#c8384a}
-.wacts button.out{border-color:rgba(238,242,255,.28);color:rgba(238,242,255,.86)}
-.wacts button .d{color:#e8c98a;margin-right:6px;font-weight:600}
+.wacts{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:12px;padding:10px;border-radius:34px;background:rgba(3,5,12,.7);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);pointer-events:auto;max-width:680px;box-sizing:border-box}
+.wacts:empty{display:none}
+.wacts button.sr{position:absolute;width:1px;height:1px;min-height:0;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);border:0;box-shadow:none}
+.wacts button .d{color:#e8c98a;margin-right:4px;font-weight:600}
 
 @media (min-width:900px) and (min-height:560px){
   .scale{left:14%;right:14%}
@@ -155,7 +154,7 @@
   .fwho{top:44px;left:0;right:0;text-align:center}
   .clip{top:0;height:100%;-webkit-mask-image:none;mask-image:none}
   .mini.left{left:24px}.mini.right{right:24px}
-  .wtrail{top:22px;left:0;right:0;text-align:center}
+  .wtrail{top:26px;left:0;right:0;text-align:center}
   .walk{padding-bottom:30px;align-items:flex-start;padding-left:clamp(28px,4vw,70px)}
   .wcard{padding:22px 30px;width:min(500px,38vw)}
   .wacts{justify-content:flex-start;max-width:min(560px,44vw)}
@@ -168,28 +167,50 @@
 .js .front.on .go{pointer-events:auto}
 .film.insky canvas{touch-action:none;cursor:grab}
 .film.insky.dragging canvas{cursor:grabbing}
-.go.third{display:none;background:rgba(10,10,14,.7);border-color:rgba(238,242,255,.3);box-shadow:none}
+.go.third{display:none}
+.film .go.third{background:rgba(12,14,26,.94);border-color:#eadfc4;box-shadow:0 2px 14px rgba(0,0,0,.55)}
 /* while exploring, the title steps aside and both ways in wait at the foot */
 .film.exploring .front{top:auto;bottom:calc(14px + env(safe-area-inset-bottom));transition:none}
 .film.exploring .front h1,.film.exploring .front .topline{display:none}
 .film.exploring .ways{margin-top:0;gap:8px}
-.film.exploring .ways .go{display:inline-block;min-height:46px;padding:0 18px;font-size:18px;letter-spacing:.03em;background-color:rgba(8,10,22,.82)}
-.starcard{position:absolute;z-index:6;width:min(310px,80%);box-sizing:border-box;padding:12px 34px 14px 16px;border-radius:10px;background:rgba(6,9,22,.9);border:1px solid rgba(238,242,255,.3);box-shadow:0 10px 40px rgba(0,0,0,.6);color:#f1ebdd;text-align:left;user-select:text;-webkit-user-select:text}
-.starcard .sname{margin:0;font-size:16px;font-weight:600;letter-spacing:.06em;color:#e8c98a;overflow-wrap:anywhere}
-.starcard .sline{margin:6px 0 0;font-size:19px;line-height:1.3;overflow-wrap:break-word}
-.starcard .sclose{position:absolute;top:0;right:0;width:44px;height:44px;border:0;background:none;font-size:24px;line-height:1;color:rgba(238,242,255,.8)}
-.starcard .swalk{margin-top:12px;min-height:46px;padding:0 22px;font-size:19px}
-.below{position:absolute;z-index:4;left:50%;bottom:calc(2px + env(safe-area-inset-bottom));transform:translateX(-50%);width:56px;height:44px;border:0;background:none;font-size:22px;color:rgba(238,242,255,.55);display:none}
-.film.insky:not(.exploring) .below{display:block}
+.film.exploring .ways .go{min-height:48px;padding:0 20px;font-size:19px;letter-spacing:.03em}
+.film.exploring .ways .go.third{display:inline-flex}
+.starcard{position:absolute;z-index:6;left:50%;transform:translateX(-50%);bottom:calc(98px + env(safe-area-inset-bottom));width:min(480px,calc(100% - 24px));box-sizing:border-box;padding:14px 60px 16px 18px;border-radius:18px;
+  background:rgba(6,9,22,.95);border:1px solid rgba(238,242,255,.3);box-shadow:0 10px 40px rgba(0,0,0,.6);color:#f1ebdd;text-align:left;user-select:text;-webkit-user-select:text}
+.starcard .sname{margin:0;font-size:18px;font-weight:600;letter-spacing:.05em;color:#e8c98a;overflow-wrap:anywhere}
+.starcard .sline{margin:6px 0 0;font-size:19px;line-height:1.32;overflow-wrap:break-word;max-height:7.9em;overflow-y:auto}
+.starcard .sclose{position:absolute;top:6px;right:6px;width:48px;padding:0;font-size:26px}
+.starcard .swalk{margin-top:12px}
 
 /* the radio inside the walk: the dial across the foot, the walk's buttons lifted above it, the station named under the address */
 .film.radio .walk{padding-bottom:calc(126px + env(safe-area-inset-bottom))}
-.film.radio .station{top:calc(48px + env(safe-area-inset-top))}
-.film.radio .fwho{top:calc(70px + env(safe-area-inset-top))}
+.film.radio .station{top:calc(110px + env(safe-area-inset-top));right:18px}
+.film.radio .fwho{top:calc(134px + env(safe-area-inset-top));right:18px}
 @media (min-width:900px) and (min-height:560px){
   .film.radio .walk{padding-bottom:132px}
-  .film.radio .station{top:52px}.film.radio .fwho{top:76px}
+  .film.radio .station{top:60px}.film.radio .fwho{top:84px}
 }
+
+/* the end credits: the site's standard carried inside the film (6.45). They roll after the end, and open from the corner at any time */
+.credits{position:absolute;inset:0;z-index:9;background:#020308;color:#f1ebdd}
+.credits::before{content:'';position:absolute;z-index:1;left:0;right:0;top:0;height:calc(92px + env(safe-area-inset-top));background:linear-gradient(to bottom,#020308 60%,rgba(2,3,8,0));pointer-events:none}
+.roll{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;user-select:text;-webkit-user-select:text;padding:0 18px}
+.rollin{max-width:620px;margin:0 auto;padding:0 0 calc(60px + env(safe-area-inset-bottom));text-align:center}
+.rollin .lead{height:86vh}
+.rollin .ctitle{margin:0;text-transform:uppercase;font-size:clamp(40px,10vw,76px);font-weight:500;letter-spacing:.2em;margin-right:-.2em;line-height:1.05;color:#f6f2ea;text-shadow:0 0 40px rgba(194,29,78,.35)}
+.rollin .ctop{margin:14px auto 0;font-style:italic;font-size:clamp(20px,5vw,25px);color:rgba(244,241,234,.86)}
+.rollin .crole{margin:64px 0 4px;font-size:15px;letter-spacing:.24em;text-transform:uppercase;color:#c79a52}
+.rollin .cname{margin:0;font-size:clamp(26px,6.4vw,34px);font-weight:500}
+.credits .foot{margin:56px 0 0;padding:0;border:0;font-size:19px;line-height:1.5;color:#e9e3d6}
+.credits .foot p{margin:0 0 12px}
+.credits .foot a{color:#f3c98a;text-decoration:underline;text-underline-offset:3px}
+.credits .foot .made{display:none}
+.csheet{margin:52px 0 0;padding:20px 22px 24px;border-radius:4px;background:linear-gradient(180deg,#fbf7ee,#f2e9d8);color:#1d1a17;text-align:left;
+  box-shadow:0 10px 40px rgba(0,0,0,.6),inset 0 0 0 1px rgba(133,122,106,.5),inset 0 0 0 5px #fbf7ee,inset 0 0 0 6px rgba(133,122,106,.35)}
+.csheet .sec{margin-top:26px}
+.cways{display:inline-flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:48px auto 0;padding:10px;border-radius:36px;background:rgba(20,22,34,.9)}
+.credits .cclose{position:absolute;z-index:2;top:calc(14px + env(safe-area-inset-top));right:calc(14px + env(safe-area-inset-right))}
+.film.credited .corner{visibility:hidden}
 </style>
 </head>
 <body>
@@ -201,8 +222,9 @@
 <video class="clip" id="clip" src="/the-approach/clips/she_is_home_scene.mp4" playsinline preload="metadata" aria-label="Tom at his radio"></video>
 
 <div class="corner">
-  <button type="button" class="quiet" id="sound" aria-pressed="false" hidden>Tune in</button>
-  <button type="button" class="quiet ringed" id="skip" hidden>Skip</button>
+  <button type="button" class="btn" id="skip" hidden>Skip</button>
+  <button type="button" class="btn" id="credit">Credits</button>
+  <button type="button" class="btn" id="sound" aria-pressed="false" hidden>Sound: off</button>
 </div>
 
 <p class="cardline" id="card" aria-live="polite"></p>
@@ -223,12 +245,11 @@
 </div>
 
 <aside class="starcard" id="starcard" hidden aria-live="polite">
-  <button type="button" class="sclose" id="sclose" aria-label="Close">×</button>
+  <button type="button" class="sclose" id="sclose" aria-label="Close the card">×</button>
   <p class="sname" id="sname"></p>
   <p class="sline" id="sline"></p>
-  <button type="button" class="go swalk" id="swalk" hidden>Walk into the film</button>
+  <button type="button" class="swalk" id="swalk" hidden>Walk into the film</button>
 </aside>
-<button type="button" class="below" id="below" aria-label="Below the film: say something, and the way in">▾</button>
 
 <p class="station" id="station" role="status"></p>
 <p class="fwho" id="who"></p>
@@ -248,42 +269,53 @@
   <div class="wacts" id="wacts"></div>
 </div>
 
-<p class="notice" id="notice" role="status" hidden><span>Pscale could not be reached.</span> <button type="button" class="quiet" id="again">Try again</button></p>
-</main>
+<p class="notice" id="notice" role="status" hidden><span>Pscale could not be reached.</span> <button type="button" id="again">Try again</button></p>
 
-<div class="ground under">
-<div class="sheet">
-<p class="brand"><a href="/">Matthew Bushell</a></p>
-<section style="max-width:620px;margin:clamp(18px,3vw,30px) auto 0">
-  <div class="tools" data-share data-comment-at="5.526"></div>
-</section>
-<section class="sec" style="max-width:620px;margin-left:auto;margin-right:auto">
-  <h2 class="h2 small" style="margin-bottom:6px">Leave your mark</h2>
-  <p class="sub" style="margin:0 auto 18px">A name, and three words.</p>
-  <div data-tool="door">
-    <div style="display:flex;gap:8px;justify-content:center;margin-bottom:14px;flex-wrap:wrap">
-      <button type="button" class="pick" aria-pressed="true">I’m new</button>
-      <button type="button" class="pick" aria-pressed="false">I’ve been here</button>
-    </div>
-    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px">
-      <input class="field" aria-label="Your name" placeholder="Your name" style="flex:1 1 180px;min-width:0;padding:10px">
-      <input class="field" aria-label="Three words" placeholder="Three words" style="flex:2 1 240px;min-width:0;padding:10px">
-    </div>
-    <div class="card">
-      <p class="top">New to the house</p>
-      <span class="hand">Your name</span>
-      <p class="words">three words here</p>
-    </div>
-  </div>
-</section>
-<footer class="foot">
+<section class="credits" id="credits" hidden aria-label="Credits">
+<div class="roll" id="roll">
+<div class="rollin">
+  <div class="lead" id="lead"></div>
+  <p class="ctitle">The Approach</p>
+  <p class="ctop">We kept our lives in this shape. Keep one of us.</p>
+  <p class="crole">Made by</p>
+  <p class="cname">Matthew Bushell</p>
+  <footer class="foot">
 <p><a href="/support">Finding support</a></p>
 <p>With thanks to <a href="https://happyseaurchin.com/page/happyseaurchin">David Pinto</a>, who <a href="https://happyseaurchin.com">built the ground these pages stand on</a>.</p>
 <p>Visits are counted with <a href="https://www.goatcounter.com">GoatCounter</a>, without cookies.</p>
 <p class="made">Made by Matthew Bushell, Northampton</p>
 </footer>
+  <div class="csheet">
+    <div class="tools" data-share data-comment-at="5.526"></div>
+    <section class="sec">
+      <h2 class="h2 small" style="margin-bottom:6px">Leave your mark</h2>
+      <p class="sub" style="margin:0 auto 18px">A name, and three words.</p>
+      <div data-tool="door">
+        <div style="display:flex;gap:8px;justify-content:center;margin-bottom:14px;flex-wrap:wrap">
+          <button type="button" class="pick" aria-pressed="true">I’m new</button>
+          <button type="button" class="pick" aria-pressed="false">I’ve been here</button>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px">
+          <input class="field" aria-label="Your name" placeholder="Your name" style="flex:1 1 180px;min-width:0;padding:10px">
+          <input class="field" aria-label="Three words" placeholder="Three words" style="flex:2 1 240px;min-width:0;padding:10px">
+        </div>
+        <div class="card">
+          <p class="top">New to the house</p>
+          <span class="hand">Your name</span>
+          <p class="words">three words here</p>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div class="cways">
+    <button type="button" class="btn red" id="csky">Back to the sky</button>
+    <a class="btn" href="/">Matthew Bushell’s site</a>
+  </div>
 </div>
 </div>
+<button type="button" class="cclose" id="cclose">Close credits</button>
+</section>
+</main>
 
 <script>
 /* The Approach: the opening, the universe, the dial and the walk. Plain JavaScript, no libraries.
@@ -366,33 +398,11 @@
     return n;
   }
 
-  /* ── the sky: every block a star, placed by a stable hash of its name ── */
-  var stars = [], dust = [], filmStar = place(FILM);
-  function place(name) {
-    var r = rnd(hash(name)), u1 = r(), u2 = r(), u3 = r(), u4 = r();
-    var kind = name.indexOf(':') > 0 ? name.slice(0, name.indexOf(':')) : '';
-    var arm = ARMS.indexOf(kind), rad, th;
-    if (arm >= 0) {
-      rad = 0.1 + 0.9 * Math.pow(u1, 0.62);
-      th = arm * TAU / 9 + rad * 2.5 + (u2 + u3 - 1) * 0.42;
-    } else {
-      rad = 0.04 + 0.96 * Math.sqrt(u1);
-      th = u2 * TAU;
-    }
-    return { x: Math.cos(th) * rad, y: Math.sin(th) * rad * 0.56 + (u4 - 0.5) * 0.03, u: u3, v: u4 };
-  }
-  function makeStars() {
-    var bytes = (index && index.bytes) || {};
-    stars = index.blocks.map(function (b) {
-      var name = typeof b === 'string' ? b : (b && b.name) || '';
-      var p = place(name), size = Number(bytes[name]) || 300;
-      var m = clamp((Math.log(size + 10) / Math.LN10 - 1.2) / 4.6, 0, 1);
-      return { name: name, x: p.x, y: p.y, m: m, tint: p.u < 0.2 ? 2 : p.u < 0.62 ? 0 : 1, ph: p.v * TAU, sp: 0.25 + p.u * 0.5 };
-    }).filter(function (s) { return s.name && s.name !== FILM; });
-    starsBorn = now();
-    beachStars();
-  }
-  (function () { var r = rnd(81); for (var i = 0; i < 520; i++) dust.push({ x: r() * 2 - 1, y: r() * 2 - 1, a: 0.1 + r() * 0.3, s: 0.4 + r() * 0.7 }); })();
+  /* ── the sky: a galaxy in three dimensions, every block a star from the live index, turned in the hand (6.42).
+        The stars are placed by the radio's own map of the beach (beachStars, below), so the sky and the dial are one sky. ── */
+  var dust = [], FILM_AT = [0.42, 0, 0.18];
+  (function () { var r = rnd(81); function g() { var u = 0; for (var k = 0; k < 4; k++) u += r(); return (u - 2) * 0.9; } for (var i = 0; i < 1400; i++) dust.push([g() * 1.6, g() * 0.45, g() * 1.6, 0.12 + r() * 0.3]); })();
+  function makeStars() { starsBorn = now(); beachStars(); }
 
   function sprite(inner, outer) {
     var c = document.createElement('canvas'); c.width = c.height = 128;
@@ -405,70 +415,86 @@
   var SPR_FILM = sprite('rgba(255,236,240,1)', 'rgba(226,38,92,.5)');
   var SPR_PIP = sprite('rgba(255,252,244,1)', 'rgba(255,226,170,.3)');
 
-  /* ── the canvas and the camera ── */
+  /* ── the canvas and the camera: it orbits a centre, the galaxy's heart until a star is chosen ── */
   var W = 0, H = 0, DPR = 1, wide = false;
-  var cam = { x: filmStar.x, y: filmStar.y, z: 1.2, ax: 0.5, ay: 0.25 };
-  var move = null;      /* a camera move in progress */
-  var starsBorn = 0, skyGlow = 0;
+  var starsBorn = 0;
+  var orb = { yaw: 0.6, pitch: 0.55, dist: 2.4, tgt: [0, 0, 0] }, glide = null, DMIN = 0.22, DMAX = 4.6, BAS = null;
   function now() { return performance.now() / 1000; }
-  function restCam() { return { x: filmStar.x, y: filmStar.y, z: wide ? 1.25 : 1.5, ax: 0.5, ay: wide ? 0.215 : 0.235 }; }
+  function restDist() { return wide ? 2.5 : 2.35; }
   function resize() {
     var r = stage.getBoundingClientRect();
     W = Math.max(1, Math.round(r.width)); H = Math.max(1, Math.round(r.height));
     DPR = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = Math.round(W * DPR); canvas.height = Math.round(H * DPR);
     wide = W >= 900 && H >= 560;
-    if (mode === 'sky' && !move) cam = restCam();
-    buildScale(); layoutClip();
+    buildScale(); layoutClip(); if (typeof seatCard === 'function') seatCard();
   }
-  function unit() { return Math.max(W, H) * 0.56; }
-  var skyR = 0;   /* how far the sky has been turned */
-  function proj(wx, wy) { var k = cam.z * unit(), dx = (wx - cam.x) * k, dy = (wy - cam.y) * k, c = Math.cos(skyR), s = Math.sin(skyR); return [cam.ax * W + dx * c - dy * s, cam.ay * H + dx * s + dy * c]; }
-  function moveTo(to, dur, fn, done) { move = { from: { x: cam.x, y: cam.y, z: cam.z, ax: cam.ax, ay: cam.ay }, to: to, t0: now(), dur: CALM ? 0.01 : dur, fn: fn || ease, done: done }; }
-  function stepCam(t) {
-    if (!move) return;
-    var k = move.fn((t - move.t0) / move.dur), a = move.from, b = move.to;
-    cam.x = lerp(a.x, b.x, k); cam.y = lerp(a.y, b.y, k); cam.ax = lerp(a.ax, b.ax, k); cam.ay = lerp(a.ay, b.ay, k);
-    cam.z = a.z * Math.pow(b.z / a.z, k);
-    if (t - move.t0 >= move.dur) { var d = move.done; move = null; if (d) d(); }
+  function basis() {
+    var cp = Math.cos(orb.pitch), sp = Math.sin(orb.pitch), cy = Math.cos(orb.yaw), sy = Math.sin(orb.yaw), t = orb.tgt;
+    var eye = [t[0] + orb.dist * cp * cy, t[1] + orb.dist * sp, t[2] + orb.dist * cp * sy];
+    var f = [t[0] - eye[0], t[1] - eye[1], t[2] - eye[2]], n = Math.sqrt(f[0] * f[0] + f[1] * f[1] + f[2] * f[2]) || 1;
+    f = [f[0] / n, f[1] / n, f[2] / n];
+    var r = [-f[2], 0, f[0]]; n = Math.sqrt(r[0] * r[0] + r[2] * r[2]) || 1; r = [r[0] / n, 0, r[2] / n];
+    var u = [r[1] * f[2] - r[2] * f[1], r[2] * f[0] - r[0] * f[2], r[0] * f[1] - r[1] * f[0]];
+    BAS = { eye: eye, f: f, r: r, u: u, S: Math.min(W, H) * (wide ? 0.9 : 1.12), cx: W / 2, cy: H * (wide ? 0.46 : 0.4) };
+    return BAS;
+  }
+  function oproj(p) {
+    var b = BAS || basis(), d0 = p[0] - b.eye[0], d1 = p[1] - b.eye[1], d2 = p[2] - b.eye[2], z = d0 * b.f[0] + d1 * b.f[1] + d2 * b.f[2];
+    if (z <= 0.01) return null;
+    return [b.cx + (d0 * b.r[0] + d1 * b.r[1] + d2 * b.r[2]) * b.S / z, b.cy - (d0 * b.u[0] + d1 * b.u[1] + d2 * b.u[2]) * b.S / z, z];
+  }
+  function starOf(name) { for (var i = 0; i < B3.length; i++) if (B3[i].name === name) return B3[i]; return null; }
+  function filmPos() { var s = starOf(FILM); return s ? s.p : FILM_AT; }
+  /* a glide of the camera: toward a star, back to the heart, or into a block to walk it */
+  function glideTo(to, dur, fn, done) {
+    glide = { from: { yaw: orb.yaw, pitch: orb.pitch, dist: orb.dist, tgt: orb.tgt.slice() }, to: to, t0: now(), dur: CALM ? 0.01 : dur, fn: fn || ease, done: done };
+  }
+  function stepGlide(t) {
+    if (!glide) return;
+    var k = glide.fn((t - glide.t0) / glide.dur), a = glide.from, b = glide.to, i;
+    if (b.tgt) for (i = 0; i < 3; i++) orb.tgt[i] = lerp(a.tgt[i], b.tgt[i], k);
+    if (b.dist != null) orb.dist = a.dist * Math.pow(b.dist / a.dist, k);
+    if (b.pitch != null) orb.pitch = lerp(a.pitch, b.pitch, k);
+    if (t - glide.t0 >= glide.dur) { var d = glide.done; glide = null; if (d) d(); }
   }
 
   function drawSky(t, alpha) {
     var g = ctx.createLinearGradient(0, 0, 0, H);
     g.addColorStop(0, '#02040b'); g.addColorStop(0.55, '#070d24'); g.addColorStop(1, '#03050c');
     ctx.globalAlpha = 1; ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    var b = basis();
     if (alpha <= 0) return;
-    var u = unit(), z = cam.z, i, s, x, y;
-    /* far dust, behind everything, drifting less than the stars */
-    ctx.fillStyle = '#c9d6ff';
-    for (i = 0; i < dust.length; i++) {
-      s = dust[i];
-      x = W * 0.5 + (s.x - cam.x * 0.25) * Math.max(W, H) * 0.75; y = H * 0.5 + (s.y - cam.y * 0.25) * Math.max(W, H) * 0.75;
-      if (x < 0 || x > W || y < 0 || y > H) continue;
-      ctx.globalAlpha = alpha * s.a * 0.55; ctx.fillRect(x, y, s.s, s.s);
-    }
+    var i, s, q;
     /* a soft haze where the disc is thickest */
-    var hp = proj(0, 0), hx = hp[0], hy = hp[1], hr = u * z * 0.75, cr = Math.cos(skyR), sr = Math.sin(skyR), ddx, ddy;
-    var hz = ctx.createRadialGradient(hx, hy, 0, hx, hy, hr);
-    hz.addColorStop(0, 'rgba(70,92,170,.2)'); hz.addColorStop(0.5, 'rgba(40,54,120,.08)'); hz.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.globalAlpha = alpha; ctx.fillStyle = hz; ctx.fillRect(0, 0, W, H);
+    q = oproj([0, 0, 0]);
+    if (q) {
+      var hr = b.S / q[2] * 1.05, hz = ctx.createRadialGradient(q[0], q[1], 0, q[0], q[1], hr);
+      hz.addColorStop(0, 'rgba(70,92,170,.22)'); hz.addColorStop(0.5, 'rgba(40,54,120,.08)'); hz.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.globalAlpha = alpha; ctx.fillStyle = hz; ctx.fillRect(0, 0, W, H);
+    }
+    /* the dust of the disc */
+    ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = '#b8c8ff';
+    for (i = 0; i < dust.length; i++) { q = oproj(dust[i]); if (!q || q[0] < 0 || q[0] > W || q[1] < 0 || q[1] > H) continue; ctx.globalAlpha = alpha * dust[i][3]; ctx.fillRect(q[0], q[1], 1.2, 1.2); }
     /* the blocks */
-    var born = clamp((t - starsBorn) / 2.5, 0, 1), zs = Math.pow(z, 0.42);
-    for (i = 0; i < stars.length; i++) {
-      s = stars[i];
-      ddx = (s.x - cam.x) * z * u; ddy = (s.y - cam.y) * z * u; x = cam.ax * W + ddx * cr - ddy * sr; y = cam.ay * H + ddx * sr + ddy * cr;
-      if (x < -30 || x > W + 30 || y < -30 || y > H + 30) continue;
-      var tw = 0.86 + 0.14 * Math.sin(t * s.sp + s.ph);
-      var rad = (1.5 + s.m * s.m * 9.5) * zs;
-      ctx.globalAlpha = alpha * born * (0.34 + s.m * 0.66) * tw;
-      ctx.drawImage(SPR[s.tint], x - rad, y - rad, rad * 2, rad * 2);
+    var born = clamp((t - starsBorn) / 2.5, 0, 1), film3 = null;
+    for (i = 0; i < B3.length; i++) {
+      s = B3[i];
+      if (s.name === FILM) { film3 = s; continue; }
+      q = oproj(s.p); if (!q || q[0] < -30 || q[0] > W + 30 || q[1] < -30 || q[1] > H + 30) continue;
+      var near = Math.min(6, 1.1 / Math.max(q[2], 0.05)), tw = 0.86 + 0.14 * Math.sin(t * s.sp + s.ph);
+      var rad = (1.4 + s.br * 3.2) * (0.55 + near * 0.45) * (wide ? 1 : 1.3);
+      ctx.globalAlpha = alpha * born * Math.min(1, 0.38 + s.br * 0.55) * tw;
+      ctx.drawImage(SPR[s.tint], q[0] - rad, q[1] - rad, rad * 2, rad * 2);
     }
     /* the film's star, crimson, breathing slowly */
-    var fp = proj(filmStar.x, filmStar.y), fx = fp[0], fy = fp[1], breath = 0.5 + 0.5 * Math.sin(t * 0.9);
-    var fr = (26 + 9 * breath) * Math.pow(z, 0.5) * (wide ? 1.2 : 1);
-    ctx.globalAlpha = alpha * (0.78 + 0.22 * breath);
-    ctx.drawImage(SPR_FILM, fx - fr, fy - fr, fr * 2, fr * 2);
-    ctx.globalAlpha = 1;
+    q = oproj(film3 ? film3.p : FILM_AT);
+    if (q) {
+      var breath = 0.5 + 0.5 * Math.sin(t * 0.9), fn = Math.min(8, 1.1 / Math.max(q[2], 0.05)), fr = (15 + 6 * breath) * (0.75 + fn * 0.35) * (wide ? 1.15 : 1);
+      ctx.globalAlpha = alpha * (0.8 + 0.2 * breath);
+      ctx.drawImage(SPR_FILM, q[0] - fr, q[1] - fr, fr * 2, fr * 2);
+    }
+    ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
   }
 
   /* ── the opening ── */
@@ -561,7 +587,7 @@
 
   function drawPips(T, pull) {
     if (T < PIPS[0].t) return;
-    var cx0 = W * 0.5, cy0 = H * (wide ? 0.56 : 0.54), tx = cam.ax * W, ty = cam.ay * H;
+    var fq = oproj(filmPos()) || [W / 2, H * 0.4], cx0 = W * 0.5, cy0 = H * (wide ? 0.56 : 0.54), tx = fq[0], ty = fq[1];
     var k = ease(pull), cx = lerp(cx0, tx, k), cy = lerp(cy0, ty, k);
     var gap = Math.min(W, H) * (wide ? 0.032 : 0.055), scale = 1 - 0.985 * k;
     /* the one becomes the nine, the nine the eighty-one: each group steps in as the next begins */
@@ -587,10 +613,9 @@
   }
   function drawOpening(t) {
     var T = t - opened;
-    var pull = ramp(T, 28.4, T_END);
-    cam = restCam();
-    cam.z = cam.z * Math.pow(30, 1 - ease(pull));
-    drawSky(t, ease(pull));
+    var pull = ramp(T, 28.4, T_END), e = ease(pull), fp = filmPos();
+    orb.tgt = [fp[0] * (1 - e), fp[1] * (1 - e), fp[2] * (1 - e)]; orb.dist = 0.05 * Math.pow(restDist() / 0.05, e); orb.pitch = 0.55;
+    drawSky(t, e);
     if (pull < 1) { ctx.globalAlpha = 1 - ease(pull); ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1; }
     drawScreens(T, ease(ramp(T, 1.0, 3.0)) * (1 - ease(ramp(T, 8.0, 10.0))));
     drawTuner(T, ease(ramp(T, 8.8, 10.6)) * (1 - ease(ramp(T, 19.0, 21.4))));
@@ -625,8 +650,8 @@
   function clearHash() { if (location.hash) history.replaceState(null, '', location.pathname + location.search); }
   function toSky(back) {
     setMode('sky'); explore(false); touchT = now();
-    if (back) { skyT0 = now(); cam = restCam(); cam.z *= 2.4; moveTo(restCam(), 2.4, easeOut); }
-    else { skyT0 = now() - 9; cam = restCam(); move = null; }
+    if (back) { skyT0 = now(); var from = (wb && !wb.film && starOf(wb.name)) ? starOf(wb.name).p : filmPos(); orb.tgt = from.slice(); orb.dist = 0.06; glideTo({ tgt: [0, 0, 0], dist: restDist(), pitch: 0.55 }, 2.4, easeOut); }
+    else { skyT0 = now() - 9; orb.tgt = [0, 0, 0]; orb.dist = restDist(); orb.pitch = 0.55; glide = null; }
     clearHash();
   }
   /* into the film: flying into the crimson star */
@@ -634,7 +659,7 @@
     if (!film) { pendingPath = []; elNotice.hidden = false; readAll(); return; }
     if (mode === 'sky' && !CALM) {
       setMode('fly'); Sound.bell(0);
-      moveTo({ x: filmStar.x, y: filmStar.y, z: 70, ax: 0.5, ay: 0.42 }, 2.6, easeIn, function () { startWalk([], true); });
+      glideTo({ tgt: filmPos().slice(), dist: 0.035 }, 2.6, easeIn, function () { startWalk([], true); });
     } else startWalk([], false);
   }
 
@@ -896,7 +921,9 @@
       var kind = name.split(':')[0], arm = ARMS.indexOf(kind), r, ang, y, size = Number(bytes[name]) || 300;
       if (arm >= 0) { r = 0.15 + 0.85 * Math.pow(hh(name, 1), 0.7); ang = arm * TAU / 9 + r * 3.2 + (hh(name, 2) - 0.5) * 0.35; y = (hh(name, 3) - 0.5) * 0.05; }
       else { ang = hh(name, 2) * TAU; r = 0.1 + 0.95 * Math.pow(hh(name, 1), 0.5); y = (hh(name, 3) - 0.5) * 0.25; }
-      return { name: name, p: [r * Math.cos(ang), y, r * Math.sin(ang)], br: 0.25 + 1.6 * Math.min(1, Math.max(0, Math.log(Math.max(size, 50)) / Math.LN10 - 1.6)) / 3.2 };
+      var u = hh(name, 4);
+      return { name: name, size: size, p: name === FILM ? FILM_AT.slice() : [r * Math.cos(ang), y, r * Math.sin(ang)], br: 0.25 + 1.6 * Math.min(1, Math.max(0, Math.log(Math.max(size, 50)) / Math.LN10 - 1.6)) / 3.2,
+        tint: u < 0.2 ? 2 : u < 0.62 ? 0 : 1, ph: hh(name, 5) * TAU, sp: 0.25 + u * 0.5 };
     });
     stationStars();
   }
@@ -1009,6 +1036,7 @@
   var elWalk = $('walk'), elTrail = $('wtrail'), elBig = $('wbig'), elSheet = $('wcard'), elLine = $('wline'), elActs = $('wacts');
   var PLATE_AT = stage.getAttribute('data-plates'), PLATES = {};
   var elClip = $('wclip'), CLIP_AT = stage.getAttribute('data-clips');
+  var wb = { name: FILM, film: true, root: null };   /* the block being walked: the film's cut, or any other star's block */
   var walking = false, wpath = [], auto = true, wTimers = [], wNode = null, wPlan = null, wT0 = 0, bgFlip = false, wEnded = false, veil = 0, wHeard = [];
   /* the lines that have a voice made for them, found by their opening words; a line with no voice is read in silence */
   var SPOKEN = [['w_clock', "it's a clock"], ['visitor', 'we kept our lives in this shape'], ['w_room', "it's not a message"], ['w_keep', 'say something you want to keep'],
@@ -1024,6 +1052,21 @@
   function kidsOf(n) { var out = []; if (n && typeof n === 'object' && !sealed(n)) for (var d = 1; d <= 8; d++) if (n[String(d)] != null) out.push(d); return out; }
   function story(n) { return tidy(lineOf(n)).trim(); }
   function cutAddress(p) { return '7.2' + p.join(''); }
+  /* the walk walks whichever block it holds: the film from 7.2 (story only, 1 to 8), or another block from its root (1 to 9) */
+  function wAt(p) {
+    if (wb.film) return cutAt(p);
+    var n = wb.root;
+    for (var i = 0; i < p.length; i++) { if (!n || typeof n !== 'object' || sealed(n) || n[String(p[i])] == null) return undefined; n = n[String(p[i])]; }
+    return n;
+  }
+  function wKids(n) { return wb.film ? kidsOf(n) : branches(n); }
+  function wAddress(p) { return wb.film ? cutAddress(p) : p.length ? p[0] + (p.length > 1 ? '.' + p.slice(1).join('') : '') : ''; }
+  function wDigits(p) { return (wb.film ? [7, 2] : []).concat(p); }
+  function firstWords(n) {
+    var w = story(n).replace(/["“”]/g, '').replace(/(^|\s)[‘']+|[’']+(?=\s|$)/g, '$1').split(/[.:,;—(!?]/)[0].trim().split(/\s+/);
+    return w.slice(0, 5).join(' ') + (w.length > 5 ? '…' : '');
+  }
+  function many(n, d) { if (!n || typeof n !== 'object' || d > 6) return 1; var c = 1, ks = wKids(n); for (var i = 0; i < ks.length; i++) c += many(n[String(ks[i])], d + 1); return c; }
   function hashPath() {
     var m = /^7\.2([1-8]{0,12})$/.exec(decodeURIComponent((location.hash || '').slice(1)));
     return m ? m[1].split('').map(Number) : null;
@@ -1066,7 +1109,13 @@
     });
     return out;
   }
-  function planOf(p) { return p.length ? (plansFor(cutAt(p.slice(0, -1)))[p[p.length - 1]] || {}) : {}; }
+  var PLANS = {};
+  function planOf(p) {
+    if (!p.length) return {};
+    var key = p.slice(0, -1).join('');
+    if (!PLANS[key]) PLANS[key] = plansFor(cutAt(p.slice(0, -1)));
+    return PLANS[key][p[p.length - 1]] || {};
+  }
   function firstPlate(p) {
     var q = p.slice(), n = cutAt(q), guard = 0;
     while (kidsOf(n).length && guard++ < 12) { q.push(kidsOf(n)[0]); n = cutAt(q); }
@@ -1114,9 +1163,9 @@
     wLater(done, 45000);   /* if a clip never arrives, the walk still moves on */
   }
   function nextPath(p) {
-    var ks = kidsOf(cutAt(p)); if (ks.length) return p.concat([ks[0]]);
+    var ks = wKids(wAt(p)); if (ks.length) return p.concat([ks[0]]);
     var q = p.slice();
-    while (q.length) { var last = q.pop(), sib = kidsOf(cutAt(q)), i = sib.indexOf(last); if (i < sib.length - 1) return q.concat([sib[i + 1]]); }
+    while (q.length) { var last = q.pop(), sib = wKids(wAt(q)), i = sib.indexOf(last); if (i < sib.length - 1) return q.concat([sib[i + 1]]); }
     return null;
   }
   function sayChain(ids, start) {
@@ -1130,22 +1179,32 @@
     if (sub) { var s = document.createElement('small'); s.textContent = sub; elBig.appendChild(s); }
     elBig.style.opacity = 1;
   }
+  function sheet(head, text) {
+    elLine.textContent = '';
+    if (head) { var h = document.createElement('strong'); h.className = 'whead'; h.textContent = head; elLine.appendChild(h); }
+    if (text) elLine.appendChild(document.createTextNode(text));
+    elSheet.scrollTop = 0;
+  }
   function goWalk(p) {
-    if (cutAt(p) === undefined) return;
-    wclear(); wEnded = false; wpath = p; wNode = cutAt(p); wT0 = performance.now(); wHeard = [];
-    var ks = kidsOf(wNode), line = story(wNode), dwell;
-    elTrail.textContent = elBig.getAttribute('data-title');
-    if (p.length) { var b = document.createElement('b'); b.textContent = cutAddress(p); elTrail.appendChild(b); }
-    var want = '#' + cutAddress(p); if (location.hash !== want) history.replaceState(null, '', want);
-    if (ks.length) { /* the film, a chapter or a scene: its name, over the first place it opens onto */
-      wPlan = {};
-      clearBg();
+    if (wAt(p) === undefined) return;
+    wclear(); wEnded = false; wpath = p; wNode = wAt(p); wT0 = performance.now(); wHeard = []; elBig.style.opacity = 0;
+    var ks = wKids(wNode), line = story(wNode), dwell;
+    elTrail.textContent = wb.film ? elBig.getAttribute('data-title') : wb.name;
+    var ad = wAddress(p); if (ad) { var b = document.createElement('b'); b.textContent = ad; elTrail.appendChild(b); }
+    if (wb.film) { var want = '#' + cutAddress(p); if (location.hash !== want) history.replaceState(null, '', want); } else clearHash();
+    if (!wb.film) { /* another block: its line on the sheet, its branches in the ring */
+      wPlan = {}; clearBg();
+      sheet(p.length ? '' : wb.name, line || 'Nothing is written here.');
+      wLater(function () { elSheet.classList.add('on'); }, 300);
+      dwell = Math.max(4.5, Math.min(14, line.length * 0.05 + 2.5));
+    } else if (ks.length) { /* the film, a chapter or a scene: its name on the sheet, its branches in the ring */
+      wPlan = {}; clearBg();
       var tt = p.length ? titleOf(line) : { title: elBig.getAttribute('data-title'), sub: elBig.getAttribute('data-sub') };
-      big(tt.title, tt.sub); elSheet.classList.remove('on');
-      dwell = tt.sub ? 7.5 : 3.8;
+      sheet(tt.title, tt.sub); wLater(function () { elSheet.classList.add('on'); }, 300);
+      dwell = tt.sub ? 7.5 : 4.2;
     } else { /* a moment */
       wPlan = planOf(p);
-      elBig.style.opacity = 0; elLine.textContent = line;
+      sheet('', line);
       if (wPlan.radio) {
         /* the radio, here and only here: the walk waits, the dial rises, and the viewer tunes through the kept lives */
         clearBg(); radioStart();
@@ -1177,11 +1236,20 @@
   }
   function endWalk() {
     wclear(); wEnded = true; wNode = null; wPlan = {}; elSheet.classList.remove('on'); clearBg();
-    var first = (/^[^.]+\./.exec(story(cutAt(wpath.slice(0, 1)))) || [''])[0];
-    big(first ? 'End of ' + first.charAt(0).toLowerCase() + first.slice(1) : 'The end, for now.', elBig.getAttribute('data-end'));
     elActs.textContent = '';
-    btn('Walk again', function () { auto = true; goWalk([]); }, 'red');
-    btn('Back to the sky', function () { toSky(true); }, 'out');
+    if (wb.film) {
+      var first = (/^[^.]+\./.exec(story(cutAt(wpath.slice(0, 1)))) || [''])[0];
+      big(first ? 'End of ' + first.charAt(0).toLowerCase() + first.slice(1) : 'The end, for now.', elBig.getAttribute('data-end'));
+      btn('Walk again', function () { auto = true; goWalk([]); }, 'red');
+      btn('Credits', function () { openCredits(false); });
+      btn('Back to the sky', function () { toSky(true); }, 'out');
+      /* the end credits roll after the end, as a film's do */
+      wLater(function () { if (walking && wEnded) openCredits(true); }, 5000);
+    } else {
+      big('End of the walk', wb.name);
+      btn('Walk again', function () { auto = true; goWalk([]); }, 'red');
+      btn('Back to the sky', function () { toSky(true); }, 'out');
+    }
   }
   function btn(label, fn, cls, digit) {
     var b = document.createElement('button'); b.type = 'button'; if (cls) b.className = cls;
@@ -1205,34 +1273,120 @@
   function carry() {
     auto = !auto;
     if (auto) { var q = nextPath(wpath); if (q) goWalk(q); else endWalk(); }
-    else { wTimers.forEach(clearTimeout); wTimers = []; acts(kidsOf(wNode)); }
+    else { wTimers.forEach(clearTimeout); wTimers = []; acts(wKids(wNode)); }
   }
   function acts(ks) {
     elActs.textContent = '';
     if (radioOn) btn('Carry on ▸', radioCarry, 'red').id = 'carry';
     else btn(auto ? 'Pause' : 'Carry on ▸', carry, auto ? '' : 'red').id = 'carry';
-    ks.forEach(function (d) {
-      var w = story(wNode[String(d)]).replace(/[‘’'"“”]/g, '').split(/[.:,]/)[0].split(/\s+/).slice(0, 4).join(' ');
-      btn(w, function () { goWalk(wpath.concat([d])); }, '', String(d));
-    });
     if (wpath.length) btn('Up', function () { goWalk(wpath.slice(0, -1)); }).id = 'up';
     btn('Back to the sky', function () { toSky(true); }, 'out').id = 'out';
+    /* the branches stand in the ring and are tapped there; for keys and screen readers they are offered here too, unseen */
+    ks.forEach(function (d) { btn(firstWords(wNode[String(d)]), function () { goWalk(wpath.concat([d])); }, 'sr', String(d)); });
   }
   function startWalk(p, flown) {
+    wb = { name: FILM, film: true, root: null };
     var q = p.slice();
     while (q.length && cutAt(q) === undefined) q.pop();
     setMode('walk');
-    walking = true; auto = true; veil = flown ? 1 : 0; move = null;
+    walking = true; auto = true; veil = flown ? 1 : 0; glide = null;
     elWalk.hidden = false;
     if (cutRoot() === undefined) { big(elBig.getAttribute('data-title'), ''); elActs.textContent = ''; btn('Back to the sky', function () { toSky(true); }, 'out'); return; }
     primeClip();
     everyMoment([], function (m) { var pl = planOf(m).img; if (pl) plate(pl); });
     goWalk(q);
   }
+  /* any other star's block, walked from its root in the same ring; its lines are its own, read live */
+  function startBlock(name, json) {
+    wb = { name: name, film: false, root: json };
+    setMode('walk');
+    walking = true; auto = true; veil = 1; glide = null;
+    elWalk.hidden = false;
+    goWalk([]);
+  }
   function leaveWalk() {
     wclear(); walking = false; wNode = null; wPlan = null; clearBg();
     elBig.style.opacity = 0; elSheet.classList.remove('on'); elWalk.hidden = true;
   }
+  /* ── the ring: the block's shape, walked (6.41). The position stands at the centre as a glowing point, its branches in a ring
+        around it with their digits and first words, the digits walked above it as a trail. ── */
+  function ringLayout() {
+    var ks = wNode && !wEnded ? wKids(wNode) : [], cx = wide ? W * 0.64 : W / 2, cy = wide ? H * 0.42 : H * 0.4;
+    var R = wide ? Math.min(W * 0.16, H * 0.23) : Math.min(W * 0.32, H * 0.16);
+    if (!wide) {   /* on a phone the ring fits the space between the address at the top and the paper sheet, whatever the sheet's length */
+      var st = stage.getBoundingClientRect(), top = elTrail.getBoundingClientRect().bottom - st.top + 8, floor = (elSheet.classList.contains('on') ? elSheet : elActs).getBoundingClientRect().top - st.top - 12;
+      R = clamp(Math.min(W * 0.32, (floor - top - 136) / 2), 54, W * 0.32); cy = top + 94 + R;
+    }
+    return { cx: cx, cy: cy, R: R, pts: ks.map(function (k, i) {
+      var a = -Math.PI / 2 + TAU * i / Math.max(ks.length, 1);
+      return { k: k, a: a, x: cx + R * Math.cos(a), y: cy + R * Math.sin(a), n: wNode[String(k)] };
+    }) };
+  }
+  function glowAt(x, y, r, sp, a) { ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = a; ctx.drawImage(sp, x - r, y - r, r * 2, r * 2); ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1; }
+  function drawRing(nowMs) {
+    if (!walking || !wNode || wEnded || radioOn || mem) return;
+    var L = ringLayout(), k = Math.min(1, (nowMs - wT0) / 650), e = k * k * (3 - 2 * k), moment = !L.pts.length, i;
+    var playing = wb.film && wPlan && (wPlan.clip || wPlan.burst);
+    if (moment && wb.film) return;   /* a moment of the film is its picture: its address stands at the top, and nothing is drawn over the clip or the place */
+    ctx.save();
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic'; ctx.shadowColor = 'rgba(0,0,0,.95)'; ctx.shadowBlur = 8;
+    /* the trail of digits walked */
+    ctx.font = '600 ' + (wide ? 24 : 22) + 'px "Cormorant Garamond",Garamond,serif'; ctx.fillStyle = 'rgba(243,217,164,' + (moment ? 0.8 : 0.95) + ')';
+    var trail = wDigits(wpath);
+    ctx.fillText(trail.length ? trail.join(' · ') : 'the root', L.cx, L.cy - (moment ? 34 : L.R + 66));
+    ctx.shadowBlur = 0;
+    /* the branches */
+    for (i = 0; i < L.pts.length; i++) {
+      var q = L.pts[i], x = L.cx + (q.x - L.cx) * e, y = L.cy + (q.y - L.cy) * e;
+      ctx.strokeStyle = 'rgba(200,218,255,' + (0.3 * e) + ')'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(L.cx, L.cy); ctx.lineTo(x, y); ctx.stroke();
+      var held = wb.film ? planOf(wpath.concat([q.k])) : {}, red = held.clip || held.burst || held.radio;
+      var sz = 9 + Math.min(14, Math.sqrt(many(q.n, 0)) * 2.6);
+      glowAt(x, y, sz * 1.7, red ? SP_R : SP_B, e);
+      ctx.globalAlpha = e;
+      ctx.shadowColor = 'rgba(0,0,0,.95)'; ctx.shadowBlur = 6;
+      ctx.fillStyle = '#ffffff'; ctx.font = '600 20px "Cormorant Garamond",Garamond,serif'; ctx.fillText(String(q.k), x, y + 7);
+      ctx.font = 'italic 500 17px "Cormorant Garamond",Garamond,serif'; ctx.fillStyle = '#f6efe0';
+      var words = firstWords(q.n); if (words.length > 24) words = words.slice(0, 23).replace(/\s+\S*$/, '') + '…';
+      var tw = ctx.measureText(words).width, below = Math.sin(q.a) > -0.3, lx = clamp(x, tw / 2 + 8, W - tw / 2 - 8);
+      ctx.fillText(words, lx, below ? y + sz + 20 : y - sz - 10);
+      ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+    }
+    /* the centre */
+    var pulse = 1 + 0.08 * Math.sin(nowMs / 400), cr = moment ? 16 : 32;
+    glowAt(L.cx, L.cy, cr * pulse, playing ? SP_R : SP_G, moment ? 0.75 : 1);
+    if (playing && !moment) { ctx.strokeStyle = 'rgba(200,56,74,' + (0.6 + 0.3 * Math.sin(nowMs / 300)) + ')'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(L.cx, L.cy, 28 * pulse, 0, TAU); ctx.stroke(); }
+    ctx.restore();
+  }
+  /* a tap in the ring steps down into that branch */
+  function ringTap(x, y) {
+    if (!walking || !wNode || wEnded || radioOn) return false;
+    var L = ringLayout();
+    for (var i = 0; i < L.pts.length; i++) {
+      var q = L.pts[i], below = Math.sin(q.a) > -0.3;
+      if (Math.hypot(q.x - x, q.y - y) < 38 || (Math.abs(q.x - x) < 70 && (below ? y - q.y > 0 && y - q.y < 52 : q.y - y > 0 && q.y - y < 46))) { goWalk(wpath.concat([q.k])); return true; }
+    }
+    return false;
+  }
+
+  /* ── the end credits (6.45) ── */
+  var elCredits = $('credits'), elRoll = $('roll'), rolling = false;
+  function openCredits(roll) {
+    if (walking && !wEnded) { auto = false; wTimers.forEach(clearTimeout); wTimers = []; try { elClip.pause(); } catch (e) { /* not playing */ } Sound.hush(); acts(wKids(wNode)); }
+    elCredits.hidden = false; stage.classList.add('credited');
+    rolling = !!roll && !CALM;
+    elRoll.scrollTop = rolling ? 0 : $('lead').offsetHeight - 40;
+  }
+  function closeCredits() { elCredits.hidden = true; rolling = false; stage.classList.remove('credited'); }
+  function rollOn() {
+    if (!rolling) return;
+    elRoll.scrollTop += wide ? 0.9 : 0.75;
+    if (elRoll.scrollTop + elRoll.clientHeight >= elRoll.scrollHeight - 2) rolling = false;
+  }
+  ['pointerdown', 'wheel', 'touchstart', 'keydown', 'focusin'].forEach(function (ev) { elRoll.addEventListener(ev, function () { rolling = false; }, { passive: true }); });
+  $('credit').addEventListener('click', function () { openCredits(false); });
+  $('cclose').addEventListener('click', closeCredits);
+  $('csky').addEventListener('click', function () { closeCredits(); toSky(true); });
+
   /* the effects of light, drawn over the place */
   function drawWalkFx(nowMs) {
     if (!wNode || !wPlan || !wPlan.fx) return;
@@ -1288,140 +1442,134 @@
     ctx.globalCompositeOperation = 'source-over'; ctx.clearRect(0, 0, W, H);
     Sound.walkMix(wPlan && wPlan.fx === 'gold');
     /* between scenes the walk moves through the beach itself: on a title the Pscale sky drifts past behind the words */
-    if (wNode && !wEnded && kidsOf(wNode).length) { var tt = (nowMs - wT0) / 1000; drawBeach(Math.min(1, 0.35 + tt * 0.4), nowMs, null, Math.min(1, tt / 1.2), (wpath.length * 0.11 + tt * 0.012) % 1); }
+    if (wNode && !wEnded && (!wb.film || wKids(wNode).length)) { var tt = (nowMs - wT0) / 1000; drawBeach(Math.min(1, 0.35 + tt * 0.4), nowMs, null, Math.min(1, tt / 1.2), (wpath.length * 0.11 + tt * 0.012) % 1); }
     drawWalkFx(nowMs);
     if (mem) drawMemory(nowMs);
+    drawRing(nowMs);
     if (veil > 0) { ctx.globalAlpha = veil; ctx.fillStyle = '#1a0510'; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1; veil = Math.max(0, veil - 0.02); }
   }
 
-  /* ── exploring the sky: drag to move and turn through it, pinch or wheel to zoom, tap a star for its card.
-        The card's opening line is read live, one small read for that block alone. ── */
+  /* ── exploring the sky (6.42): one finger turns the galaxy around its centre, a pinch or the wheel zooms toward and away from it,
+        a tap on a star glides the centre to that star and opens its card. The card's opening line is read live, one small read
+        for that block alone; a block the index lists as larger than 40 KB shows its name and size only, never downloaded. ── */
   var elStar = $('starcard'), elSName = $('sname'), elSLine = $('sline'), elSWalk = $('swalk');
-  var exploring = false, touchT = -99, pts = {}, gest = null, picked = null, LINES_READ = {}, BIG = 40000, ZMIN = 0.7, ZMAX = 14, lastSky = 0;
-  function unitNow() { return cam.z * unit(); }
-  function unproj(sxp, syp) {
-    var dx = sxp - cam.ax * W, dy = syp - cam.ay * H, c = Math.cos(-skyR), s = Math.sin(-skyR), k = unitNow();
-    return [cam.x + (dx * c - dy * s) / k, cam.y + (dx * s + dy * c) / k];
-  }
-  /* slide the sky by a move on the screen */
-  function pan(dx, dy) {
-    var c = Math.cos(-skyR), s = Math.sin(-skyR), k = unitNow();
-    cam.x = clamp(cam.x - (dx * c - dy * s) / k, -1.4, 1.4); cam.y = clamp(cam.y - (dx * s + dy * c) / k, -1.1, 1.1);
-  }
-  /* zoom, and turn, about a point on the screen, so what is under the finger stays under it */
-  function zoomAbout(sxp, syp, k, turn) {
-    var w = unproj(sxp, syp);
-    cam.z = clamp(cam.z * k, ZMIN, ZMAX); skyR += turn || 0;
-    var p = proj(w[0], w[1]); pan(sxp - p[0], syp - p[1]);
-  }
+  var exploring = false, touchT = -99, pts = {}, gest = null, picked = null, LINES_READ = {}, BLOCKS = {}, BIG = 40000, lastSky = 0;
   function explore(on) {
     if (exploring === on) return;
     exploring = on; stage.classList.toggle('exploring', on);
     if (!on) closeStar();
   }
-  function touchSky() { touchT = now(); move = null; }
+  function touchSky(hold) { touchT = now(); if (hold && glide && !glide.into) glide = null; }
   function at(e) { var r = stage.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
   function two() { var k = Object.keys(pts); return k.length >= 2 ? [pts[k[0]], pts[k[1]]] : null; }
+  var wTap = null;
   canvas.addEventListener('pointerdown', function (e) {
+    if (mode === 'walk') { wTap = { p: at(e), t: now() }; return; }
     if (mode !== 'sky') return;
     var p = at(e); pts[e.pointerId] = p;
-    gest = { x: p[0], y: p[1], moved: 0, t: now(), dist: 0, ang: 0, turn: e.shiftKey || e.button === 2, many: Object.keys(pts).length > 1 };
+    gest = { moved: 0, t: now(), dist: 0, d0: orb.dist, many: Object.keys(pts).length > 1 };
     try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* no capture, no matter */ }
-    touchSky(); stage.classList.add('dragging');
+    touchSky(true); stage.classList.add('dragging');
   });
   canvas.addEventListener('pointermove', function (e) {
     if (mode !== 'sky' || !pts[e.pointerId] || !gest) return;
-    var p = at(e), was = pts[e.pointerId]; pts[e.pointerId] = p; touchSky();
+    var p = at(e), was = pts[e.pointerId]; pts[e.pointerId] = p; touchSky(true);
     var pair = two();
-    if (pair) {
-      var dist = Math.max(8, Math.sqrt(Math.pow(pair[0][0] - pair[1][0], 2) + Math.pow(pair[0][1] - pair[1][1], 2))), ang = Math.atan2(pair[1][1] - pair[0][1], pair[1][0] - pair[0][0]);
-      if (gest.dist) {
-        var turn = ang - gest.ang; if (turn > Math.PI) turn -= TAU; if (turn < -Math.PI) turn += TAU;
-        zoomAbout((pair[0][0] + pair[1][0]) / 2, (pair[0][1] + pair[1][1]) / 2, dist / gest.dist, turn);
-      }
-      gest.dist = dist; gest.ang = ang; gest.moved = 99; gest.many = true; explore(true);
+    if (pair) {   /* a pinch: toward the centre and away from it, within limits */
+      var dist = Math.max(8, Math.hypot(pair[0][0] - pair[1][0], pair[0][1] - pair[1][1]));
+      if (!gest.dist) { gest.dist = dist; gest.d0 = orb.dist; } else orb.dist = clamp(gest.d0 * gest.dist / dist, DMIN, DMAX);
+      gest.moved = 99; gest.many = true; explore(true);
       return;
     }
     var dx = p[0] - was[0], dy = p[1] - was[1];
     gest.moved += Math.abs(dx) + Math.abs(dy);
-    if (gest.moved > 8) {
+    if (gest.moved > 8) {   /* one finger: left and right turn it about its upright axis, up and down tilt it */
       explore(true);
-      if (gest.turn) zoomAbout(cam.ax * W, cam.ay * H, 1, dx * 0.006); else pan(dx, dy);
+      orb.yaw += dx * 0.006; orb.pitch = clamp(orb.pitch + dy * 0.005, -1.2, 1.45);
     }
   });
   function lift(e) {
+    if (mode === 'walk' && wTap && e.type === 'pointerup') { var w = at(e); if (Math.hypot(w[0] - wTap.p[0], w[1] - wTap.p[1]) < 12 && now() - wTap.t < 0.8) ringTap(w[0], w[1]); wTap = null; return; }
     if (!pts[e.pointerId]) return;
     var p = pts[e.pointerId]; delete pts[e.pointerId];
     var left = Object.keys(pts).length;
+    touchSky(false);
     if (gest && !left && !gest.many && gest.moved <= 8 && now() - gest.t < 0.7 && mode === 'sky' && e.type === 'pointerup') tapSky(p[0], p[1]);
     if (!left) { gest = null; stage.classList.remove('dragging'); } else if (gest) gest.dist = 0;
-    touchSky();
   }
   canvas.addEventListener('pointerup', lift);
   canvas.addEventListener('pointercancel', lift);
   canvas.addEventListener('contextmenu', function (e) { if (mode === 'sky') e.preventDefault(); });
   canvas.addEventListener('wheel', function (e) {
     if (mode !== 'sky') return;
-    var k = Math.exp(-e.deltaY * 0.0014), nz = clamp(cam.z * k, ZMIN, ZMAX);
-    if (nz === cam.z) return;   /* at the edge of the zoom the wheel is the page's again, so the sheet below can be reached */
     e.preventDefault();
-    var p = at(e); zoomAbout(p[0], p[1], nz / cam.z, 0); explore(true); touchSky();
+    orb.dist = clamp(orb.dist * Math.exp(e.deltaY * 0.0012), DMIN, DMAX); explore(true); touchSky(true);
   }, { passive: false });
 
   /* a tap: the nearest star under the finger, the film's own first */
   function tapSky(x, y) {
-    var f = proj(filmStar.x, filmStar.y), best = null, bd = 26 * 26, i;
-    if (Math.pow(f[0] - x, 2) + Math.pow(f[1] - y, 2) < 36 * 36) best = { name: FILM, x: filmStar.x, y: filmStar.y };
-    else for (i = 0; i < stars.length; i++) {
-      var p = proj(stars[i].x, stars[i].y), d = Math.pow(p[0] - x, 2) + Math.pow(p[1] - y, 2);
-      if (d < bd) { bd = d; best = stars[i]; }
+    basis();
+    var best = null, bd = 28, q = oproj(filmPos()), i;
+    if (q && Math.hypot(q[0] - x, q[1] - y) < 40) best = starOf(FILM) || { name: FILM, p: FILM_AT.slice(), size: 0 };
+    else for (i = 0; i < B3.length; i++) {
+      if (B3[i].name === FILM) continue;
+      q = oproj(B3[i].p); if (!q) continue;
+      var d = Math.hypot(q[0] - x, q[1] - y); if (d < bd) { bd = d; best = B3[i]; }
     }
     if (best) openStar(best); else closeStar();
   }
+  function bytesOf(name) { return Number(((index && index.bytes) || {})[name]) || 0; }
   function openStar(s) {
-    picked = { name: s.name, x: s.x, y: s.y };
-    explore(true);
-    elSName.textContent = s.name; elSWalk.hidden = s.name !== FILM; elStar.hidden = false; placeStar();
-    var name = s.name;
-    function show(text) { if (picked && picked.name === name) elSLine.textContent = text; }
-    if (LINES_READ[name] != null) { show(LINES_READ[name]); return; }
-    /* a block the index lists as larger than 40 KB shows its name and size only, and is never downloaded */
-    var size = Number(((index && index.bytes) || {})[name]) || 0;
-    if (size > BIG) { LINES_READ[name] = kb(size); show(LINES_READ[name]); return; }
-    show('Reading…');
+    picked = s; explore(true);
+    /* the camera glides to the chosen star, which becomes the centre the sky turns around */
+    glideTo({ tgt: s.p.slice(), dist: Math.min(orb.dist, wide ? 1.4 : 1.2) }, 1.4, ease);
+    var name = s.name, size = bytesOf(name), film = name === FILM;
+    elSName.textContent = name; elStar.hidden = false; seatCard();
+    elSWalk.textContent = film ? 'Walk into the film' : 'Walk this block';
+    elSWalk.hidden = !film;
+    function show(text, walkable) { if (picked && picked.name === name) { elSLine.textContent = text; if (!film) elSWalk.hidden = !walkable; } }
+    if (size > BIG) { show(kb(size), false); return; }
+    if (LINES_READ[name] != null) { show(LINES_READ[name][0], LINES_READ[name][1]); return; }
+    show('Reading…', false);
     get(WIRE + '?block=' + encodeURIComponent(name) + '&spindle=0').then(function (j) {
-      var line = tidy(sealed(j) ? '' : lineOf(j)).replace(/\s+/g, ' ').trim();
+      var line = tidy(sealed(j) ? '' : lineOf(j)).replace(/\s+/g, ' ').trim(), ok = !sealed(j);
       if (sealed(j)) line = 'This block is sealed.';
       else if (!line) line = 'Nothing is written at the top of this block.';
       else if (line.length > 200) line = line.slice(0, 200).replace(/\s+\S*$/, '') + '…';
-      LINES_READ[name] = line; show(line);
-    }).catch(function () { show('Pscale could not be reached.'); });
+      LINES_READ[name] = [line, ok]; show(line, ok);
+    }).catch(function () { show('Pscale could not be reached.', false); });
   }
   function kb(n) { var k = n / 1000;   /* as the index counts them */ return (k < 10 ? k.toFixed(1) : String(Math.round(k))) + ' KB'; }
   function closeStar() { picked = null; elStar.hidden = true; }
-  function placeStar() {
-    if (!picked) return;
-    var p = proj(picked.x, picked.y), w = elStar.offsetWidth, h = elStar.offsetHeight;
-    if (p[0] < -20 || p[0] > W + 20 || p[1] < -20 || p[1] > H + 20) { closeStar(); return; }
-    var floor = H - (stage.querySelector('.front').offsetHeight || 0) - 30;
-    var top = p[1] + 22; if (top + h > floor) top = p[1] - 22 - h;
-    top = clamp(top, 56, Math.max(56, floor - h));   /* never under the corner, never over the ways in */
-    elStar.style.left = clamp(p[0] - w / 2, 10, Math.max(10, W - w - 10)) + 'px'; elStar.style.top = top + 'px';
+  function seatCard() { if (!elStar.hidden) elStar.style.bottom = Math.round(elFront.getBoundingClientRect().height + 26) + 'px'; }
+  /* walking another block: read it whole (it is no larger than 40 KB), then fly into its star */
+  function walkBlock(name) {
+    if (bytesOf(name) > BIG) return;
+    function go(j) {
+      var s = starOf(name); closeStar(); setMode('fly'); Sound.bell(0);
+      glideTo({ tgt: s ? s.p.slice() : orb.tgt.slice(), dist: 0.035 }, 2.2, easeIn, function () { startBlock(name, j); });
+      glide.into = true;
+    }
+    if (BLOCKS[name]) { go(BLOCKS[name]); return; }
+    elSLine.textContent = 'Reading the block…'; elSWalk.hidden = true;
+    get(WIRE + '?block=' + encodeURIComponent(name)).then(function (j) {
+      if (!j || typeof j !== 'object' || sealed(j)) throw new Error('not walkable');
+      BLOCKS[name] = j; if (picked && picked.name === name) go(j);
+    }).catch(function () { if (picked && picked.name === name) elSLine.textContent = 'Pscale could not be reached.'; });
   }
-  /* the ring round the star whose card is open, the card kept beside it, and the gentle drift when the sky is left alone */
+  /* the ring round the chosen star, and the slow drift when the sky is left alone */
   function tendSky(t) {
     var dt = Math.min(0.1, Math.max(0, t - lastSky)); lastSky = t;
     if (mode !== 'sky') return;
     if (picked) {
-      placeStar();
-      if (picked) { var p = proj(picked.x, picked.y); ctx.strokeStyle = picked.name === FILM ? 'rgba(255,120,140,.9)' : 'rgba(232,201,138,.9)'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(p[0], p[1], 15 + 2 * Math.sin(t * 2), 0, TAU); ctx.stroke(); }
+      var q = oproj(picked.p);
+      if (q) { ctx.strokeStyle = picked.name === FILM ? 'rgba(255,120,140,.95)' : 'rgba(232,201,138,.95)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(q[0], q[1], 17 + 2 * Math.sin(t * 2), 0, TAU); ctx.stroke(); }
     }
-    if (!CALM && !picked && !move && !Object.keys(pts).length && t - touchT > 3) skyR += dt * 0.006;
+    if (!CALM && !glide && !Object.keys(pts).length && t - touchT > 3) orb.yaw += dt * 0.035;
   }
   $('sclose').addEventListener('click', closeStar);
-  elSWalk.addEventListener('click', enterFilm);
-  $('totitle').addEventListener('click', function () { explore(false); moveTo(restCam(), 1.8, ease); });
-  $('below').addEventListener('click', function () { var u = document.querySelector('.under'); if (u && u.scrollIntoView) u.scrollIntoView({ behavior: CALM ? 'auto' : 'smooth', block: 'start' }); });
+  elSWalk.addEventListener('click', function () { if (!picked || picked.name === FILM) enterFilm(); else walkBlock(picked.name); });
+  $('totitle').addEventListener('click', function () { explore(false); glideTo({ tgt: [0, 0, 0], dist: restDist(), pitch: 0.55 }, 1.8, ease); });
 
   /* ── sound: made here, with the voice files, and only after a tap ── */
   var Sound = (function () {
@@ -1569,18 +1717,25 @@
     lives: function () { return LIVES.map(function (L) { return { f: L.f, band: L.band, who: L.who, kind: L.kind, date: L.date || '', text: L.text || '', over: L.over || [], thought: L.thought || '', digits: L.digits || '', voice: L.voice || '', overV: L.overV || [], thoughtV: L.thoughtV || '' }; }); },
     on: function () { return cur ? cur.band : ''; },
     sky: function () {
-      var f = proj(filmStar.x, filmStar.y), out = [], i, j;
-      for (i = 0; i < stars.length && out.length < 400; i++) { var p = proj(stars[i].x, stars[i].y); if (p[0] > 30 && p[0] < W - 30 && p[1] > 70 && p[1] < H - 150) out.push({ name: stars[i].name, x: p[0], y: p[1] }); }
+      basis();
+      var out = [], i, j, f = oproj(filmPos()) || [-999, -999];
+      for (i = 0; i < B3.length && out.length < 3000; i++) {
+        if (B3[i].name === FILM) continue;
+        var q = oproj(B3[i].p); if (q && q[0] > 30 && q[0] < W - 30 && q[1] > 90 && q[1] < H - 200) out.push({ name: B3[i].name, x: q[0], y: q[1], big: bytesOf(B3[i].name) > BIG });
+      }
       /* stars standing clear of their neighbours, for a tap that cannot be mistaken */
-      var clear = out.filter(function (a) { for (j = 0; j < out.length; j++) if (out[j] !== a && Math.pow(out[j].x - a.x, 2) + Math.pow(out[j].y - a.y, 2) < 60 * 60) return false; return Math.pow(f[0] - a.x, 2) + Math.pow(f[1] - a.y, 2) > 80 * 80; });
-      return { exploring: exploring, x: cam.x, y: cam.y, z: cam.z, r: skyR, picked: picked ? picked.name : '', film: f, clear: clear.slice(0, 40), seen: out.length };
+      var clear = out.filter(function (a) { for (j = 0; j < out.length; j++) if (out[j] !== a && Math.hypot(out[j].x - a.x, out[j].y - a.y) < 36) return false; return Math.hypot(f[0] - a.x, f[1] - a.y) > 80; });
+      return { exploring: exploring, yaw: orb.yaw, pitch: orb.pitch, dist: orb.dist, tgt: orb.tgt.slice(), gliding: !!glide, picked: picked ? picked.name : '', film: f, clear: clear.slice(0, 60), stars: out.filter(function (a) { return Math.hypot(f[0] - a.x, f[1] - a.y) > 60; }).slice(0, 300), seen: out.length };
     },
+    star: function (name) { basis(); var st = name === FILM ? { p: filmPos() } : starOf(name), q = st && oproj(st.p); return q ? { x: q[0], y: q[1] } : null; },
+    ring: function () { if (!walking || !wNode || wEnded) return null; var L = ringLayout(); return { cx: L.cx, cy: L.cy, pts: L.pts.map(function (q) { return { k: q.k, x: q.x, y: q.y, words: firstWords(q.n) }; }) }; },
+    credits: function () { return { open: !elCredits.hidden, rolling: rolling, top: elRoll.scrollTop, height: elRoll.scrollHeight }; },
     beach: function () { var nb = nearest(); return { stars: B3.length, stations: STN.map(function (s) { return s.name; }), blur: 1 - nb[1], cam: camT.slice() }; },
     memory: function () { return mem ? { t: (performance.now() - mem.t0) / 1000, src: mem.src, particles: mem.P ? mem.P.length : -1, real: !!mem.real, clip: vid.currentTime, paused: vid.paused } : null; },
-    walk: function () { return walking ? { path: wpath.join(''), address: cutAddress(wpath), auto: auto, ended: wEnded, kids: kidsOf(wNode), plate: (wPlan && wPlan.img) || '', fx: (wPlan && wPlan.fx) || '', burst: (wPlan && wPlan.burst) || '', say: (wPlan && wPlan.say) || [], clip: (wPlan && wPlan.clip) || '', pos: (wPlan && wPlan.pos) || 0, sayAt: (wPlan && wPlan.sayAt) || [], title: !!(wNode && kidsOf(wNode).length), radio: radioOn,
+    walk: function () { return walking ? { block: wb.name, path: wpath.join(''), address: wAddress(wpath), auto: auto, ended: wEnded, kids: wKids(wNode), plate: (wPlan && wPlan.img) || '', fx: (wPlan && wPlan.fx) || '', burst: (wPlan && wPlan.burst) || '', say: (wPlan && wPlan.say) || [], clip: (wPlan && wPlan.clip) || '', pos: (wPlan && wPlan.pos) || 0, sayAt: (wPlan && wPlan.sayAt) || [], title: !!(wNode && kidsOf(wNode).length), radio: radioOn,
       playing: { name: elClip.getAttribute('data-name') || '', on: elClip.classList.contains('on'), t: elClip.currentTime, paused: elClip.paused, muted: elClip.muted, w: elClip.videoWidth, fit: elClip.style.objectPosition } } : null; }
   };
-  function soundLabel() { elSound.textContent = Sound.isOn() ? 'Sound off' : (Sound.state() === 'none' ? 'Tune in' : 'Sound on'); elSound.setAttribute('aria-pressed', String(Sound.isOn())); }
+  function soundLabel() { elSound.textContent = Sound.isOn() ? 'Sound: on' : 'Sound: off'; elSound.setAttribute('aria-pressed', String(Sound.isOn())); elSound.setAttribute('aria-label', Sound.isOn() ? 'Sound is on. Turn it off' : 'Sound is off. Turn it on'); }
   elSound.hidden = !(window.AudioContext || window.webkitAudioContext);
   /* the first tap anywhere in the film starts the sound, inside that tap; after that the corner turns it off and on */
   var tapped = false;
@@ -1598,13 +1753,13 @@
     raf = 0;
     if (!visible || document.hidden) return;
     var t = now();
-    stepCam(t);
+    stepGlide(t); rollOn();
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     if (mode === 'opening') drawOpening(t);
     else if (mode === 'walk') { if (radioOn) { f += (target - f) * 0.18; drawDial(t); } else drawWalk(); }
     else {
       drawSky(t, ease((t - skyT0) / 1.6)); tendSky(t);
-      if (mode === 'fly' && move) { var k = easeIn((t - move.t0) / move.dur); ctx.globalAlpha = k * k; ctx.fillStyle = '#1a0510'; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1; }
+      if (mode === 'fly' && glide) { var k = easeIn((t - glide.t0) / glide.dur); ctx.globalAlpha = k * k; ctx.fillStyle = '#1a0510'; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1; }
       Sound.bed(0.012, 1100);
     }
     elNeedle.style.left = (f * 100) + '%';
@@ -1622,14 +1777,15 @@
   elSkip.addEventListener('click', endOpening);
   window.addEventListener('hashchange', function () {
     var p = hashPath();
-    if (p && film && (mode !== 'walk' || p.join('') !== wpath.join(''))) { if (mode === 'walk') goWalk(p); else startWalk(p, false); }
+    if (p && film && (mode !== 'walk' || !wb.film || p.join('') !== wpath.join(''))) { if (mode === 'walk' && wb.film) goWalk(p); else startWalk(p, false); }
   });
   document.addEventListener('keydown', function (e) {
     var el = e.target;
     if (e.metaKey || e.ctrlKey || e.altKey || (el && (/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || el.isContentEditable))) return;
     if (el && el.closest && !el.closest('#film') && el !== document.body) return;
+    if (!elCredits.hidden) { if (e.key === 'Escape') { e.preventDefault(); closeCredits(); } return; }
     if (mode === 'walk') {
-      if (/^[1-8]$/.test(e.key)) { var p = wpath.concat([Number(e.key)]); if (!wEnded && cutAt(p) !== undefined) { e.preventDefault(); goWalk(p); } }
+      if (/^[1-9]$/.test(e.key)) { var p = wpath.concat([Number(e.key)]); if (!wEnded && wAt(p) !== undefined && wKids(wNode).indexOf(Number(e.key)) >= 0) { e.preventDefault(); goWalk(p); } }
       else if (e.key === 'Backspace') { e.preventDefault(); if (wpath.length) goWalk(wpath.slice(0, -1)); }
       else if (e.key === 'Escape') { e.preventDefault(); toSky(true); }
       /* at the radio the arrow keys tune */
@@ -1641,7 +1797,7 @@
   resize();
   buildScale();
   var first = hashPath();
-  if (first) { pendingPath = first; setMode('fly'); cam = restCam(); skyT0 = now() - 9; }
+  if (first) { pendingPath = first; setMode('fly'); skyT0 = now() - 9; }
   else if (store.get(SEEN) || CALM) toSky(false);
   else { setMode('opening'); opened = now(); elSkip.hidden = false; }
   readAll();
