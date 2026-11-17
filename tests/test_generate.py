@@ -522,36 +522,37 @@ class TheFilmPage(Base):
             self.assertTrue(url.startswith(ROOT + '/'), '%s="%s"' % (attr, url))
 
     def test_its_parts_are_carried_beside_it_with_a_list_of_what_is_there(self):
-        """Version three (film:the-approach 6.46): clips, glimpses and stills beside the page, and a manifest
-        listing them, so a clip or glimpse dropped in plays with no change to the page."""
+        """Version four (film:the-approach 2.696 and 6.4): the working piece's own folders beside the page (clips,
+        img, nar, voices, fictions) and a manifest listing what is there."""
         self.run_with(blocks())
         files = self.run_.files()
         here = os.path.join(fixture.REPO, 'the-approach')
-        for kind, ext in (('clips', '.mp4'), ('glimpses', '.mp4'), ('stills', '.jpg')):
+        kinds = (('clips', '.mp4'), ('img', '.jpg'), ('nar', '.mp3'), ('fictions', '.mp4'))
+        for kind, ext in kinds:
             names = sorted(fn[:-len(ext)] for fn in os.listdir(os.path.join(here, kind)) if fn.endswith(ext))
             self.assertTrue(names, kind)
             for n in names:
                 self.assertIn('the-approach/%s/%s%s' % (kind, n, ext), files)
-        src = os.path.join(here, 'clips', 'ch1_s2_06.mp4')
-        self.assertEqual(os.path.getsize(os.path.join(self.run_.out, 'the-approach', 'clips', 'ch1_s2_06.mp4')), os.path.getsize(src))
+        src = os.path.join(here, 'clips', 'ch1_s3_06.mp4')
+        self.assertEqual(os.path.getsize(os.path.join(self.run_.out, 'the-approach', 'clips', 'ch1_s3_06.mp4')), os.path.getsize(src))
         listed = json.loads(self.read('the-approach/manifest.json'))
-        self.assertEqual(sorted(listed), ['clips', 'glimpses', 'stills'])
-        self.assertIn('ch1_s2_06', listed['clips'])
-        self.assertIn('ch1_s2_07', listed['clips'])
-        self.assertEqual(len(listed['glimpses']), 8)
-        self.assertIn('ch1_s2_03', listed['stills'])
-        self.assertIn('the-approach/walk.json', files)
+        self.assertEqual(sorted(listed), ['clips', 'fictions', 'img', 'nar'])
+        for clip in ('ch1_s2_06', 'ch1_s2_07', 'ch1_s3_06', 'mara_station', 'tom_smile', 'hands_book', 'ink_kitchen', 'light_archive', 'g_face'):
+            self.assertIn(clip, listed['clips'])
+        self.assertEqual(len(listed['nar']), 27)
+        self.assertEqual(len(listed['fictions']), 5)
         h = self.read(self.FILE)
         self.assertIn('data-parts="%s/the-approach/"' % ROOT, h)
 
-    def test_the_moments_the_opening_and_the_narrator_are_retired(self):
+    def test_the_moments_the_opening_and_the_third_versions_parts_are_retired(self):
         self.run_with(blocks())
         files = self.run_.files()
-        self.assertEqual([f for f in files if f.startswith(('the-approach/moments/', 'the-approach/plates/'))], [])
+        self.assertEqual([f for f in files if f.startswith(('the-approach/moments/', 'the-approach/plates/', 'the-approach/glimpses/',
+                                                            'the-approach/stills/'))], [])
+        self.assertNotIn('the-approach/walk.json', files)
         voices = [f for f in files if re.fullmatch(r'the-approach/voices/[a-z0-9_]+\.mp3', f)]
-        self.assertEqual(len(voices), 34)   # the radio's 27 and the walk's seven
-        self.assertEqual(sorted(f for f in voices if '/w_' in f), ['the-approach/voices/w_%s.mp3' % w for w in
-                         ('books', 'clock', 'dial', 'gate', 'keep', 'night', 'room')])
+        self.assertEqual(len(voices), 31)   # the radio's 27 and the piece's four
+        self.assertEqual(sorted(f for f in voices if '/w_' in f), ['the-approach/voices/w_%s.mp3' % w for w in ('books', 'dial', 'gate', 'keep')])
         self.assertIn('the-approach/credits/mara.jpg', files)
         self.assertIn('the-approach/credits/tom.jpg', files)
         h = self.read(self.FILE)
