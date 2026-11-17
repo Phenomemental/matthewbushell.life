@@ -72,7 +72,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 .tneedle{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;left:50%;background:#ff5a3c;box-shadow:0 0 10px #ff5a3c,0 0 3px #fff;pointer-events:none}
 .tbtns{display:flex;gap:8px}
 .tbtns .btn{flex:1 1 0;min-width:0;padding:0 8px;border-radius:10px}
-.tbtns #tauto{flex:1.7 1 0}
+.tbtns #tin{flex:1.7 1 0}
 .sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);border:0}
 
 /* the story card: paper and ink, the phone's full width less 16 pixels each side, just above the dial (6.44) */
@@ -168,7 +168,6 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 <canvas id="sky" aria-hidden="true"></canvas>
 <video class="tv" id="clipA" playsinline preload="auto"></video>
 <video class="tv" id="clipB" playsinline preload="auto"></video>
-<video class="tv" id="glim" playsinline muted preload="auto"></video>
 
 <p class="fmark" id="fmark">THE APPROACH<b id="faddr"></b></p>
 <div class="corner">
@@ -200,12 +199,11 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 <article class="wcard" id="wcard" aria-live="polite" hidden><p id="wline"></p></article>
 
 <div class="tuner" id="tuner">
-  <p class="tread" id="tread">turn the dial, or let it walk</p>
+  <p class="tread" id="tread">turn the dial, or tap a star</p>
   <div class="tband" id="tband" role="slider" aria-label="The dial" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" tabindex="0"><div class="tneedle" id="tneedle"></div></div>
   <div class="tbtns">
     <button type="button" class="btn" id="tup" disabled>Up</button>
-    <button type="button" class="btn red" id="tauto">Walk the film</button>
-    <button type="button" class="btn" id="tin" disabled>Go in</button>
+    <button type="button" class="btn red" id="tin" disabled>Go in</button>
   </div>
   <div class="sr" id="tkids"></div>
 </div>
@@ -350,8 +348,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   ];
   var NARS = ['m111', 'm112', 'm113', 'm114', 'm115', 'm121', 'm122', 'm123', 'm124', 'm126', 'm131', 'm132', 't133', 'm134', 'm135', 'm136', 'm138', 'm141', 'm142', 't142', 'm143', 'm151', 't151', 'm152', 'm153', 'm155a', 'm155b'];
   var VOXS = ['visitor', 'w_books', 'aoife_o1', 'aoife_o2', 'oisin_thought', 'ferry_1', 'ferry_2', 'ferry_3', 'ferry_4', 'brid_o1', 'mara_thought', 'aoife_diary', 'oisin_diary', 'brid_diary', 'ines_diary', 'archive', 'g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8', 'g9', 'g10', 'g11', 'g12'];
-  var WHISP = ['g1', 'g5', 'g6', 'g12', 'g7', 'g2', 'g4', 'g8', 'g9', 'g10', 'g3', 'g11'], BEDS = ['aoife_diary', 'ines_diary', 'oisin_diary', 'brid_diary', 'archive'];
-  var GLIMPSES = ['g_gate', 'g_face', 'g_city', 'g_fauna', 'g_void', 'g_kaleido', 'g_nested', 'g_flesh'];
+  var WHISP = ['g1', 'g5', 'g6', 'g12', 'g7', 'g2', 'g4', 'g8', 'g9', 'g10', 'g3', 'g11'];
   var FICTIONS = [
     { block: 'spine:ai-inoculation', title: 'The Dose', file: 'fictions/spine-ai-inoculation', len: 37 },
     { block: 'spine:community-recovery-design', title: 'The Door', file: 'fictions/spine-community-recovery-design', len: 39 },
@@ -359,9 +356,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     { block: 'archive:function:meeting-protocol:2026-10-09', title: 'The Third Point', file: 'fictions/archive-function-meeting-protocol-2026-10-09', len: 33 },
     { block: 'guide:brighton-room', title: 'With Her Yes', file: 'fictions/guide-brighton-room', len: 34 }
   ];
-  var GHOSTS = ['aoife_o1', 'ferry_2', 'oisin_thought', 'brid_o1', 'ferry_4', 'g3', 'g7'];
-  var MARA = { file: 'clips/ch1_s2_06', at: 1.5, title: 'Mara', block: FILM }, TOM = { file: 'clips/ch1_s3_06', at: 2.2, title: 'Tom', block: FILM };
-  var LOCK_LINE = 'A film, kept on the beach among everything else that is kept here.', ROOT_LINE = 'The Approach. A film kept on the beach.', END_LINE = 'The end of chapter one.';
+  var ROOT_LINE = 'The Approach. A film kept on the beach.';
 
   /* ── small helpers ── */
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
@@ -555,7 +550,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     labels.forEach(function (l) { var e = document.createElement('b'); e.style.left = (l[0] * 100) + '%'; e.textContent = l[1]; elBand.appendChild(e); });
     (marks || []).forEach(function (m) { var e = document.createElement('div'); e.className = 'smark' + (m[1] ? ' own' : ''); e.style.left = (m[0] * 100) + '%'; elBand.appendChild(e); });
   }
-  var readout = 'turn the dial, or let it walk';
+  var readout = 'turn the dial, or tap a star';
   function setRead(t) { readout = t; }
   function fOf(i, n) { return (i + 0.5) / n; }
 
@@ -728,7 +723,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   var whi = 0;
 
   /* ── the run: every journey is one chain of steps; a new hand on the dial ends it ── */
-  var run = 0, autoOn = false, busy = false, staticV = 0, staticNow = 0, flying = false;
+  var run = 0, busy = false, staticV = 0, staticNow = 0, flying = false;
   function sleep(ms, r) { if (r === undefined) r = run; return new Promise(function (ok, no) { setTimeout(function () { if (r === run) ok(); else no('stop'); }, ms); }); }
   function tween(o, key, to, ms, r, fn) {
     if (r === undefined) r = run; fn = fn || ease;
@@ -740,12 +735,12 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   function quiet(p) { if (p && p.catch) p.catch(function () {}); return p; }
   function setStatic(v) { staticV = v; }
   function stopAll() {
-    run++; Sound.hush(); setStatic(0); clipStop(); try { elGlim.pause(); } catch (e) { /* not playing */ }
-    tuned = null; glimpse = null; ficNote = ''; burst = null; vring = 0; busy = false; digitsShown = ''; sparks = []; shapeT.v = 0; allb = false; fly = null; V.ringS = 1;
+    run++; Sound.hush(); setStatic(0); clipStop();
+    tuned = null; burst = null; vring = 0; busy = false; digitsShown = ''; sparks = []; shapeT.v = 0; allb = false; fly = null; V.ringS = 1;
     say('');
     if (radioOn) radioStop();
     if (inside && SK.dim < DIMIN) SK.dim = DIMIN;
-    if (!inside) { SK.tb = 0; stage.classList.remove('tuning'); if (flying) { flying = false; V.b = 0; glideTo({ tgt: [0, 0, 0], dist: restDist(), pitch: 0.55 }, 1.6, easeOut); } }
+    if (!inside) { SK.tb = 0; if (flying) { flying = false; V.b = 0; glideTo({ tgt: [0, 0, 0], dist: restDist(), pitch: 0.55 }, 1.6, easeOut); } }
   }
 
   /* ── where we are: the sky, or inside a block walking its real branches ── */
@@ -829,55 +824,30 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   function pointCard(p) {
     var n = nodeOf(p), line = story(n), ks = kids(p);
     if (!line) { card('', momentAt(p) ? (CUT[address(p)].t || '') : 'Nothing is written here.'); return; }
-    if (ks.length) { var hd = headOf(line); card(hd, autoOn && !inCut(p) ? '' : line.slice(line.indexOf(hd) + hd.length).replace(/^[\s—.:]+/, '')); }
+    if (ks.length) { var hd = headOf(line); card(hd, line.slice(line.indexOf(hd) + hd.length).replace(/^[\s—.:]+/, '')); }
     else card('', line);
   }
   function select(d, quietly) {
     sel = d; var ks = kids(path), i = ks.indexOf(d); f = target = fOf(i, ks.length);
     setRead(readFor(path.concat([d])));
     if (!quietly) pip(620, 0.05, 0.05);
-    if (!autoOn) pointCard(path.concat([d]));
+    pointCard(path.concat([d]));
     setHash(); update();
   }
   function update() {
     var p = sel != null ? path.concat([sel]) : null, mo = inside && p && momentAt(p), deeper = inside && p && kids(p).length > 0, fic = !inside && ficFront && !(SK.lock > 0.5);
-    $('tup').disabled = !inside || autoOn || flying;
-    $('tauto').textContent = radioOn ? 'Carry on ▸' : autoOn ? 'Stop' : 'Walk the film';
-    $('tin').textContent = mo || fic ? 'Play' : 'Go in';
-    $('tin').disabled = autoOn || busy || radioOn || flying || (inside ? !(mo || deeper) : !(SK.lock > 0.5 || fic));
+    $('tup').disabled = !inside || flying;
+    /* Go in is the main way: it enters, plays a moment or a fiction, and at the kept-lives radio carries on */
+    $('tin').textContent = radioOn ? 'Carry on ▸' : mo || fic ? 'Play' : 'Go in';
+    $('tin').disabled = !radioOn && (busy || flying || (inside ? !(mo || deeper) : !(SK.lock > 0.5 || fic)));
     stage.classList.toggle('inside', inside);
-    stage.classList.toggle('auto', autoOn);
     stage.classList.toggle('insky', !inside && !flying);
     elBand.setAttribute('aria-valuenow', String(Math.round(f * 100)));
   }
 
   /* ── travelling through the sky ── */
   function lockedNow() { return !inside && Math.abs(wrapPi(orb.yaw - filmYaw())) < 0.09 && Math.hypot(orb.tgt[0], orb.tgt[1], orb.tgt[2]) < 0.06 && orb.dist > 0.8; }
-  var ficNote = '', ficFront = null;
-  /* 'Walk the film' at the sky: the dial turns, the sky turns with it; Mara, then a block's fiction, then Tom come half-tuned
-     out of the static, ghost voices and a diary under it all; then the film's star sharpens */
-  async function tuneSky(r) {
-    closeStar(); explore(false); stage.classList.add('tuning'); card('');
-    if (Math.hypot(orb.tgt[0], orb.tgt[1], orb.tgt[2]) > 0.01 || Math.abs(orb.dist - restDist()) > 0.05) glideTo({ tgt: [0, 0, 0], dist: restDist(), pitch: 0.55 }, 0.9, ease);
-    var y0 = orb.yaw, fy = filmYaw(), goal = fy + Math.ceil((y0 - fy) / TAU + 0.2) * TAU + TAU;
-    SK.lock = 0; setStatic(0.9); quiet(tween(SK, 'tb', 0.85, 700, r));
-    var t0 = performance.now(), dur = 10500, gi = 0, vi = 0, gAt = [900, 4300, 7400], vAt = [400, 3600, 6500];
-    sayP(BEDS[Math.floor(Math.random() * BEDS.length)], { radio: true, vol: 0.3 });
-    while (true) {
-      if (r !== run) throw 'stop';
-      var t = (performance.now() - t0) / dur; if (t >= 1) break;
-      orb.yaw = y0 + (goal - y0) * ease(t) + Math.sin(t * 38) * 0.012 * (1 - t); f = yawToF();
-      if (ficNote) setRead(ficNote); else if (front) setRead('· · ·  ' + front.name + '  · · ·');
-      if (gi < 3 && t * dur > gAt[gi]) { quiet(gi === 1 ? showGlimpse('', 3200, r, FICTIONS[Math.floor(Math.random() * FICTIONS.length)]) : showGlimpse('', gi ? 2500 : 3000, r, gi ? TOM : MARA)); gi++; }
-      if (vi < 3 && t * dur > vAt[vi]) { sayP(GHOSTS[vi], { radio: true, vol: 0.55 }); vi++; }
-      await new Promise(function (q) { requestAnimationFrame(q); });
-    }
-    orb.yaw = goal; await lockFilm(r);
-  }
-  async function lockFilm(r) {
-    setStatic(0.12); pip(880, 0.09, 0.12); quiet(tween(SK, 'lock', 1, 500, r)); await tween(SK, 'tb', 0, 600, r);
-    f = target = yawToF(); setRead('THE APPROACH  ·  film:the-approach'); card('', LOCK_LINE); stage.classList.remove('tuning'); update();
-  }
+  var ficFront = null;
   /* into a star: the camera flies in with a gold bloom, and the block's real branches open as a ring */
   async function enterBlock(name, json, r) {
     closeStar(); explore(false); say(''); card(''); flying = true; update();
@@ -899,10 +869,10 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   }
   function leaveToSky() {
     var from = wb && !wb.film && starOf(wb.name) ? starOf(wb.name).p : filmPos();
-    stopAll(); inside = false; wb = null; path = []; sel = null; his = null; autoOn = false;
+    stopAll(); inside = false; wb = null; path = []; sel = null; his = null;
     SK.dim = 1; SK.tb = 0; SK.lock = 0; card(''); say(''); band(SKY_MARKS); srKids();
     orb.tgt = from.slice(); orb.dist = 0.06; glideTo({ tgt: [0, 0, 0], dist: restDist(), pitch: 0.55 }, 2.4, easeOut);
-    setRead('turn the dial, or let it walk'); touchT = now(); setHash(); update();
+    setRead('turn the dial, or tap a star'); touchT = now(); setHash(); update();
   }
 
   /* ── walking the block: the needle moves to a digit, the chosen point flies to the centre and its own ring opens ── */
@@ -931,10 +901,10 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     if (!line) { card('', ''); return; }
     var tt = titleOf(line), hd = headOf(line);
     /* a chapter or scene of the walked cut is story: its name and its line; the makers' notes above it give their name while the film walks */
-    card(hd, inCut(path) && path.length >= 3 ? tt.sub : autoOn ? '' : line.slice(line.indexOf(hd) + hd.length).replace(/^[\s—.:]+/, ''));
+    card(hd, inCut(path) && path.length >= 3 ? tt.sub : line.slice(line.indexOf(hd) + hd.length).replace(/^[\s—.:]+/, ''));
   }
   function goUp() {
-    stopAll(); autoOn = false;
+    stopAll();
     if (!inside) return;
     if (!path.length) { leaveToSky(); return; }
     var d = path.pop(); if (his && his.scene !== path.join('')) his = null;
@@ -969,11 +939,11 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   }
   ['ch1_s1_05', 'ch1_s1_11', 'ch1_s2_03', 'ch1_s3_05'].forEach(stillOf);
   var sparks = [], shapeT = { v: 0 }, allb = false, vring = 0, digitsShown = '';
-  /* what the checks read: each moment's telling and clips, the faces on the journey, the run's length */
-  var LOG = { walk0: 0, end: 0, moments: [], journey: [], clips: [] }, curLog = null;
+  /* what the checks read: each moment's telling and clips */
+  var LOG = { moments: [], clips: [] }, curLog = null;
   function logNar(id) { if (curLog) curLog.nars.push(id); }
   function logClip(name, el) {
-    var rec = { name: name, at: curLog ? curLog.at : 'journey', t: Date.now(), seen: 0, ended: false };
+    var rec = { name: name, at: curLog ? curLog.at : 'sky', t: Date.now(), seen: 0, ended: false };
     LOG.clips.push(rec); if (curLog) curLog.clips.push(name);
     (function watch() { if (el.currentTime > rec.seen) rec.seen = el.currentTime; if (el.ended) rec.ended = true; if (!el.paused && !el.ended && !rec.ended) setTimeout(watch, 200); else if (el.ended) rec.ended = true; })();
   }
@@ -1040,7 +1010,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     try { await play2(p, c, r); }
     finally { curLog.t1 = Date.now(); curLog = null; if (r === run) { busy = false; update(); } }
     /* played by hand, the radio's moment then gives the viewer the dial through the kept lives */
-    if (c.fx === 'radio' && !autoOn && r === run) radioStart(p);
+    if (c.fx === 'radio' && r === run) radioStart(p);
   }
   async function play2(p, c, r) {
     var ks = kids(path), i = ks.indexOf(p[4]), pt = ringPos(i, ks.length), clean = [];
@@ -1120,8 +1090,8 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     for (var i = 0; i < M.cols * M.rows; i++) { var q = (M.RND[i] + ph) % 1; if (q > rev * (1 - M.EDGE[i] * 0.9)) { if (Math.random() < 0.05) { var v = 60 + Math.random() * 170; a[i * 4] = a[i * 4 + 1] = a[i * 4 + 2] = v; a[i * 4 + 3] = 200; } else a[i * 4 + 3] = 0; } }
     og.putImageData(id, 0, 0); ctx.imageSmoothingEnabled = false; ctx.drawImage(oc, R.x, R.y, R.w, R.h); ctx.imageSmoothingEnabled = true;
   }
-  var tuned = null, glimpse = null, burst = null;
-  var clips = [$('clipA'), $('clipB')], elGlim = $('glim'), clipLive = 0;
+  var tuned = null, burst = null;
+  var clips = [$('clipA'), $('clipB')], clipLive = 0;
   function clipSrc(name) { return PARTS + (name.indexOf('/') >= 0 ? name : 'clips/' + name) + '.mp4'; }
   function holder(src) { for (var i = 0; i < 2; i++) if (clips[i].getAttribute('data-src') === src) return clips[i]; return null; }
   function loadInto(el, src) { el.setAttribute('data-src', src); el.preload = 'auto'; el.src = src; try { el.load(); } catch (e) { /* loads when it can */ } return el; }
@@ -1133,8 +1103,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     var busySrc = (busyNames || []).map(clipSrc);
     for (var i = 0; i < 2; i++) { var el = clips[(clipLive + 1 + i) % 2]; if (busySrc.indexOf(el.getAttribute('data-src')) < 0 && (el.paused || el.ended)) { loadInto(el, src); return; } }
   }
-  function clipsOf(c) { return (c && c.pic && c.pic.clip ? [c.pic.clip] : []).concat((c && c.own) || []); }
-  function clipStop() { clips.forEach(function (v) { v._tok = (v._tok || 0) + 1; try { v.pause(); } catch (e) { /* not playing */ } v.loop = false; }); elGlim._tok = (elGlim._tok || 0) + 1; }
+  function clipStop() { clips.forEach(function (v) { v._tok = (v._tok || 0) + 1; try { v.pause(); } catch (e) { /* not playing */ } v.loop = false; }); }
   /* a player started at a time: it answers when it plays, or after two and a half seconds whatever happens */
   function playing(el, at) {
     return new Promise(function (ok) {
@@ -1165,20 +1134,6 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     });
     tuned.rev = 0.99; setStatic(0.3); await tween(tuned, 'rev', 0, 420, r, lin); tuned = null; el.pause(); setStatic(0.05);
   }
-  /* a glimpse on the journey: a face, a block's fiction, or a silent fragment, half-tuned, gone again */
-  async function showGlimpse(name, ms, r, fic) {
-    try {
-      var file = fic ? fic.file : 'clips/' + name, at = fic ? (fic.at || (3 + Math.floor(Math.random() * (fic.len - 10)))) : 0;
-      elGlim.muted = !fic || !Sound.isOn(); elGlim.volume = 0.55; elGlim.setAttribute('data-src', file); elGlim.src = PARTS + file + '.mp4';
-      await playing(elGlim, at);
-      if (fic) ficNote = '· · ·  ' + fic.title + '  ·  ' + fic.block + '  · · ·';
-      if (r !== run) return;
-      glimpse = { el: elGlim, rev: 0, R: picRect(16 / 9), mode: 'tune' };
-      LOG.journey.push({ name: fic ? fic.title : name, file: file, ms: LOG.walk0 ? Date.now() - LOG.walk0 : 0 });
-      var top = fic ? 0.94 : 0.72 + Math.random() * 0.2; await tween(glimpse, 'rev', top, 380, r); await sleep(ms - 800, r); await tween(glimpse, 'rev', 0, 380, r);
-      glimpse = null; ficNote = ''; elGlim.pause();
-    } catch (e) { glimpse = null; ficNote = ''; }
-  }
   /* a picture bursting out of its point as particles */
   function makeBurst(img, ox, oy, R) {
     var asp = R.w / R.h, cw = asp >= 1 ? 112 : Math.round(84 * asp / 0.75), chh = Math.round(cw / asp);
@@ -1207,7 +1162,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     if (!inside || radioOn) return;
     var c = ringCentre(), cx = c[0], cy = c[1];
     function draw(ks, par, scale, ox, oy, pick) {
-      var many = ks.length, quietNow = busy || glimpse, pts = ks.map(function (d, i) {
+      var many = ks.length, quietNow = busy, pts = ks.map(function (d, i) {
         var q = ringPos(i, many, scale), p = par.concat([d]), deep = kids(p).length > 0;
         return { d: d, i: i, x: q[0] + ox, y: q[1] + oy, a: -Math.PI / 2 + i / many * TAU, deep: deep, named: deep || (!inCut(p) && many <= 6) };
       });
@@ -1284,51 +1239,6 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     ctx.fillStyle = '#f6c377'; ctx.shadowColor = '#c6791f'; ctx.shadowBlur = 18; ctx.fillText(digitsShown.replace(/^(\d{4})(\d*)$/, '$1 $2'), c[0], y); ctx.shadowBlur = 0;
   }
 
-  /* ── walk the film: the piece's journey, from the sky to 'The end of chapter one', then the credits ── */
-  async function walkFilm(after) {
-    stopAll(); var r = run; autoOn = true; update();
-    try {
-      if (!film) { elNotice.hidden = false; readAll(); throw 'stop'; }
-      LOG.walk0 = Date.now(); LOG.end = 0;
-      if (inside && !wb.film) { var from = starOf(wb.name); inside = false; wb = null; path = []; sel = null; card(''); band(SKY_MARKS); orb.tgt = [0, 0, 0]; if (from) orb.yaw = Math.atan2(from.p[2], from.p[0]); }
-      if (!inside) { await tuneSky(r); await sleep(1500, r); await enterBlock(FILM, film, r); await sleep(700, r); }
-      else if (!after) { path = []; sel = null; his = null; V.ringS = 1; bandForRing(); card('', ROOT_LINE); await sleep(500, r); }
-      var chap = [7, 2, 1], scenes, startScene = 0, skipTo = 0;
-      if (after) {   /* carrying on from the radio by hand: up to the chapter, then the scene after */
-        while (path.length > 3) { var dd = path.pop(); V.ringS = 1.5; bandForRing(); select(dd, true); await tween(V, 'ringS', 1, 320, r); }
-        scenes = kids(chap); var a = String(after); startScene = Math.max(0, scenes.indexOf(Number(a[3]))); skipTo = Number(a[4]) || 0;
-        var last = kids(chap.concat([scenes[startScene]])); if (skipTo >= last[last.length - 1]) { startScene++; skipTo = 0; }
-      } else {
-        for (var i = 0; i < 3; i++) { await needleTo(chap[i], r); await sleep(350, r); await goIn(r); await sleep(500, r); }
-        scenes = kids(chap);
-      }
-      for (var si = startScene; si < scenes.length; si++) {
-        var sc = scenes[si];
-        await needleTo(sc, r); await sleep(450, r); await goIn(r); await sleep(650, r);
-        var moments = kids(path);
-        for (var mi = 0; mi < moments.length; mi++) {
-          var d = moments[mi]; if (si === startScene && d <= skipTo) continue;
-          var here = path.concat([d]), cNow = CUT[address(here)], nextP = mi + 1 < moments.length ? path.concat([moments[mi + 1]]) : null, cNext = nextP && CUT[address(nextP)];
-          if (clipsOf(cNow).length) prefetch(clipsOf(cNow)[0], []);
-          whisper(0.28); await needleTo(d, r); await sleep(120, r);
-          if (momentAt(here)) {
-            var pm = playMoment(here, r);
-            if (cNext && clipsOf(cNext).length) setTimeout(function (nm, busyNow) { return function () { if (r === run) prefetch(nm, busyNow); }; }(clipsOf(cNext)[0], clipsOf(cNow)), 1500);
-            await pm;
-          }
-          else { pointCard(path.concat([d])); await sleep(1200 + story(nodeOf(path.concat([d]))).length * 55, r); }
-          card('');
-        }
-        his = null; setStatic(0.4); if (si < scenes.length - 1) await showGlimpse(GLIMPSES[gi++ % GLIMPSES.length], 1300, r); setStatic(0.05);
-        path.pop(); V.ringS = 1.5; bandForRing(); select(sc, true); await tween(V, 'ringS', 1, 320, r);
-      }
-      setRead('film · 7 · 2 · 1'); card('', END_LINE); LOG.end = Date.now();
-      await sleep(3000, r);
-      autoOn = false; update(); openCredits(true);
-    } catch (e) { if (e !== 'stop' && window.console) console.warn(e); }
-    if (r === run) { autoOn = false; busy = false; update(); }
-  }
-  var gi = 0;
 
   /* ── the kept lives, read live from the story at 1.61 to 1.69, each with its own voice: the radio by hand ── */
   var LIVES = [], FIRST = 0.06;
@@ -1548,7 +1458,15 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     if (inside) { bandForRing(); if (sel != null) f = target = fOf(kids(path).indexOf(sel), kids(path).length); }
     update();
   }
-  function radioCarry() { var at = radioAt; radioAt = null; radioStop(); card(''); quiet(walkFilm(at ? at.join('') : '')); }
+  /* Carry on, or Tom's own station: on to the next scene, its first moment chosen and ready to play */
+  function radioCarry() {
+    var at = radioAt; radioAt = null; radioStop(); card('');
+    if (!at || !inside || !(wb && wb.film)) return;
+    var chap = at.slice(0, 3), scenes = kids(chap), next = scenes[scenes.indexOf(at[3]) + 1];
+    if (next == null) { travelNow(at.slice(0, 4)); return; }
+    var first = kids(chap.concat([next]))[0];
+    V.ringS = 0; travelNow(chap.concat([next]).concat(first != null ? [first] : [])); quiet(tween(V, 'ringS', 1, 600, run));
+  }
 
   /* ── the end credits (6.45): the sky turning behind, the title, Mara and then Tom gathering out of the stars and each heard once,
         the roll with what is read live from Pscale, the visitor's line last, then the site's own tools ── */
@@ -1614,7 +1532,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     g.fillStyle = m; g.fillRect(0, 0, S, S); g.globalCompositeOperation = 'source-over';
   }
   function openCredits(roll) {
-    if (autoOn || busy || radioOn) { stopAll(); autoOn = false; update(); }
+    if (busy || radioOn) { stopAll(); update(); }
     Sound.hush();
     elCredits.hidden = false; stage.classList.add('credited');
     [].forEach.call(elRoll.querySelectorAll('[data-face]'), function (pn) { pn.removeAttribute('data-started'); var c = pn.querySelector('canvas'); c.getContext('2d').clearRect(0, 0, c.width, c.height); });
@@ -1667,14 +1585,14 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   function at(e) { var r = stage.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
   function two() { var k = Object.keys(pts); return k.length >= 2 ? [pts[k[0]], pts[k[1]]] : null; }
   canvas.addEventListener('pointerdown', function (e) {
-    if (inside || autoOn || flying) { tapIn = { p: at(e), t: now() }; return; }
+    if (inside || flying) { tapIn = { p: at(e), t: now() }; return; }
     var p = at(e); pts[e.pointerId] = p;
     gest = { moved: 0, t: now(), dist: 0, d0: orb.dist, many: Object.keys(pts).length > 1 };
     try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* no capture, no matter */ }
     touchSky(true); stage.classList.add('dragging');
   });
   canvas.addEventListener('pointermove', function (e) {
-    if (inside || autoOn || flying || !pts[e.pointerId] || !gest) return;
+    if (inside || flying || !pts[e.pointerId] || !gest) return;
     var p = at(e), was = pts[e.pointerId]; pts[e.pointerId] = p; touchSky(true);
     var pair = two();
     if (pair) {
@@ -1701,13 +1619,13 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   canvas.addEventListener('pointercancel', lift);
   canvas.addEventListener('contextmenu', function (e) { if (!inside) e.preventDefault(); });
   canvas.addEventListener('wheel', function (e) {
-    if (inside || autoOn || flying) return;
+    if (inside || flying) return;
     e.preventDefault();
     orb.dist = clamp(orb.dist * Math.exp(e.deltaY * 0.0012), DMIN, DMAX); explore(true); touchSky(true);
   }, { passive: false });
   /* inside, a tap on a point chooses it; a second tap goes in, or plays it */
   function ringTap(x, y) {
-    if (!inside || autoOn || radioOn || busy) return;
+    if (!inside || radioOn || busy) return;
     var ks = kids(path), best = -1, bd = 46;
     ks.forEach(function (d, i) { var q = ringPos(i, ks.length, 1), dd = Math.hypot(q[0] - x, q[1] - y); if (dd < bd) { bd = dd; best = i; } });
     if (best < 0) return;
@@ -1771,8 +1689,8 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   }
   function tendSky(t) {
     var dt = Math.min(0.1, Math.max(0, t - lastSky)); lastSky = t;
-    if (inside) { if (!autoOn || !busy) orb.yaw += dt * 0.02; return; }
-    if (autoOn || flying) return;
+    if (inside) { orb.yaw += dt * 0.02; return; }
+    if (flying) return;
     if (!CALM && !glide && !Object.keys(pts).length && !bandDrag && t - touchT > 3 && SK.lock < 0.5 && !ficFront && !tuned) orb.yaw += dt * 0.035;
     var lk = lockedNow();
     if (lk && SK.lock < 0.5) { SK.lock = 1; pip(880, 0.07, 0.1); setStatic(0.05); setRead('THE APPROACH  ·  film:the-approach'); update(); }
@@ -1792,7 +1710,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     }
     if (V.b > 0 && flyAt) { var fq = oproj(flyAt) || [W / 2, H * 0.4], br = Math.min(W, H) * (0.05 + 2.2 * Math.pow(V.b, 4)); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = Math.min(1, V.b * 1.2); ctx.drawImage(SP_A, fq[0] - br, fq[1] - br, br * 2, br * 2); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; }
     ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic'; ctx.font = '600 18px "Cormorant Garamond",Garamond,serif'; ctx.shadowColor = '#000'; ctx.shadowBlur = 8;
-    if (ficFront && ficFront.q && !tuned && !autoOn) {
+    if (ficFront && ficFront.q && !tuned) {
       var r2 = 18 + 3 * Math.sin(t * 2.9), x2 = ficFront.q[0], y2 = ficFront.q[1];
       ctx.strokeStyle = 'rgba(120,235,225,.85)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(x2, y2, r2, 0, TAU); ctx.stroke();
       ctx.fillStyle = '#c9f5ef'; ctx.fillText(ficFront.fic.title.toUpperCase(), x2, y2 - r2 - 10);
@@ -1813,7 +1731,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   function bandMove(x) {
     var fx = bandAt(x);
     if (radioOn) { target = fx; elCard.hidden = true; return; }
-    if (autoOn || flying) return;
+    if (flying) return;
     if (!inside) {   /* turning the dial turns the universe; what comes into focus is where we are */
       f = target = fx; orb.yaw = filmYaw() + (fx - 0.5) * TAU; SK.tb = Math.max(SK.tb, 0.45); touchT = now();
       setStatic(Math.abs(fx - 0.5) < 0.02 ? 0.05 : 0.5); return;
@@ -1826,7 +1744,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   elBand.addEventListener('pointerdown', function (e) {
     unlock(); bandDrag = true;
     try { elBand.setPointerCapture(e.pointerId); } catch (err) { /* no capture, no matter */ }
-    if (!inside && !autoOn) { closeStar(); explore(false); if (Math.hypot(orb.tgt[0], orb.tgt[1], orb.tgt[2]) > 0.01 || Math.abs(orb.dist - restDist()) > 0.05) glideTo({ tgt: [0, 0, 0], dist: restDist(), pitch: 0.55 }, 0.8, ease); }
+    if (!inside) { closeStar(); explore(false); if (Math.hypot(orb.tgt[0], orb.tgt[1], orb.tgt[2]) > 0.01 || Math.abs(orb.dist - restDist()) > 0.05) glideTo({ tgt: [0, 0, 0], dist: restDist(), pitch: 0.55 }, 0.8, ease); }
     bandMove(e.clientX); e.preventDefault();
   });
   elBand.addEventListener('pointermove', function (e) { if (bandDrag) bandMove(e.clientX); });
@@ -1841,21 +1759,16 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   function turn(dir) {
     unlock();
     if (radioOn) { elCard.hidden = true; target = clamp(target + dir * 0.01, 0, 1); return; }
-    if (autoOn || flying) return;
+    if (flying) return;
     if (!inside) { closeStar(); orb.tgt = [0, 0, 0]; orb.yaw += dir * TAU / 90; SK.tb = 0.3; touchT = now(); return; }
     var ks = kids(path); if (!ks.length) return;
     var i = sel == null ? (dir > 0 ? 0 : ks.length - 1) : clamp(ks.indexOf(sel) + dir, 0, ks.length - 1);
     if (ks[i] !== sel) { stopAll(); select(ks[i]); }
   }
   $('tup').addEventListener('click', function () { unlock(); goUp(); });
-  $('tauto').addEventListener('click', function () {
-    unlock();
-    if (radioOn) { radioCarry(); return; }
-    if (autoOn) { stopAll(); autoOn = false; card(''); update(); return; }
-    quiet(walkFilm());
-  });
   $('tin').addEventListener('click', function () {
     unlock();
+    if (radioOn) { radioCarry(); return; }
     if (!inside) {
       if (ficFront && !(SK.lock > 0.5)) { playFiction(ficFront.fic); return; }
       if (SK.lock > 0.5 && film) { stopAll(); quiet(enterBlock(FILM, film, run).catch(function () {})); }
@@ -1870,13 +1783,13 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     if (!tapped) { tapped = true; Sound.start(); soundLabel(); }
     else Sound.wake();
     if (unlocked) return; unlocked = true;
-    clips.concat([elGlim]).forEach(function (v) { if (!v.getAttribute('src')) { var was = v.muted; v.muted = true; v.src = PARTS + 'clips/g_void.mp4'; quiet(v.play()); setTimeout(function () { if (!v.getAttribute('data-src')) v.pause(); v.muted = was; }, 60); } });
+    clips.forEach(function (v) { if (!v.getAttribute('src')) { var was = v.muted; v.muted = true; v.src = PARTS + 'clips/g_void.mp4'; quiet(v.play()); setTimeout(function () { if (!v.getAttribute('data-src')) v.pause(); v.muted = was; }, 60); } });
   }
   function soundLabel() { elSound.textContent = Sound.isOn() ? 'Sound: on' : 'Sound: off'; elSound.setAttribute('aria-pressed', String(Sound.isOn())); elSound.setAttribute('aria-label', Sound.isOn() ? 'Sound is on. Turn it off' : 'Sound is off. Turn it on'); }
   elSound.hidden = !(window.AudioContext || window.webkitAudioContext);
   function tap(e) { if (e.target && e.target.closest && e.target.closest('#sound')) return; unlock(); }
   ['pointerup', 'touchend', 'click', 'keydown'].forEach(function (ev) { stage.addEventListener(ev, tap, true); });
-  elSound.addEventListener('click', function () { tapped = true; if (Sound.isOn()) Sound.stop(); else Sound.start(); clips.forEach(function (v) { v.muted = !Sound.isOn(); }); elGlim.muted = true; if (cvoice) cvoice.muted = !Sound.isOn(); soundLabel(); });
+  elSound.addEventListener('click', function () { tapped = true; if (Sound.isOn()) Sound.stop(); else Sound.start(); clips.forEach(function (v) { v.muted = !Sound.isOn(); }); if (cvoice) cvoice.muted = !Sound.isOn(); soundLabel(); });
   document.addEventListener('visibilitychange', function () { if (!document.hidden) Sound.wake(); });
 
   /* ── the frame ── */
@@ -1903,7 +1816,6 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
       }
       if (burst) drawBurst(nowMs);
       if (tuned) drawTuned(tuned, nowMs);
-      if (glimpse) drawTuned(glimpse, nowMs);
       drawVring(); drawSparks(nowMs); drawShape(); drawHis(nowMs); drawDigits();
       Sound.air(staticNow * 0.22);
     }
@@ -1920,7 +1832,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   /* ── keys and links ── */
   window.addEventListener('hashchange', function () {
     var p = hashPath();
-    if (p && film && wb && wb.film && inside) { stopAll(); autoOn = false; travelNow(p); }
+    if (p && film && wb && wb.film && inside) { stopAll(); travelNow(p); }
     else if (p && film) { stopAll(); enterNow(FILM, film); travelNow(p); }
   });
   document.addEventListener('keydown', function (e) {
@@ -1930,8 +1842,8 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     if (!elCredits.hidden) { if (e.key === 'Escape') { e.preventDefault(); closeCredits(); } return; }
     if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); turn(e.key === 'ArrowRight' ? 1 : -1); return; }
     if (!inside) return;
-    if (/^[1-9]$/.test(e.key) && !autoOn) { var d = Number(e.key); if (kids(path).indexOf(d) >= 0) { e.preventDefault(); unlock(); stopAll(); select(d); quiet(goIn(run)); } }
-    else if (e.key === 'Enter' && el === document.body && sel != null && !autoOn) { e.preventDefault(); unlock(); stopAll(); quiet(goIn(run)); }
+    if (/^[1-9]$/.test(e.key)) { var d = Number(e.key); if (kids(path).indexOf(d) >= 0) { e.preventDefault(); unlock(); stopAll(); select(d); quiet(goIn(run)); } }
+    else if (e.key === 'Enter' && el === document.body && sel != null) { e.preventDefault(); unlock(); stopAll(); quiet(goIn(run)); }
     else if (e.key === 'Backspace') { e.preventDefault(); goUp(); }
     else if (e.key === 'Escape') { e.preventDefault(); leaveToSky(); }
   });
@@ -1939,7 +1851,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   /* ── what the checks read ── */
   window.theApproach = {
     sound: Sound.state, soundOn: Sound.isOn, voices: Sound.loaded, heard: Sound.heard,
-    state: function () { return { inside: inside, block: wb ? wb.name : '', path: path.join(''), sel: sel, auto: autoOn, busy: busy, radio: radioOn, lock: SK.lock, readout: readout, f: f, tuned: !!tuned, glimpse: !!glimpse, burst: !!burst, his: !!his, card: elCard.hidden ? '' : elLine.textContent, say: elSay.hidden ? '' : elSay.textContent, flying: flying, address: $('faddr').textContent, ficFront: ficFront ? ficFront.fic.title : '' }; },
+    state: function () { return { inside: inside, block: wb ? wb.name : '', path: path.join(''), sel: sel, busy: busy, radio: radioOn, lock: SK.lock, readout: readout, f: f, tuned: !!tuned, burst: !!burst, his: !!his, card: elCard.hidden ? '' : elLine.textContent, say: elSay.hidden ? '' : elSay.textContent, flying: flying, address: $('faddr').textContent, ficFront: ficFront ? ficFront.fic.title : '' }; },
     log: function () { return JSON.parse(JSON.stringify(LOG)); },
     cut: function () { return Object.keys(CUT).map(function (a) { var c = CUT[a]; return { at: a, nar: (c.nar || []).concat(c.nar2 || []), clips: (c.pic && c.pic.clip ? [c.pic.clip] : []).concat(c.own || []), still: c.pic && c.pic.still || '', fx: [c.fx, c.fx2].filter(Boolean) }; }); },
     moments: function () { var keep = wb; if (!(wb && wb.film) && film) wb = { name: FILM, root: film, film: true }; var out = []; if (wb) kids([7, 2, 1]).forEach(function (s) { kids([7, 2, 1, s]).forEach(function (m) { var p = [7, 2, 1, s, m]; out.push({ at: address(p), cut: momentAt(p) }); }); }); wb = keep; return out; },
