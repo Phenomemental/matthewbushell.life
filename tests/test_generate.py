@@ -572,7 +572,7 @@ class TheFilmPage(Base):
         opening, and a sky canvas drawn by the graphics chip, not in software."""
         self.run_with(blocks())
         h = self.read(self.FILE)
-        for id_ in ('id="stop"', 'id="skipop"', 'id="find"', 'id="credit"', 'id="sound"'):
+        for id_ in ('id="stop"', 'id="skipop"', 'id="find"', 'id="credit"', 'id="sound"', 'id="play"', 'id="sfilm"'):
             self.assertIn(id_, h)
         self.assertIn("'Back to the film'", h)
         self.assertNotIn("canvas.getContext('2d', { willReadFrequently: true })", h)
