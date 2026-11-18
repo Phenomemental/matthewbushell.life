@@ -567,6 +567,16 @@ class TheFilmPage(Base):
         for gone in ('the-approach/moments/', 'data-moments', 'id="skip"', 'Walk the film', 'beachsky.js', 'screens_dark', 'tom_one_page'):
             self.assertNotIn(gone, h)
 
+    def test_the_viewer_can_always_stop_it_and_step_out(self):
+        """6.6: a Stop button from Begin to the end card (Back to the film once stopped), a way to skip the rest of the
+        opening, and a sky canvas drawn by the graphics chip, not in software."""
+        self.run_with(blocks())
+        h = self.read(self.FILE)
+        for id_ in ('id="stop"', 'id="skipop"', 'id="find"', 'id="credit"', 'id="sound"'):
+            self.assertIn(id_, h)
+        self.assertIn("'Back to the film'", h)
+        self.assertNotIn("canvas.getContext('2d', { willReadFrequently: true })", h)
+
     def test_it_is_in_no_menu_and_no_sitemap(self):
         self.run_with(blocks())
         self.assertNotIn('the-approach', self.read('sitemap.xml'))
