@@ -110,6 +110,16 @@ body.intro #radio #band{pointer-events:none}   /* the dial hidden in the opening
 /* nothing empty may darken the sky (6.7 ZERO): the words box has no background or shadow while it holds nothing */
 #words{transition:background-color .35s,box-shadow .35s}
 #words.empty{background:none;box-shadow:none}
+/* the nine moons (6.8): the card and the hint in the sketch's own look */
+.mcard{position:absolute;z-index:5;left:50%;transform:translateX(-50%);bottom:calc(var(--tuner) + 12px);width:min(560px,calc(100% - 28px));pointer-events:none;margin:0}
+.mcard p{margin:0}
+#maddr{font-family:ui-monospace,Menlo,Consolas,monospace;color:#d9b36c;letter-spacing:.12em;font-size:14px;min-height:18px;text-shadow:0 0 8px #000}
+#mline{font-size:20px;line-height:1.28;margin-top:6px;height:78px;overflow:hidden;color:var(--ink);text-shadow:0 0 10px #000,0 0 3px #000}
+.mhint{position:absolute;z-index:5;left:16px;right:16px;bottom:calc(var(--tuner) + 116px);text-align:center;font-style:italic;font-size:19px;margin:0;pointer-events:none;color:var(--ink);text-shadow:0 0 10px #000,0 0 4px #000}
+body.walking #band b{font:600 15px ui-monospace,Menlo,Consolas,monospace;color:#d9b36c;top:7px}
+body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
+.mhint:empty{display:none}
+#band b.off{opacity:.22}
 
 /* a star's card, opened by a tap on the sky; the paper card for a block's words and a film's title (6.44) */
 .film.insky #sky{cursor:grab}
@@ -199,6 +209,8 @@ body.intro #radio #band{pointer-events:none}   /* the dial hidden in the opening
   <button type="button" class="sfic" id="sfic" hidden>Play its film</button>
 </aside>
 <article class="wcard" id="wcard" aria-live="polite" hidden><p id="wline"></p></article>
+<div class="mcard" id="mcard" hidden aria-live="polite"><p id="maddr"></p><p id="mline"></p></div>
+<p class="mhint" id="mhint"></p>
 
 <div id="radio">
   <p id="read">· · ·</p>
@@ -423,7 +435,7 @@ body.intro #radio #band{pointer-events:none}   /* the dial hidden in the opening
     wide = W >= 900 && H >= 560;
     tunerH = Math.round($('radio').getBoundingClientRect().height) || tunerH;
     stage.style.setProperty('--tuner', tunerH + 'px');
-    BAS = null; cardTop = -1; ringBottom = -1;
+    BAS = null; cardTop = -1;
     layout();
   }
   function basis() {
@@ -803,7 +815,7 @@ body.intro #radio #band{pointer-events:none}   /* the dial hidden in the opening
     if (started || !begun) return;
     resumeAudio(); started = true; inviting = false; LOG.play = Date.now();
     document.body.classList.remove('prelude'); $('play').classList.remove('rise');
-    if (filmOn) stopHand(); if (inside) leaveBlock(); closeStar(); handWins = false; R = null; layoutButtons();
+    if (filmOn) stopHand(); if (inside) leaveBlock(true); closeStar(); handWins = false; R = null; layoutButtons();
     glideTo({ tgt: filmPos().slice(), dist: 0.45, pitch: 0.5 }, CALM ? 0.01 : 1.4, easeIn);
     setTimeout(function () { if (started && !stopped && !intro && !introDone) { runIntro(false); glideTo({ tgt: filmPos().slice(), dist: restDist(), pitch: 0.55 }, CALM ? 0.01 : 3.4, easeOut); } }, CALM ? 20 : 1400);
   }
@@ -992,115 +1004,219 @@ body.intro #radio #band{pointer-events:none}   /* the dial hidden in the opening
   function firstWords(n, max) { var w = story(n).replace(/["“”]/g, '').replace(/(^|\s)[‘']+|[’']+(?=\s|$)/g, '$1').split(/[.:,;—(!?]/)[0].trim().split(/\s+/); max = max || 5; return w.slice(0, max).join(' ') + (w.length > max ? '…' : ''); }
   function fOf(i, n) { return (i + 0.5) / n; }
   function setAddr() { var p = sel != null ? path.concat([sel]) : path; $('faddr').textContent = inside ? (wb.film ? address(p) || 'film:the-approach' : wb.name + (p.length ? ' ' + address(p) : '')) : ''; $('dots').hidden = inside; }
-  var ringBottom = -1;
-  function ringFloor() {
-    var floor = H - tunerH - 12 - Math.min(H * 0.2, 150);
-    if (!elCard.hidden) { if (cardTop < 0) cardTop = elCard.getBoundingClientRect().top - stage.getBoundingClientRect().top; floor = Math.min(floor, cardTop - (wide ? 44 : 40)); }
-    return floor;
-  }
-  function settleRing() { var want = ringFloor(); ringBottom = ringBottom < 0 || Math.abs(want - ringBottom) > H ? want : ringBottom + (want - ringBottom) * 0.12; }
-  function ringCentre() { var bottom = ringBottom < 0 ? ringFloor() : ringBottom, top = wide ? 74 : 78; return [W / 2, (top + Math.max(top + 120, bottom)) / 2, Math.max(120, bottom - top)]; }
-  function ringR() { var c = ringCentre(); return wide ? Math.min(W * 0.16, c[2] * 0.32, 220) : Math.min(W * 0.34, c[2] * 0.3); }
-  function ringPos(i, n, s) { var c = ringCentre(), R = ringR() * (s == null ? V.ringS : s), a = -Math.PI / 2 + i / n * TAU; return [c[0] + Math.cos(a) * R, c[1] + Math.sin(a) * R]; }
-  function bandForRing() {
-    var b = $('band'), ks = kids(path); b.querySelectorAll('i,b,u,s').forEach(function (e) { e.remove(); });
-    for (var i = 0; i <= 60; i++) { var e = document.createElement('i'); e.style.left = (i / 60 * 100) + '%'; e.style.height = (i % 5 ? 9 : 18) + 'px'; b.appendChild(e); }
-    ks.forEach(function (d, j) { var e = document.createElement('b'); e.style.left = (fOf(j, ks.length) * 100) + '%'; e.textContent = String(d); b.appendChild(e); });
-  }
   function needleAt(v) { f = v; $('needle').style.left = (clamp(f, 0.005, 0.995) * 100) + '%'; }
-  function pointCard(p) {
-    var n = nodeOf(p), line = story(n), ks = kids(p);
-    if (!line) { card('', 'Nothing is written here.'); return; }
-    if (ks.length) { var hd = headOf(line); card(hd, line.slice(line.indexOf(hd) + hd.length).replace(/^[\s—.:]+/, '')); } else card('', line);
+  function update() { if (inside) mcard(); else { $('tup').disabled = true; $('tin').disabled = true; } stage.classList.toggle('insky', !inside && !flying); }
+
+  /* ── the nine moons (6.8): a block's places drawn round its star as moons on one tilted orbit: the walk made visible.
+        The look and the motion are the sketch 'The Approach: nine moons' (version 1795029782-9f65), carried into the live sky;
+        the data, the reads and the limits are the page's own walk. ── */
+  var MSTEP = TAU / 9, MS = 4.6, MBETA = 0.25, MQ = 0.40, MTILT = -0.22, MCT = Math.cos(MTILT), MST = Math.sin(MTILT), KSKY = 4, MPAD = 26;
+  var MNOTE = [392, 440, 494, 587, 659, 784, 880, 988, 1175];
+  var M = { rot: 0, rotT: 0, v: 1, vT: 1, selLive: 0, tr: null, labelA: 0, seenDive: false, nodes: {}, hits: [], lastD: null, cardKey: '', cardFocus: true, drag: null, pts: {}, pinch: null, lastZoom: 0, cx: 0, cy: 0, R0: 100, t: 0 };
+  var MSTARS = []; (function () { var r = rnd(11); for (var i = 0; i < 280; i++) MSTARS.push({ a: r() * TAU, u: r(), z: 0.25 + r() * 0.75, s: 0.5 + r() * 1.2, tw: r() * TAU, c: r() < 0.16 ? '255,226,190' : '208,218,255' }); })();
+  function mkey(p) { return p.join('.'); }
+  function mnode(p) { var k = mkey(p); if (!M.nodes[k]) { var h = hash((wb ? wb.name : '') + '/' + k); M.nodes[k] = { ph: (h % 6283) / 1000, om: (0.07 + ((h >>> 8) % 1000) / 1000 * 0.13) * (((h >>> 20) & 1) ? -1 : 1), rot: 0 }; } return M.nodes[k]; }
+  function mnk(p) { return kids(p).length; }
+  function mw(p) { return 0.8 + 0.045 * mnk(p); }
+  function onFocusPath(p) { if (p.length > path.length) return false; for (var i = 0; i < p.length; i++) if (path[i] !== p[i]) return false; return true; }
+  function isFocus(p) { return p.length === path.length && onFocusPath(p); }
+  function ringRot(p) { var n = mnode(p); return isFocus(p) ? M.rot : onFocusPath(p) ? n.rot : n.ph + M.t * 0.001 * n.om; }
+  function mframe(p) { if (!p.length) return { x: 0, y: 0, R: 1 }; var up = p.slice(0, -1), P = mframe(up), a = ringRot(up) + (p[p.length - 1] - 1) * MSTEP, sn = Math.sin(a), pp = 1 - 0.28 * (1 - sn) / 2, ex = P.R * Math.cos(a), ey = P.R * MQ * sn; return { x: P.x + ex * MCT - ey * MST, y: P.y + ex * MST + ey * MCT, R: P.R / MS * pp }; }
+  function mcam(c) { if (c === 'sky') return { x: 0, y: 0, k: KSKY }; var q = mframe(c); return { x: q.x, y: q.y, k: M.R0 / q.R }; }
+  function mease(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+  function mwrap(a) { a = (a + Math.PI) % TAU; if (a < 0) a += TAU; return a - Math.PI; }
+  function mview() {
+    if (!M.tr) { var c = mcam(inside ? path : 'sky'); return { ox: M.cx - c.x * c.k, oy: M.cy - c.y * c.k, k: c.k }; }
+    var A = mcam(M.tr.A), B = mcam(M.tr.B), e = mease(clamp((M.t - M.tr.t0) / M.tr.dur, 0, 1)); if (M.tr.dir < 0) e = 1 - e;
+    var k = A.k * Math.pow(B.k / A.k, e), m0x = M.cx + (B.x - A.x) * A.k, m0y = M.cy + (B.y - A.y) * A.k, mx = m0x + (M.cx - m0x) * e, my = m0y + (M.cy - m0y) * e;
+    return { ox: mx - B.x * k, oy: my - B.y * k, k: k };
   }
-  function pointCardHere() {
-    var line = story(nodeOf(path));
-    if (!path.length) { card(wb.film ? 'THE APPROACH' : wb.name, wb.film ? 'The film, as it is kept on the beach: walk its branches by hand.' : line.length > 220 ? line.slice(0, 220).replace(/\s+\S*$/, '') + '…' : line); return; }
-    if (!line) { card('', ''); return; }
-    var hd = headOf(line); card(hd, line.slice(line.indexOf(hd) + hd.length).replace(/^[\s—.:]+/, ''));
+  /* the star itself, swelling as you arrive: crimson for the film's own star, sea-green for a block film's, warm white for any other */
+  function mstar(x, y, r, a) {
+    var rr = Math.max(r, 3.2), pu = 0.5 + 0.5 * Math.sin(M.t * 0.003), A = a * (rr > 60 ? Math.max(0.74, 60 / rr) : 1);
+    if (x + rr * 2.4 < 0 || x - rr * 2.4 > W || y + rr * 2.4 < 0 || y - rr * 2.4 > H) return;
+    var s = wb && starOf(wb.name), P = wb && wb.film ? ['255,252,246', '255,236,236', '244,120,146', '200,50,60', '255,130,150'] : s && s.fic ? ['246,255,252', '230,255,250', '120,235,222', '40,150,140', '140,240,228'] : ['255,252,246', '255,246,232', '240,208,156', '190,142,74', '242,210,160'];
+    var gr = ctx.createRadialGradient(x, y, 0, x, y, rr * 2.4);
+    gr.addColorStop(0, 'rgba(' + P[0] + ',' + A + ')'); gr.addColorStop(0.28, 'rgba(' + P[1] + ',' + A * 0.96 + ')'); gr.addColorStop(0.42, 'rgba(' + P[2] + ',' + A * 0.5 + ')'); gr.addColorStop(0.7, 'rgba(' + P[3] + ',' + A * 0.15 + ')'); gr.addColorStop(1, 'rgba(' + P[3] + ',0)');
+    ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(x, y, rr * 2.4, 0, TAU); ctx.fill();
+    ctx.strokeStyle = 'rgba(' + P[4] + ',' + A * (0.5 + 0.4 * pu) + ')'; ctx.lineWidth = Math.max(1.5, rr * 0.06); ctx.beginPath(); ctx.arc(x, y, rr * (1.2 + 0.06 * pu), 0, TAU); ctx.stroke();
   }
-  function readFor(p) { var line = story(nodeOf(p)); return (wb.film ? 'film' : wb.name) + ' · ' + p.join(' · ') + (line ? '   ' + headOf(line) : ''); }
-  function select(d, quietly) { sel = d; var ks = kids(path); needleAt(fOf(ks.indexOf(d), ks.length)); readout(readFor(path.concat([d]))); if (!quietly) pip(620, 0.05, 0.05); pointCard(path.concat([d])); setAddr(); update(); }
-  function update() {
-    var p = sel != null ? path.concat([sel]) : null, deeper = inside && p && kids(p).length > 0;
-    $('tup').disabled = !inside || flying; $('tin').disabled = !deeper || flying;
-    stage.classList.toggle('insky', !inside && !flying);
+  /* a moon, lit from the body it circles */
+  function mmoon(x, y, r, lx, ly, a) {
+    if (r < 0.35 || a < 0.02) return; if (x + r * 2 < 0 || x - r * 2 > W || y + r * 2 < 0 || y - r * 2 > H) return;
+    if (r < 2.2) { ctx.fillStyle = 'rgba(233,222,196,' + a + ')'; ctx.beginPath(); ctx.arc(x, y, Math.max(r, 0.7), 0, TAU); ctx.fill(); return; }
+    var A = a * (r > 80 ? Math.max(0.9, 80 / r) : 1);
+    var h = ctx.createRadialGradient(x, y, r * 0.6, x, y, r * 1.9); h.addColorStop(0, 'rgba(240,226,190,' + 0.17 * A + ')'); h.addColorStop(1, 'rgba(240,226,190,0)'); ctx.fillStyle = h; ctx.beginPath(); ctx.arc(x, y, r * 1.9, 0, TAU); ctx.fill();
+    var gr = ctx.createRadialGradient(x + lx * r * 0.45, y + ly * r * 0.45, r * 0.06, x, y, r * 1.02);
+    gr.addColorStop(0, 'rgba(255,250,236,' + A + ')'); gr.addColorStop(0.4, 'rgba(226,210,174,' + A + ')'); gr.addColorStop(0.8, 'rgba(118,106,104,' + A + ')'); gr.addColorStop(1, 'rgba(34,30,52,' + A + ')');
+    ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.fill();
   }
-  async function enterBlock(name, json, r) {
-    closeStar(); card(''); flying = true; radioF = inside ? radioF : f; hold(true);
-    var s = starOf(name), at = name === FILM ? filmPos() : s ? s.p : orb.tgt.slice(); flyAt = at.slice();
-    readout('going in'); glideTo({ tgt: at.slice(), dist: 0.035 }, 1.5, easeIn);
-    await tween(V, 'b', 1, 1500, r);   /* the glow of going in finishes before it is put out (a timer racing it once left it lit) */
-    flying = false; glide = null; inside = true; wb = { name: name, root: json, film: name === FILM }; path = []; sel = null; V.b = 0;
-    orb.tgt = [0, 0, 0]; orb.dist = restDist(); orb.pitch = 0.55; SK.dim = DIMIN; hold(true);
-    bandForRing(); needleAt(0.5); readout(wb.film ? 'film:the-approach' : name); pointCardHere(); setAddr(); update();
-    V.bloom = 1; V.ringS = 0; pip(440, 0.08, 0.3); quiet(tween(V, 'bloom', 0, 500, r)); await tween(V, 'ringS', 1, 700, r); update();
+  function msystem(p, x, y, R, lx, ly, a) {
+    var ext = R * 1.35 + 60; if (x + ext < 0 || x - ext > W || y + ext < 0 || y - ext > H) return;
+    var ks = kids(p), nk = ks.length, sub = a * clamp((R - 9) / 14, 0, 1), br = R * MBETA * (0.8 + 0.045 * nk);
+    var lit = isFocus(p) || (M.tr && M.tr.B !== 'sky' && M.tr.B.length === p.length && mkey(M.tr.B) === mkey(p));
+    if (sub > 0.01 && nk && R < 60000) { ctx.strokeStyle = 'rgba(217,179,108,' + sub * (lit ? 0.36 : 0.2) + ')'; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(x, y, R, R * MQ, MTILT, 0, TAU); ctx.stroke(); }
+    var it = [], r0 = ringRot(p);
+    if (sub > 0.01) for (var k = 1; k <= 9; k++) { var an = r0 + (k - 1) * MSTEP, sn = Math.sin(an), ex = R * Math.cos(an), ey = R * MQ * sn; it.push({ k: k, sn: sn, p: 1 - 0.28 * (1 - sn) / 2, x: x + ex * MCT - ey * MST, y: y + ex * MST + ey * MCT, has: ks.indexOf(k) >= 0 }); }
+    it.sort(function (u, w) { return u.sn - w.sn; });
+    var here = inside && isFocus(p);
+    function kid(q) {
+      var Rc = R / MS * q.p, cp = p.concat([q.k]);
+      if (here) M.hits.push({ k: q.k, x: q.x, y: q.y, sn: q.sn, has: q.has, r: q.has ? Rc * MBETA * mw(cp) : 3 });
+      if (!q.has) return;
+      var dx = x - q.x, dy = y - q.y, dl = Math.hypot(dx, dy) || 1, ca = sub * (0.5 + 0.5 * (q.sn + 1) / 2);
+      if (Rc >= 9 && mnk(cp)) msystem(cp, q.x, q.y, Rc, dx / dl, dy / dl, ca); else mmoon(q.x, q.y, Rc * MBETA * mw(cp), dx / dl, dy / dl, ca);
+    }
+    it.forEach(function (q) { if (q.sn <= 0) kid(q); });
+    if (!p.length) mstar(x, y, br, a); else mmoon(x, y, br, lx, ly, a);
+    it.forEach(function (q) { if (q.sn > 0) kid(q); });
   }
-  function leaveBlock() {
-    var from = wb && !wb.film && starOf(wb.name) ? starOf(wb.name).p : filmPos();
-    stopHand(); inside = false; wb = null; path = []; sel = null; SK.dim = 1; V.b = 0; flyAt = null; card(''); setAddr();
-    buildBand(); needleAt(radioF); placeMark(); hold(false);
-    orb.tgt = from.slice(); orb.dist = 0.06; glideTo({ tgt: [0, 0, 0], dist: restDist(), pitch: 0.55 }, 2.4, easeOut); touchT = now(); update();
+  /* the stars stream past as you dive */
+  function mstars(D) {
+    var rmax = Math.hypot(W, H) * 0.62, spin = inside ? M.rot : 0, RR = function (q) { return rmax * (0.015 + Math.pow(q, 1.5)); };
+    if (M.lastD === null) M.lastD = D;
+    for (var i = 0; i < MSTARS.length; i++) {
+      var s = MSTARS[i], f1 = ((s.u + D * s.z * 0.24) % 1 + 1) % 1, f0 = ((s.u + M.lastD * s.z * 0.24) % 1 + 1) % 1, an = s.a + spin * 0.1 * s.z;
+      var r1 = RR(f1), x1 = M.cx + r1 * Math.cos(an), y1 = M.cy + r1 * Math.sin(an) * 0.92, al = Math.pow(Math.sin(Math.PI * f1), 0.55) * (0.3 + 0.7 * s.z) * (0.75 + 0.25 * Math.sin(M.t * 0.0015 + s.tw));
+      if (Math.abs(f1 - f0) < 0.4) { var r00 = RR(f0), x0 = M.cx + r00 * Math.cos(an), y0 = M.cy + r00 * Math.sin(an) * 0.92; if (Math.hypot(x1 - x0, y1 - y0) > 1.6) { ctx.strokeStyle = 'rgba(' + s.c + ',' + al * 0.8 + ')'; ctx.lineWidth = s.s; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke(); continue; } }
+      ctx.fillStyle = 'rgba(' + s.c + ',' + al + ')'; ctx.beginPath(); ctx.arc(x1, y1, s.s, 0, TAU); ctx.fill();
+    }
+    M.lastD = D;
   }
-  async function goIn(r) {
-    var d = sel; if (d == null || !inside) return;
-    var p = path.concat([d]); if (!kids(p).length) { pointCard(p); return; }
-    var pks = kids(path), i = pks.indexOf(d);
-    fly = { i: i, n: pks.length, t: 0, ks: pks, par: path.slice() }; await tween(fly, 't', 1, 650, r, function (t) { return t * t; }); fly = null;
-    path = p; sel = null; V.ringS = 0; bandForRing(); needleAt(0.5); pip(520 + path.length * 60, 0.07, 0.2);
-    readout((wb.film ? 'film' : wb.name) + ' · ' + path.join(' · ')); pointCardHere(); setAddr();
-    await tween(V, 'ringS', 1, 600, r); update();
+  function mshort(p) { var t = story(nodeOf(p)); if (!t) return address(p); var s = t.split(' — ')[0].split(': ')[0].split(', ')[0].split(' (')[0].split(' for the ')[0]; return s.length > 26 ? s.slice(0, 25) + '…' : s; }
+  function mlabels() {
+    if (M.labelA < 0.02 || !inside) return;
+    ctx.textAlign = 'center'; ctx.shadowColor = '#000'; ctx.shadowBlur = 6;
+    M.hits.forEach(function (h) {
+      var sl = h.k === M.selLive, below = h.sn > -0.25;
+      if (!h.has) { ctx.strokeStyle = 'rgba(217,179,108,' + M.labelA * 0.4 + ')'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(h.x, h.y, 3, 0, TAU); ctx.stroke(); }
+      ctx.font = '600 12px ui-monospace,Menlo,Consolas,monospace'; ctx.fillStyle = 'rgba(217,179,108,' + M.labelA * (!h.has ? 0.3 : sl ? 1 : 0.62) + ')'; ctx.fillText(String(h.k), h.x, below ? h.y + h.r + 16 : h.y - h.r - 8);
+      if (sl && h.has) {
+        ctx.shadowBlur = 0; ctx.strokeStyle = 'rgba(255,110,130,' + M.labelA * 0.95 + ')'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(h.x, h.y, h.r + 6, 0, TAU); ctx.stroke(); ctx.shadowBlur = 6;
+        ctx.font = 'italic 18px "Cormorant Garamond","EB Garamond",Georgia,serif'; ctx.fillStyle = 'rgba(239,230,210,' + M.labelA + ')'; ctx.fillText(mshort(path.concat([h.k])), h.x, h.y + h.r + 37);
+      }
+    });
+    ctx.shadowBlur = 0;
+  }
+  function drawMoons() {
+    if (!inside) return;
+    var Vw = mview(); mstars(Math.log(Vw.k / M.R0) / Math.log(MS));
+    M.hits.length = 0; msystem([], Vw.ox, Vw.oy, Vw.k, 0, -1, 1); mlabels();
+  }
+  function moonsTick(dt) {
+    M.t = performance.now();
+    if (M.tr && M.t - M.tr.t0 >= M.tr.dur) { var d = M.tr.done; M.tr = null; if (d) d(); }
+    if (!inside) return;
+    if (!M.drag && !ringDrag) M.v += (M.vT - M.v) * (1 - Math.exp(-dt * 10));
+    M.rotT = Math.PI / 2 - (M.v - 1) * MSTEP;
+    var sw = M.tr && M.tr.swirl ? (1 - mease(clamp((M.t - M.tr.t0) / M.tr.dur, 0, 1))) * 2.6 : 0;
+    M.rot += (M.rotT + sw - M.rot) * (1 - Math.exp(-dt * 12));
+    M.labelA += ((M.tr ? 0 : 1) - M.labelA) * (1 - Math.exp(-dt * (M.tr ? 14 : 5)));
+    var bw = $('band').clientWidth || 300, px = MPAD + (M.v - 1) / 8 * (bw - 2 * MPAD); f = px / bw;   /* the needle stands on the dial's place among the nine */
+  }
+  /* the band: the digits 1 to 9, the empty places faint */
+  function moonBand() {
+    var b = $('band'), bw = b.clientWidth || 300, ks = kids(path); b.querySelectorAll('i,b,u,s').forEach(function (e) { e.remove(); });
+    for (var j = 0; j <= 32; j++) { var e = document.createElement('i'); e.style.left = (MPAD + j / 32 * (bw - 2 * MPAD)) + 'px'; e.style.height = (j % 4 ? 10 : 24) + 'px'; e.style.opacity = j % 4 ? 0.4 : 0.8; b.appendChild(e); }
+    for (var k = 1; k <= 9; k++) { var m = document.createElement('b'); m.textContent = String(k); m.style.left = (MPAD + (k - 1) / 8 * (bw - 2 * MPAD)) + 'px'; if (ks.indexOf(k) < 0) m.className = 'off'; b.appendChild(m); }
+  }
+  var mtypeT = null;
+  function mtype(s) { clearInterval(mtypeT); var el = $('mline'), i = 0; el.textContent = ''; mtypeT = setInterval(function () { i += 3; el.textContent = s.slice(0, i); if (i >= s.length) clearInterval(mtypeT); }, 16); }
+  /* the card: the address growing a digit at each dive, and that place's own first line, typed */
+  function mcard() {
+    if (!inside) return;
+    var cur2 = sel || M.selLive, p = M.cardFocus || !cur2 ? path : path.concat([cur2]), key = wb.name + '/' + mkey(p) + '/' + (M.cardFocus ? 'f' : 's');
+    $('tup').disabled = !!M.tr; $('tin').disabled = !!M.tr || !cur2 || !mnk(path.concat([cur2]));
+    stage.classList.remove('insky'); setAddr();
+    if (key === M.cardKey) return; M.cardKey = key;
+    $('maddr').textContent = wb.name + (p.length ? ' · ' + address(p) : '');
+    var line = story(nodeOf(p)); mtype(line || (p.length ? 'Nothing is written here.' : wb.name));
+    $('mhint').textContent = !M.seenDive ? 'Turn the dial to spin the moons. Tap a moon, then Go in.' : '';
+    readout(wb.name + (p.length ? ' · ' + address(p) : ''));
+  }
+  function mnearest(val) { var best = 0, bd = 99; kids(path).forEach(function (k) { var d = Math.abs(k - val); if (d < bd) { bd = d; best = k; } }); return best; }
+  function msetV(val, live) { M.v = M.vT = val; var k = mnearest(val); if (k && k !== M.selLive) { M.selLive = k; M.cardFocus = false; pip(MNOTE[k - 1] || 440, 0.05, 0.16); mcard(); } }
+  function mrelease() { if (M.selLive) sel = M.selLive; M.vT = sel || M.vT; M.cardFocus = false; mcard(); }
+  function mpick(k) { sel = M.selLive = k; M.vT = k; M.cardFocus = false; pip(MNOTE[k - 1] || 440, 0.05, 0.16); mcard(); }
+  function msetLevel(r0) {
+    var best = 0, bs = -9; kids(path).forEach(function (k) { var s = Math.sin(r0 + (k - 1) * MSTEP); if (s > bs) { bs = s; best = k; } });
+    sel = M.selLive = best || 1; M.v = M.vT = sel; M.rotT = Math.PI / 2 - (M.v - 1) * MSTEP; M.rot = M.rotT + mwrap(r0 - M.rotT); M.cardKey = ''; M.cardFocus = true; mcard();
+  }
+  /* coming close to a star: its places open round it as moons */
+  function enterBlock(name, json) {
+    if (inside) return;
+    closeStar(); card(''); radioF = f; stopHand();
+    var s = starOf(name), at = name === FILM ? filmPos() : s ? s.p : orb.tgt.slice();
+    inside = true; wb = { name: name, root: json, film: name === FILM }; path = []; M.nodes = {}; M.cardKey = ''; M.lastD = null;
+    flying = true; hold(true);
+    glideTo({ tgt: at.slice(), dist: Math.min(orb.dist, 0.55), pitch: 0.5 }, CALM ? 0.01 : 2.3, ease);
+    M.cx = W / 2; M.cy = H * (wide ? 0.42 : 0.38); M.R0 = Math.min(W * 0.39, H * 0.25);
+    var ks = kids([]); sel = M.selLive = ks.indexOf(1) >= 0 ? 1 : (ks[0] || 1); M.v = M.vT = sel; M.rotT = Math.PI / 2 - (M.v - 1) * MSTEP; M.rot = M.rotT + 2.6;
+    M.tr = { A: 'sky', B: [], t0: performance.now(), dur: CALM ? 10 : 2300, dir: 1, swirl: true, done: function () { flying = false; M.cardKey = ''; mcard(); update(); } };
+    M.cardFocus = true; quiet(tween(SK, 'dim', DIMIN, 900));
+    moonBand(); $('mcard').hidden = false; mcard();
+    pip(392, 0.05, 0.5); pip(587, 0.05, 0.6, 0.25); pip(784, 0.04, 0.8, 0.5);
+    LOG.moons = LOG.moons || []; LOG.moons.push({ name: name, t: Date.now() });
+  }
+  /* from a star's top, Up folds the moons back into the star and returns to the sky */
+  function leaveBlock(instant) {
+    if (!inside) return;
+    var name = wb.name;
+    function finish() {
+      inside = false; wb = null; path = []; sel = null; flying = false; M.tr = null; M.hits.length = 0; SK.dim = 1;
+      $('mcard').hidden = true; $('mhint').textContent = ''; setAddr(); buildBand(); needleAt(radioF); placeMark(); hold(false); touchT = now(); update();
+      var s = starOf(name); if (!instant) glideTo({ tgt: (name === FILM ? filmPos() : s ? s.p : orb.tgt).slice(), dist: 1.2, pitch: 0.55 }, 1.6, easeOut);
+    }
+    if (instant || CALM) { finish(); return; }
+    if (M.tr) return;
+    M.cardFocus = true; pip(392, 0.05, 0.3); pip(587, 0.05, 0.4, 0.14);
+    M.tr = { A: 'sky', B: [], t0: performance.now(), dur: 1700, dir: -1, done: finish };
+    quiet(tween(SK, 'dim', 1, 1500)); update();
+  }
+  /* Go in: the view falls toward the moon until it is the body in the centre, its own moons standing round it */
+  function goIn() {
+    if (!inside || M.tr) return;
+    var d = sel || M.selLive; if (!d) return;
+    var X = path.concat([d]); if (!mnk(X)) { mpick(d); return; }
+    M.seenDive = true; pip(784, 0.05, 0.3); pip(587, 0.05, 0.4, 0.14); pip(392, 0.05, 0.6, 0.28);
+    var F = path.slice();
+    M.tr = { A: F, B: X, t0: performance.now(), dur: 1500, dir: 1, done: function () { mnode(F).rot = M.rot; var nx = mnode(X), r = nx.ph + performance.now() * 0.001 * nx.om; path = X; moonBand(); msetLevel(r); } };
+    update();
   }
   function goUp() {
-    stopHand(); if (!inside) return;
+    if (!inside || M.tr) return;
     if (!path.length) { leaveBlock(); return; }
-    var d = path.pop(); V.ringS = 1.6; bandForRing(); select(d, true); quiet(tween(V, 'ringS', 1, 400, hrun)); update();
+    pip(392, 0.05, 0.3); pip(587, 0.05, 0.4, 0.14);
+    var X = path.slice(), Fp = X.slice(0, -1), nx = mnode(X);
+    nx.ph = M.rot - performance.now() * 0.001 * nx.om;
+    path = Fp; M.rot = mnode(Fp).rot; sel = M.selLive = X[X.length - 1]; M.v = M.vT = sel; M.rotT = Math.PI / 2 - (M.v - 1) * MSTEP; M.cardKey = ''; M.cardFocus = false;
+    moonBand(); mcard();
+    M.tr = { A: Fp, B: X, t0: performance.now(), dur: 1250, dir: -1, done: function () { M.cardKey = ''; mcard(); } };
   }
-  function bandHand(e) { ringDrag = true; try { $('band').setPointerCapture(e.pointerId); } catch (err) { /* no capture, no matter */ } bandMove(e.clientX); }
-  function bandMove(x) {
-    var b = $('band').getBoundingClientRect(), fx = clamp((x - b.left) / b.width, 0, 1), ks = kids(path); if (!ks.length || flying) return;
-    var i = Math.min(ks.length - 1, Math.floor(fx * ks.length)); if (sel !== ks[i]) { stopHand(); select(ks[i]); } needleAt(fx);
+  function bandX(x) { var r = $('band').getBoundingClientRect(); return clamp((x - r.left - MPAD) / (r.width - 2 * MPAD), 0, 1); }
+  function bandHand(e) { ringDrag = true; try { $('band').setPointerCapture(e.pointerId); } catch (err) { /* no capture, no matter */ } if (!M.tr) msetV(1 + bandX(e.clientX) * 8, true); }
+  function bandMove(x) { if (!M.tr) msetV(1 + bandX(x) * 8, true); }
+  function bandUp() { if (ringDrag) { ringDrag = false; mrelease(); } }
+  function moonTap(x, y) {
+    if (!inside || M.tr) return;
+    var b = null, bd = 1e9; M.hits.forEach(function (h) { if (!h.has) return; var d = Math.hypot(x - h.x, y - h.y); if (d < Math.max(26, h.r + 16) && d < bd) { bd = d; b = h; } });
+    if (b) { if (b.k === sel) goIn(); else mpick(b.k); }
   }
-  function bandUp() { ringDrag = false; if (sel != null) { var ks = kids(path); needleAt(fOf(ks.indexOf(sel), ks.length)); } }
-  function ringTap(x, y) {
-    if (!inside || flying) return;
-    var ks = kids(path), best = -1, bd = 46;
-    ks.forEach(function (d, i) { var q = ringPos(i, ks.length, 1), dd = Math.hypot(q[0] - x, q[1] - y); if (dd < bd) { bd = dd; best = i; } });
-    if (best < 0) return;
-    if (sel === ks[best]) { stopHand(); quiet(goIn(hrun)); } else { stopHand(); select(ks[best]); }
+  function mzoom(dir) { var t = performance.now(); if (M.tr || t - M.lastZoom < 550) return; M.lastZoom = t; if (dir > 0) goIn(); else goUp(); }
+  /* the hand among the moons: a drag spins the orbit, a tap chooses, a pinch dives or climbs */
+  function mdown(e) { var p = at(e); M.pts[e.pointerId] = p; try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* no matter */ } var k = Object.keys(M.pts); if (k.length === 1) M.drag = { x: p[0], t: performance.now(), moved: false, v0: M.v }; else if (k.length === 2) { M.drag = null; var a = M.pts[k[0]], b = M.pts[k[1]]; M.pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]) }; } }
+  function mmove(e) {
+    if (!M.pts[e.pointerId]) return; var p = at(e); M.pts[e.pointerId] = p; var k = Object.keys(M.pts);
+    if (M.pinch && k.length === 2) { var a = M.pts[k[0]], b = M.pts[k[1]], d = Math.hypot(a[0] - b[0], a[1] - b[1]), q = d / M.pinch.d; if (q > 1.28) { mzoom(1); M.pinch.d = d; } else if (q < 0.78) { mzoom(-1); M.pinch.d = d; } }
+    else if (M.drag && !M.tr) { var dx = p[0] - M.drag.x; if (Math.abs(dx) > 8) M.drag.moved = true; if (M.drag.moved) msetV(clamp(M.drag.v0 + dx / (M.R0 * MSTEP), 1, 9), true); }
+  }
+  function mup(e) {
+    if (!M.pts[e.pointerId]) return; var p = M.pts[e.pointerId]; delete M.pts[e.pointerId]; if (Object.keys(M.pts).length < 2) M.pinch = null;
+    if (M.drag) { if (!M.drag.moved && performance.now() - M.drag.t < 450 && e.type === 'pointerup') moonTap(p[0], p[1]); else if (M.drag.moved) mrelease(); M.drag = null; }
   }
   $('tup').addEventListener('click', goUp);
-  $('tin').addEventListener('click', function () { stopHand(); quiet(goIn(hrun)); });
+  $('tin').addEventListener('click', goIn);
   function glowAt(x, y, r, sp, a) { ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = a; ctx.drawImage(sp, x - r, y - r, r * 2, r * 2); ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1; }
-  function drawRing(nowMs) {
-    if (!inside) return;
-    var c = ringCentre(), cx = c[0], cy = c[1];
-    function draw(ks, par, scale, ox, oy, pick) {
-      var many = ks.length, pts = ks.map(function (d, i) { var q = ringPos(i, many, scale), p = par.concat([d]), deep = kids(p).length > 0; return { d: d, i: i, x: q[0] + ox, y: q[1] + oy, a: -Math.PI / 2 + i / many * TAU, deep: deep, named: deep || (!inCut(p) && many <= 6) }; });
-      pts.forEach(function (q) {
-        var p = par.concat([q.d]), on = sel === q.d || pick === q.i, r = (q.deep ? 20 : 12) * (on ? 1.7 : 1) * (1 + 0.08 * Math.sin(nowMs / 400 + q.i));
-        ctx.strokeStyle = 'rgba(240,190,120,.12)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(cx + ox, cy + oy); ctx.lineTo(q.x, q.y); ctx.stroke();
-        glowAt(q.x, q.y, r, on ? SP_A : q.deep ? SP_W : SP_B, q.deep ? 1 : 0.55);
-        if (scale > 0.6 && scale < 2) {
-          ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic'; ctx.shadowColor = 'rgba(0,0,0,.95)'; ctx.shadowBlur = 6;
-          ctx.font = '600 ' + (on ? 19 : 17) + 'px ui-monospace,Menlo,Consolas,monospace'; ctx.fillStyle = on ? '#ffd9a0' : q.deep ? '#f1e2c4' : '#b8b0a0';
-          ctx.fillText(String(q.d), q.x, q.y - r * 0.55 - 8);
-          if (q.named) {
-            var words = firstWords(nodeOf(p), 3), below = Math.sin(q.a) > -0.3, room = W - 16;
-            ctx.font = 'italic 500 ' + (wide ? 17 : 16) + 'px "Cormorant Garamond",Garamond,serif'; ctx.fillStyle = on ? '#fff3dc' : '#e9dcc2';
-            pts.forEach(function (o) { if (o !== q && o.named && (Math.sin(o.a) > -0.3) === below && Math.abs(o.y - q.y) < 26) room = Math.min(room, Math.abs(o.x - q.x) - 14); });
-            while (ctx.measureText(words).width > room && /\s/.test(words)) words = words.replace(/…$/, '').replace(/\s+\S*$/, '') + '…';
-            var tw = ctx.measureText(words).width, lx = clamp(q.x, tw / 2 + 8, W - tw / 2 - 8);
-            ctx.fillText(words, lx, below ? q.y + r * 0.6 + 20 : q.y - r * 0.6 - 30);
-          }
-          ctx.shadowBlur = 0;
-        }
-      });
-    }
-    if (fly) { var fp = ringPos(fly.i, fly.n, 1), s = 1 + 7 * fly.t; draw(fly.ks, fly.par, s, -(fp[0] - cx) * s, -(fp[1] - cy) * s, fly.i); }
-    else draw(kids(path), path, V.ringS, 0, 0, -1);
-    glowAt(cx, cy, 7 + 3 * Math.sin(nowMs / 600), SP_A, 1);
-  }
 
   /* ── exploring the sky (6.42): a finger turns it, a pinch or the wheel zooms, a tap opens a star's card.
         A block the index lists as larger than 40 KB shows its name and size only, never downloaded. ── */
@@ -1109,23 +1225,24 @@ body.intro #radio #band{pointer-events:none}   /* the dial hidden in the opening
   function at(e) { var r = stage.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
   function two() { var k = Object.keys(pts); return k.length >= 2 ? [pts[k[0]], pts[k[1]]] : null; }
   canvas.addEventListener('pointerdown', function (e) {
-    if (inside || flying) { tapIn = { p: at(e), t: now() }; return; }
+    if (inside) { mdown(e); return; }
+    if (flying) return;
     var p = at(e); pts[e.pointerId] = p; handWins = true; if (begun && !started) touches++;
     gest = { moved: 0, t: now(), dist: 0, d0: orb.dist, many: Object.keys(pts).length > 1 };
     try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* no capture, no matter */ }
     touchT = now(); if (glide) glide = null; stage.classList.add('dragging');
   });
   canvas.addEventListener('pointermove', function (e) {
-    if (inside || flying || !pts[e.pointerId] || !gest) return;
+    if (inside) { mmove(e); return; }
+    if (flying || !pts[e.pointerId] || !gest) return;
     var p = at(e), was = pts[e.pointerId]; pts[e.pointerId] = p; touchT = now();
     var pair = two();
-    if (pair) { var dist = Math.max(8, Math.hypot(pair[0][0] - pair[1][0], pair[0][1] - pair[1][1])); if (!gest.dist) { gest.dist = dist; gest.d0 = orb.dist; } else orb.dist = clamp(gest.d0 * gest.dist / dist, DMIN, DMAX); gest.moved = 99; gest.many = true; return; }
+    if (pair) { var dist = Math.max(8, Math.hypot(pair[0][0] - pair[1][0], pair[0][1] - pair[1][1])); if (!gest.dist) { gest.dist = dist; gest.d0 = orb.dist; } else { orb.dist = clamp(gest.d0 * gest.dist / dist, DMIN, DMAX); maybeMoons(); } gest.moved = 99; gest.many = true; return; }
     var dx = p[0] - was[0], dy = p[1] - was[1]; gest.moved += Math.abs(dx) + Math.abs(dy);
     if (gest.moved > 8) { orb.yaw += dx * 0.006; orb.pitch = clamp(orb.pitch + dy * 0.005, -1.2, 1.45); }
   });
   function lift(e) {
-    if (tapIn && e.type === 'pointerup') { var w = at(e), ti = tapIn; tapIn = null; if (Math.hypot(w[0] - ti.p[0], w[1] - ti.p[1]) < 12 && now() - ti.t < 0.8) ringTap(w[0], w[1]); return; }
-    tapIn = null;
+    if (inside) { mup(e); return; }
     if (!pts[e.pointerId]) return;
     var p = pts[e.pointerId]; delete pts[e.pointerId];
     var left = Object.keys(pts).length; touchT = now();
@@ -1135,13 +1252,13 @@ body.intro #radio #band{pointer-events:none}   /* the dial hidden in the opening
   canvas.addEventListener('pointerup', lift);
   canvas.addEventListener('pointercancel', lift);
   canvas.addEventListener('contextmenu', function (e) { if (!inside) e.preventDefault(); });
-  canvas.addEventListener('wheel', function (e) { if (inside || flying) return; e.preventDefault(); handWins = true; if (begun && !started && now() - lastWheel > 0.6) touches++; lastWheel = now(); orb.dist = clamp(orb.dist * Math.exp(e.deltaY * 0.0012), DMIN, DMAX); touchT = now(); }, { passive: false });
+  canvas.addEventListener('wheel', function (e) { if (inside) { e.preventDefault(); mzoom(e.deltaY < 0 ? 1 : -1); return; } if (flying) return; e.preventDefault(); handWins = true; if (begun && !started && now() - lastWheel > 0.6) touches++; lastWheel = now(); orb.dist = clamp(orb.dist * Math.exp(e.deltaY * 0.0012), DMIN, DMAX); touchT = now(); maybeMoons(); }, { passive: false });
   function tapSky(x, y) {
     basis();
     var best = null, bd = 28, q = oproj(filmPos()), i;
     if (q && Math.hypot(q[0] - x, q[1] - y) < 44) best = starOf(FILM) || { name: FILM, p: FILM_AT.slice(), size: 0 };
     else for (i = 0; i < B3.length; i++) { if (B3[i].name === FILM) continue; q = oproj(B3[i].p); if (!q) continue; var d = Math.hypot(q[0] - x, q[1] - y) - (B3[i].fic ? 10 : 0); if (d < bd) { bd = d; best = B3[i]; } }
-    if (best) { if (filmPlaying()) stopFilm(); openStar(best); } else closeStar();   /* a star tapped while the film itself plays stops it first (6.6); in a gap it simply opens */
+    if (best) { if (filmPlaying()) stopFilm(); if (picked && picked.name === best.name && !elStar.hidden) { walkBlock(best.name); return; } openStar(best); } else closeStar();   /* a star tapped while the film itself plays stops it first (6.6); in a gap it simply opens */
   }
   function bytesOf(name) { return Number(((index && index.bytes) || {})[name]) || 0; }
   function openStar(s) {
@@ -1153,7 +1270,7 @@ body.intro #radio #band{pointer-events:none}   /* the dial hidden in the opening
     $('sfilm').hidden = !(isFilm && begun && !started); if (isFilm && begun && !started) invite();
     function show(text, walkable) { if (picked && picked.name === name) { elSLine.textContent = text; if (!isFilm) elSWalk.hidden = !walkable; } }
     if (isFilm) { show('The film is the radio. Its block can be walked here by hand.', true); return; }
-    if (size > BIG) { show(kb(size), false); return; }
+    if (size > BIG) { show('A large block (' + kb(size) + '). Its places open as moons, read a branch at a time.', true); return; }
     if (LINES_READ[name] != null) { show(LINES_READ[name][0], LINES_READ[name][1]); return; }
     show('Reading…', false);
     get(WIRE + '?block=' + encodeURIComponent(name) + '&spindle=0').then(function (j) {
@@ -1164,16 +1281,40 @@ body.intro #radio #band{pointer-events:none}   /* the dial hidden in the opening
   }
   function kb(n) { var k = n / 1000; return (k < 10 ? k.toFixed(1) : String(Math.round(k))) + ' KB'; }
   function closeStar() { picked = null; elStar.hidden = true; }
+  /* the moons show only when the viewer has come close by their own zoom or tap, and never while the film itself plays */
+  var MOON_NEAR = 0.3;
+  function moonsAllowed() { return !filmPlaying() && !filmOn && !inside; }
+  function nearestToCentre() { basis(); var best = null, bd = 70; B3.forEach(function (s) { var q = oproj(s.p); if (!q) return; var d = Math.hypot(q[0] - BAS.cx, q[1] - BAS.cy); if (d < bd) { bd = d; best = s; } }); return best; }
+  function maybeMoons() { if (inside || flying || orb.dist > MOON_NEAR || !moonsAllowed()) return; var s = picked || nearestToCentre(); if (s) walkBlock(s.name); }
+  /* a block over the read limit: only what its moons need, by the beach's lighter reads (6.8): its floor, then its places one level
+     at a time, each with its opening line and how many places stand beneath it */
+  function readLight(name) {
+    var B = WIRE + '?block=' + encodeURIComponent(name) + '&pscale=';
+    function put(root, e) { var a = String(e.address || '').replace('.', ''); if (!/^[1-9]+$/.test(a)) return; var n = root; for (var i = 0; i < a.length - 1; i++) { var c = n[a[i]]; if (!c || typeof c !== 'object') return; n = c; } n[a[a.length - 1]] = e.beneath ? { _: e.content || '' } : (e.content || ''); }
+    return get(B + '20').then(function (j) {
+      var F = j && j.floor; if (!F) throw new Error('no floor');
+      return get(B + (F - 1)).then(function (top) {
+        var root = { _: '' }; (top.entries || []).forEach(function (e) { put(root, e); });
+        if (!Object.keys(root).some(function (k) { return k !== '_'; })) throw new Error('nothing to walk');
+        get(B + (F - 2)).then(function (lv) { (lv.entries || []).forEach(function (e) { put(root, e); }); M.cardKey = ''; if (inside) { moonBand(); mcard(); } }).catch(function () { /* the next level waits */ });
+        return root;
+      });
+    });
+  }
+  var READING = {};
   function walkBlock(name) {
-    function go(j) { stopHand(); quiet(enterBlock(name, j, hrun)); }
+    if (filmPlaying()) stopFilm();
+    function go(j) { if (!inside && moonsAllowed()) enterBlock(name, j); }
+    if (READING[name]) return;   /* already being read: its moons open when it arrives */
     if (name === FILM && film) { go(film); return; }   /* the film's own block is read on load, whatever its size */
     if (BLOCKS[name]) { go(BLOCKS[name]); return; }
-    if (bytesOf(name) > BIG && name !== FILM) return;
+    READING[name] = true;
+    if (bytesOf(name) > BIG && name !== FILM) { if (picked && picked.name === name) { elSLine.textContent = 'Reading its places…'; elSWalk.hidden = true; } readLight(name).then(function (j) { delete READING[name]; BLOCKS[name] = j; go(j); }).catch(function () { delete READING[name]; if (picked && picked.name === name) elSLine.textContent = 'Pscale could not be reached.'; }); return; }
     elSLine.textContent = 'Reading the block…'; elSWalk.hidden = true;
     get(WIRE + '?block=' + encodeURIComponent(name)).then(function (j) {
       if (!j || typeof j !== 'object' || sealed(j)) throw new Error('not walkable');
-      BLOCKS[name] = j; if (picked && picked.name === name) go(j);
-    }).catch(function () { if (picked && picked.name === name) elSLine.textContent = 'Pscale could not be reached.'; });
+      delete READING[name]; BLOCKS[name] = j; go(j);
+    }).catch(function () { delete READING[name]; if (picked && picked.name === name) elSLine.textContent = 'Pscale could not be reached.'; });
   }
   $('sclose').addEventListener('click', closeStar);
   elSWalk.addEventListener('click', function () { if (picked) walkBlock(picked.name); });
@@ -1279,7 +1420,7 @@ body.intro #radio #band{pointer-events:none}   /* the dial hidden in the opening
   ['pointerdown', 'wheel', 'touchstart', 'keydown', 'focusin'].forEach(function (ev) { elRoll.addEventListener(ev, function () { rolling = false; }, { passive: true }); });
   $('credit').addEventListener('click', function () { openCredits(false); });
   $('cclose').addEventListener('click', closeCredits);
-  $('csky').addEventListener('click', function () { closeCredits(); if (inside) leaveBlock(); });
+  $('csky').addEventListener('click', function () { closeCredits(); if (inside) leaveBlock(true); });
 
   /* ── keys for walking a block: digits go down, Enter goes in, Backspace climbs, Escape leaves ── */
   document.addEventListener('keydown', function (e) {
@@ -1288,10 +1429,10 @@ body.intro #radio #band{pointer-events:none}   /* the dial hidden in the opening
     if (!elCredits.hidden) { if (e.key === 'Escape') { e.preventDefault(); closeCredits(); } return; }
     if (!inside) return;
     var ks = kids(path);
-    if (/^[1-9]$/.test(e.key)) { var d = Number(e.key); if (ks.indexOf(d) >= 0) { e.preventDefault(); stopHand(); select(d); quiet(goIn(hrun)); } }
-    else if ((e.key === 'ArrowRight' || e.key === 'ArrowLeft') && ks.length) { e.preventDefault(); var i = sel == null ? 0 : clamp(ks.indexOf(sel) + (e.key === 'ArrowRight' ? 1 : -1), 0, ks.length - 1); stopHand(); select(ks[i]); }
-    else if (e.key === 'Enter' && el === document.body && sel != null) { e.preventDefault(); stopHand(); quiet(goIn(hrun)); }
-    else if (e.key === 'Backspace') { e.preventDefault(); goUp(); }
+    if (/^[1-9]$/.test(e.key)) { var d = Number(e.key); if (ks.indexOf(d) >= 0) { e.preventDefault(); if (sel === d) goIn(); else mpick(d); } }
+    else if ((e.key === 'ArrowRight' || e.key === 'ArrowLeft') && ks.length) { e.preventDefault(); var i = ks.indexOf(sel); i = clamp((i < 0 ? 0 : i) + (e.key === 'ArrowRight' ? 1 : -1), 0, ks.length - 1); mpick(ks[i]); }
+    else if ((e.key === 'Enter' && el === document.body) || e.key === 'ArrowDown') { e.preventDefault(); goIn(); }
+    else if (e.key === 'Backspace' || e.key === 'ArrowUp') { e.preventDefault(); goUp(); }
     else if (e.key === 'Escape') { e.preventDefault(); leaveBlock(); }
   });
 
@@ -1304,14 +1445,14 @@ body.intro #radio #band{pointer-events:none}   /* the dial hidden in the opening
     var dtF = Math.min(0.1, Math.max(0, t - (frameLoop.last || t)));
     recentK += ((intro ? 1 : 0) - recentK) * Math.min(1, dtF * 0.7); frameLoop.last = t;
     preludeFrame(t); pulled = pullFrame(dtF);
+    moonsTick(Math.min(0.05, dtF));
     stepGlide(t); rollOn(t);
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    if (inside) settleRing();
     radioFrame(nowMs);
     if (!elCredits.hidden) drawCreditSky(t);
     else {
       tendSky(t); drawSky(t, 1, sMnow); drawPicked(t);
-      if (inside) { if (V.bloom > 0) { var br = Math.max(W, H) * 1.5 * V.bloom; ctx.globalCompositeOperation = 'lighter'; ctx.drawImage(SP_A, W / 2 - br, H * 0.4 - br, br * 2, br * 2); ctx.globalCompositeOperation = 'source-over'; } drawRing(nowMs); }
+      if (inside) drawMoons();
       if (tuned) drawTuned(tuned, nowMs);
     }
     raf = requestAnimationFrame(frameLoop);
@@ -1325,7 +1466,7 @@ body.intro #radio #band{pointer-events:none}   /* the dial hidden in the opening
   /* ── what the checks read ── */
   window.__t = { get s() { return { f: f, pi: pi, beat: beat, mLocked: mLocked, heard: heard, showTom: showTom, done: done, cur: cur && cur.who }; }, setF: function (x) { f = x; } };
   window.theApproach = {
-    state: function () { var hq = oproj(filmPos()), G = gapNow(), gs = G && starOf(G.block), gq = gs && oproj(gs.p); return { started: started, inviting: inviting, touches: touches, lost: lost, gap: G ? G.title : '', gapF: G ? G.f : null, gapStar: gq ? [Math.round(gq[0]), Math.round(gq[1])] : null, home: hq ? [Math.round(hq[0]), Math.round(hq[1])] : null, centre: BAS ? [Math.round(BAS.cx), Math.round(BAS.cy)] : null, ficOn: fic.on, ficS: +sFnow.toFixed(3), ficBs: fic.bs, ficT: fic.on ? +vid.currentTime.toFixed(1) : 0, ficFilter: vid.style.filter, pxShown: pxc.style.display === 'block', handWins: handWins, pulled: pulled, dist: +orb.dist.toFixed(3), who: $('who').textContent, diary: $('diary').textContent, vb: +V.b.toFixed(3), stopped: stopped, quietR: quietR, begun: begun, introAt: introAt, introDone: introDone, btn: $('stop').hidden ? '' : $('stop').textContent, skip: !$('skipop').hidden, find: !$('find').hidden, needle: $('needle').style.left, vidPaused: vid.paused, frameOn: fr.classList.contains('on'), stG: stG ? +stG.gain.value.toFixed(3) : -1, ghostG: bus.ghost ? +bus.ghost.g.gain.value.toFixed(3) : -1, live: live.size, intro: intro, recentK: +recentK.toFixed(2), recent: RECENT.length, f: f, pi: pi, mLocked: mLocked, heard: heard, showTom: showTom, done: done, cur: cur && cur.who, clipOn: clipOn, held: held, inside: inside, block: wb ? wb.name : '', path: path.join(''), sel: sel, filmOn: filmOn, tuned: !!tuned, rev: tuned ? tuned.rev : 0, card: elCard.hidden ? '' : elLine.textContent, read: $('read').textContent, say: $('say').textContent, who: $('who').textContent, ac: AC ? AC.state : 'none', loaded: Object.keys(BUF).length, sM: sMnow, marka: curM() ? curM().f : null }; },
+    state: function () { var hq = oproj(filmPos()), G = gapNow(), gs = G && starOf(G.block), gq = gs && oproj(gs.p); return { started: started, inviting: inviting, touches: touches, lost: lost, gap: G ? G.title : '', gapF: G ? G.f : null, gapStar: gq ? [Math.round(gq[0]), Math.round(gq[1])] : null, home: hq ? [Math.round(hq[0]), Math.round(hq[1])] : null, centre: BAS ? [Math.round(BAS.cx), Math.round(BAS.cy)] : null, ficOn: fic.on, ficS: +sFnow.toFixed(3), ficBs: fic.bs, ficT: fic.on ? +vid.currentTime.toFixed(1) : 0, ficFilter: vid.style.filter, pxShown: pxc.style.display === 'block', handWins: handWins, pulled: pulled, dist: +orb.dist.toFixed(3), who: $('who').textContent, diary: $('diary').textContent, vb: +V.b.toFixed(3), stopped: stopped, quietR: quietR, begun: begun, introAt: introAt, introDone: introDone, btn: $('stop').hidden ? '' : $('stop').textContent, skip: !$('skipop').hidden, find: !$('find').hidden, needle: $('needle').style.left, vidPaused: vid.paused, frameOn: fr.classList.contains('on'), stG: stG ? +stG.gain.value.toFixed(3) : -1, ghostG: bus.ghost ? +bus.ghost.g.gain.value.toFixed(3) : -1, live: live.size, intro: intro, recentK: +recentK.toFixed(2), recent: RECENT.length, f: f, pi: pi, mLocked: mLocked, heard: heard, showTom: showTom, done: done, cur: cur && cur.who, clipOn: clipOn, held: held, inside: inside, block: wb ? wb.name : '', path: path.join(''), sel: sel, filmOn: filmOn, tuned: !!tuned, rev: tuned ? tuned.rev : 0, card: inside ? $('maddr').textContent + ' ' + $('mline').textContent : elCard.hidden ? '' : elLine.textContent, read: $('read').textContent, say: $('say').textContent, who: $('who').textContent, ac: AC ? AC.state : 'none', loaded: Object.keys(BUF).length, sM: sMnow, marka: curM() ? curM().f : null }; },
     log: function () { return JSON.parse(JSON.stringify(LOG)); },
     lives: function () { return LIVES.map(function (L) { return { f: L.f, who: L.who }; }); },
     mara: function () { return MARA.map(function (P) { return P.f; }).concat([TOM.f]); },
@@ -1337,7 +1478,9 @@ body.intro #radio #band{pointer-events:none}   /* the dial hidden in the opening
       return { yaw: orb.yaw, dist: orb.dist, film: fq, clear: clear.slice(0, 60), fictions: out.filter(function (a) { return a.fic; }), stars: B3.length };
     },
     star: function (name) { basis(); var s = starOf(name), q = s && oproj(s.p); return q ? { x: q[0], y: q[1] } : null; },
-    ring: function () { if (!inside) return null; var ks = kids(path); return { pts: ks.map(function (d, i) { var q = ringPos(i, ks.length, 1); return { k: d, x: q[0], y: q[1] }; }) }; },
+    moons: function () { return { inside: inside, block: wb ? wb.name : '', focus: inside ? address(path) : '', sel: sel, selLive: M.selLive, tr: !!M.tr, kids: inside ? kids(path) : [], addr: $('maddr').textContent, line: $('mline').textContent, hits: M.hits.map(function (h) { return { k: h.k, has: h.has, sn: +h.sn.toFixed(3), x: Math.round(h.x), y: Math.round(h.y), r: Math.round(h.r) }; }), dist: +orb.dist.toFixed(3), labelA: +M.labelA.toFixed(2) }; },
+    ring: function () { if (!inside || M.tr) return null; return { pts: M.hits.filter(function (h) { return h.has; }).sort(function (a, b) { return a.k - b.k; }).map(function (h) { return { k: h.k, x: h.x, y: h.y }; }) }; },
+    oldring: function () { if (!inside) return null; var ks = kids(path); return { pts: ks.map(function (d, i) { var q = [0, 0]; return { k: d, x: q[0], y: q[1] }; }) }; },
     film: function () { return { src: (elFilm.currentSrc || '').split('/').pop(), t: elFilm.currentTime, paused: elFilm.paused, muted: elFilm.muted }; },
     credits: function () { return { open: !elCredits.hidden, faces: faces.length, voice: cvoice ? cvoice.src.split('/').pop() : '' }; }
   };
