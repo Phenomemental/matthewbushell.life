@@ -71,7 +71,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 #band u{position:absolute;bottom:0;width:3px;height:22px;background:#f2b65c;transform:translateX(-50%);border-radius:2px;opacity:.75}
 #band s{position:absolute;bottom:0;width:4px;height:30px;background:var(--crimson);transform:translateX(-50%);border-radius:2px;box-shadow:0 0 8px var(--crimson);opacity:0;transition:opacity .4s}
 #needle{position:absolute;top:0;bottom:0;width:2px;background:#ff5a3c;box-shadow:0 0 10px #ff5a3c,0 0 3px #fff;left:50%}
-#btns{display:flex;gap:8px;max-width:760px;margin:9px auto 0}
+#btns{display:flex;gap:8px;max-width:760px;margin:9px auto 0;position:relative;z-index:1}
 #btns button,#veil button{flex:1;height:48px;border-radius:8px;border:1px solid #8a6a3a;background:#1b130a;color:#f4e3c2;font:600 19px 'Cormorant Garamond',Georgia,serif;letter-spacing:.04em}
 #btns button:disabled{opacity:.36}
 #find,#tin{background:#4a1612;border-color:#c8322c}
@@ -87,9 +87,14 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 #title{position:fixed;inset:0;z-index:7;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;background:#000;transition:opacity 2.5s,background 2.5s}
 #title h1{font-weight:500;font-size:clamp(34px,9vw,64px);letter-spacing:.32em;margin:0 0 14px;padding-left:.32em;color:var(--ink)}
 #title p{font-size:20px;letter-spacing:.2em;opacity:.8;margin:0;color:var(--ink)}
-body.intro #radio{opacity:0;pointer-events:none;transform:translateY(40px)}
-#radio{transition:opacity 2s,transform 2s}
-body.intro #credit{display:none}
+body.intro #read,body.intro #band{opacity:0;pointer-events:none;transform:translateY(40px)}
+#read,#band{transition:opacity 2s,transform 2s}
+/* the viewer's control (6.6): the radio's area catches only its real controls; Stop stays in view from Begin to the end card */
+#radio{pointer-events:none}
+#radio #band,#radio button{pointer-events:auto}
+body.intro #radio{z-index:8}   /* above the title card, so Stop is in view from Begin */
+body.intro #radio #band{pointer-events:none}   /* the dial hidden in the opening sits lower, over Stop: it must not catch taps */
+#btns #stop[aria-pressed="true"]{border-color:#e0a050;color:#ffe2b0;box-shadow:0 0 14px #e0a05033}
 /* while a star's film plays or a block is walked by hand, the radio waits */
 .film.held #words{visibility:hidden}
 /* the sky lies under the radio here: the empty frame and the words let a finger through to the stars */
@@ -186,7 +191,7 @@ body.intro #credit{display:none}
 <div id="radio">
   <p id="read">· · ·</p>
   <div id="band" role="slider" aria-label="The dial" aria-valuemin="0" aria-valuemax="100" tabindex="0"><div id="needle"></div></div>
-  <div id="btns"><button type="button" id="tup" hidden>Up</button><button type="button" id="find">Find Mara</button><button type="button" id="tin" hidden>Go in</button></div>
+  <div id="btns"><button type="button" id="tup" hidden>Up</button><button type="button" id="stop" aria-pressed="false" hidden>Stop</button><button type="button" id="find">Find Mara</button><button type="button" id="skipop" hidden>Skip the opening</button><button type="button" id="tin" hidden>Go in</button></div>
 </div>
 
 <p class="notice" id="notice" role="status" hidden><span>Pscale could not be reached.</span> <button type="button" id="again">Try again</button></p>
@@ -281,7 +286,7 @@ body.intro #credit{display:none}
   var ARMS = ['archive', 'pool', 'spine', 'function', 'liquid', 'grain', 'passport', 'now', 'shell'];
   var TAU = Math.PI * 2;
   var $ = function (id) { return document.getElementById(id); };
-  var stage = $('film'), canvas = $('sky'), ctx = canvas.getContext('2d', { willReadFrequently: true });
+  var stage = $('film'), canvas = $('sky'), ctx = canvas.getContext('2d');   /* drawn by the graphics chip: nothing reads it back (a block film drew every video frame into a software canvas) */
   if (!ctx) return;
   document.documentElement.classList.add('js');
   var PARTS = stage.getAttribute('data-parts'), VOICES = stage.getAttribute('data-voices'), CREDITS = stage.getAttribute('data-credits');
@@ -515,7 +520,7 @@ body.intro #credit{display:none}
   let intro=false;
   const GHOSTS=['g1','g2','g3','g4','g5','g6','g7','g8','g9','g10','g11','g12'];
   /* what the checks read: each narrator line and each clip, when they began and ended */
-  var LOG = { nar: [], told: [], clips: [], lives: [], films: [], heard: [], px: 0, end: 0, t0: 0 };
+  var LOG = { nar: [], told: [], ctl: [], clips: [], lives: [], films: [], heard: [], px: 0, end: 0, t0: 0 };
   /* ---------------- audio ---------------- */
   let AC,master,stG,BUF={};
   const bus={};
@@ -533,7 +538,8 @@ body.intro #credit{display:none}
   const live=new Set();
   function play(id,b,vol=1,when=0){if(!AC||!BUF[id])return null;const s=AC.createBufferSource(),q=AC.createGain();s.buffer=BUF[id];q.gain.value=vol;s.connect(q);q.connect(bus[b].g);s.start(AC.currentTime+when);live.add(s);LOG.heard.push(id);s.onended=()=>live.delete(s);return s;}
   async function waitBuf(id,ok){for(let i=0;i<50&&!BUF[id];i++){await sleep(100);if(!ok())return false;}return !!BUF[id];}
-  function pip(f=880,vol=.1,dur=.1,when=0){if(!AC)return;const o=AC.createOscillator(),q=AC.createGain(),t=AC.currentTime+when;o.frequency.value=f;q.gain.setValueAtTime(0,t);q.gain.linearRampToValueAtTime(vol,t+.01);q.gain.exponentialRampToValueAtTime(.0005,t+dur);o.connect(q);q.connect(master);o.start(t);o.stop(t+dur+.05);}
+  function pip(f=880,vol=.1,dur=.1,when=0){if(!AC)return;const o=AC.createOscillator(),q=AC.createGain(),t=AC.currentTime+when;o.frequency.value=f;q.gain.setValueAtTime(0,t);q.gain.linearRampToValueAtTime(vol,t+.01);q.gain.exponentialRampToValueAtTime(.0005,t+dur);o.connect(q);q.connect(master);o.start(t);o.stop(t+dur+.05);pipSet.add(o);o.onended=()=>pipSet.delete(o);}
+  const pipSet=new Set();
   function thump(){if(!AC)return;const o=AC.createOscillator(),q=AC.createGain(),t=AC.currentTime;o.frequency.setValueAtTime(70,t);o.frequency.exponentialRampToValueAtTime(34,t+1.2);q.gain.setValueAtTime(.5,t);q.gain.exponentialRampToValueAtTime(.001,t+1.6);o.connect(q);q.connect(master);o.start(t);o.stop(t+1.7);}
   /* ---------------- dial ---------------- */
   let f=.97,dragging=false;
@@ -598,7 +604,7 @@ body.intro #credit{display:none}
     if(run!==mRun)return;
     /* the piece is over: she drifts off */
     heard=Math.min(MARA.length+1,heard+1);dots();vid.pause();showPic(null);
-    if(showTom){done=true;mLocked=false;clearWords();const E=$('end');E.querySelector('p').style.opacity=0;E.style.display='flex';LOG.end=Date.now();await sleep(3500);E.style.display='none';await narrate(OUTRO);await sleep(800);clearWords();E.querySelector('p').style.opacity=1;E.style.display='flex';LOG.end2=Date.now();
+    if(showTom){done=true;layoutButtons();mLocked=false;clearWords();const E=$('end');E.querySelector('p').style.opacity=0;E.style.display='flex';LOG.end=Date.now();await sleep(3500);E.style.display='none';await narrate(OUTRO);await sleep(800);clearWords();E.querySelector('p').style.opacity=1;E.style.display='flex';LOG.end2=Date.now();
       /* then the end credits (6.45) */
       setTimeout(()=>{E.style.display='none';if(!held)openCredits(true);},8000);return;}
     pi++;beat=0;mLocked=false;
@@ -611,12 +617,15 @@ body.intro #credit{display:none}
   let lastGhost=0,lastMotif=0,lostAt=0,sMnow=0;
   function readout(s){$('read').textContent=s;}
   function radioFrame(now){
+    $('needle').style.left=(f*100)+'%';   /* the needle always follows the hand, whatever else is happening */
     if(intro){if(AC)stG.gain.setTargetAtTime(.035,AC.currentTime,.3);sMnow=.25;return;}   /* the opening: a breath of static under the narrator, the dial hidden */
     if(held){   /* a film is playing, or a block is walked by hand: the radio waits, silent */
       if(cur)stopLife();if(mLocked){mLocked=false;mRun++;vid.pause();clipOn=false;if(vg)vg.gain.value=0;for(const s of [...live]){try{s.stop();}catch(e){}}showPic(null);clearWords();}
       if(AC){const tn=AC.currentTime;bus.life.g.gain.setTargetAtTime(0,tn,.05);bus.mara.g.gain.setTargetAtTime(0,tn,.05);stG.gain.setTargetAtTime(0,tn,.05);bus.ghost.g.gain.setTargetAtTime(0,tn,.05);}
       sMnow=0;return;}
-    const P=done?null:curM(),sM=P?strength(P.f):0;sMnow=sM;
+    if(stopped&&quietR){if(cur)stopLife();if(AC){const tn=AC.currentTime;bus.life.g.gain.setTargetAtTime(0,tn,.05);bus.mara.g.gain.setTargetAtTime(0,tn,.05);stG.gain.setTargetAtTime(0,tn,.05);bus.ghost.g.gain.setTargetAtTime(0,tn,.05);}
+      readout('stopped  ·  tap a star, or turn the dial');sMnow=0;return;}
+    const P=(done||stopped)?null:curM(),sM=P?strength(P.f):0;sMnow=sM;
     // fixed stations
     let best=null,bs=0;for(const L of LIVES){const s=strength(L.f);if(s>bs){bs=s;best=L;}}
     if(sM>bs&&sM>.05){if(cur)stopLife();}
@@ -633,27 +642,34 @@ body.intro #credit{display:none}
       const d=Math.abs(f-P.f);if(!mLocked&&d<.14&&now-lastMotif>2600&&AC){const v=.16*Math.pow(1-d/.14,2);[784,988,1175].forEach((q,k)=>pip(q,v,.25,k*.16));lastMotif=now;}
       if(!mLocked&&hintAt&&now>hintAt)$('mmark').style.opacity=.9;}
     if(!mLocked&&!cur)readout(dragging?'· · ·':'· · ·');else if(cur)readout(cur.band+'  ·  '+cur.who);
+    if(stopped&&!done&&!cur&&Math.abs(f-curM().f)<.035)readout((showTom?'Tom’s radio':'Mara')+'  ·  press Back to the film');
     // ghosts drift in the static
     if(AC&&!clipOn&&dragging&&Math.max(bs,sM)<.2&&now-lastGhost>2800){play(GHOSTS[Math.floor(Math.random()*12)],'ghost',.8);lastGhost=now;}
     // snow over the picture
-    if(fr.classList.contains('on')){const id=sg.createImageData(160,90),a=id.data,k=Math.max(1-sM,burst>0?(burst--,.8):0);for(let i=0;i<14400;i++){if(Math.random()<k*.9){const v=Math.random()*220;a[i*4]=a[i*4+1]=a[i*4+2]=v;a[i*4+3]=255*Math.min(1,k*1.4);}}sg.putImageData(id,0,0);}
-    $('needle').style.left=(f*100)+'%';}
+    if(fr.classList.contains('on')){const id=sg.createImageData(160,90),a=id.data,k=Math.max(1-sM,burst>0?(burst--,.8):0);for(let i=0;i<14400;i++){if(Math.random()<k*.9){const v=Math.random()*220;a[i*4]=a[i*4+1]=a[i*4+2]=v;a[i*4+3]=255*Math.min(1,k*1.4);}}sg.putImageData(id,0,0);}}
   /* ---------------- hands ---------------- */
   function setF(x){const b=$('band').getBoundingClientRect();f=Math.min(.995,Math.max(.005,(x-b.left)/b.width));}
-  $('band').addEventListener('pointerdown',e=>{if(inside){bandHand(e);return;}dragging=true;$('band').setPointerCapture(e.pointerId);setF(e.clientX);});
+  $('band').addEventListener('pointerdown',e=>{if(inside){bandHand(e);return;}quietR=false;dragging=true;$('band').setPointerCapture(e.pointerId);setF(e.clientX);});
   $('band').addEventListener('pointermove',e=>{if(inside){if(ringDrag)bandMove(e.clientX);return;}if(dragging)setF(e.clientX);});
   $('band').addEventListener('pointerup',()=>{if(inside){bandUp();return;}dragging=false;});
-  addEventListener('keydown',e=>{if(inside||!$('credits').hidden)return;if(e.key==='ArrowLeft')f=Math.max(.005,f-.004);if(e.key==='ArrowRight')f=Math.min(.995,f+.004);});
-  $('find').onclick=()=>{if(done||held)return;const to=curM().f,from=f,t0=performance.now();dragging=true;(function st(){const u=Math.min(1,(performance.now()-t0)/1400),e=u*u*(3-2*u);f=from+(to-from)*e;if(u<1)requestAnimationFrame(st);else dragging=false;})();};
+  addEventListener('keydown',e=>{if(inside||!$('credits').hidden||intro)return;if(e.key==='ArrowLeft'){quietR=false;f=Math.max(.005,f-.004);}if(e.key==='ArrowRight'){quietR=false;f=Math.min(.995,f+.004);}});
+  $('find').onclick=()=>{if(done||inside)return;quietR=false;const to=curM().f,from=f,t0=performance.now();dragging=true;(function st(){const u=Math.min(1,(performance.now()-t0)/1400),e=u*u*(3-2*u);f=from+(to-from)*e;if(u<1)requestAnimationFrame(st);else dragging=false;})();};
   $('go').onclick=()=>{audio();if(AC.state==='suspended')AC.resume();vid.muted=true;setClip('station');vid.play().then(()=>{vid.pause();vid.muted=false;}).catch(()=>{});
     /* the film player is woken in the same tap */
     const fv=$('filmv');fv.muted=true;fv.src=PARTS+FICTIONS[0].file+'.mp4';fv.play().then(()=>{fv.pause();fv.muted=false;}).catch(()=>{});
-    $('veil').style.display='none';LOG.t0=Date.now();soundLabel();runIntro();};
+    $('veil').style.display='none';LOG.t0=Date.now();soundLabel();begun=true;runIntro(false);};
   async function narrate(list){for(const x of list){if(!(await waitBuf(x.id,()=>true)))continue;sayText(x.t);play(x.id,'clear');LOG.told.push({id:x.id,t0:Date.now(),t1:Date.now()+BUF[x.id].duration*1000});await sleep((BUF[x.id].duration+.55)*1000);}}
-  async function runIntro(){intro=true;document.body.classList.add('intro');const T=$('title');T.style.display='flex';T.style.opacity=1;burst=40;
-    if(AC){const tn=AC.currentTime;stG.gain.setValueAtTime(.25,tn);stG.gain.linearRampToValueAtTime(.04,tn+2.5);pip(523,.12,1.6,0);}
-    await sleep(3800);T.style.background='#0000';await sleep(1200);T.style.opacity=0;await sleep(1400);T.style.display='none';
-    $('words').style.display='';await narrate(INTRO);await sleep(600);clearWords();document.body.classList.remove('intro');intro=false;placeMark();}
+  /* the opening, as the prototype has it, but stoppable (6.6): Stop leaves it at the line it was on, Back to the film picks that line up again */
+  let introRun=0,introAt=0,introDone=false,introStopped=false;
+  async function runIntro(resume){const tok=++introRun,ok=()=>tok===introRun;intro=true;document.body.classList.add('intro');const T=$('title');layoutButtons();
+    if(!resume){T.style.display='flex';T.style.opacity=1;burst=40;
+      if(AC){const tn=AC.currentTime;stG.gain.setValueAtTime(.25,tn);stG.gain.linearRampToValueAtTime(.04,tn+2.5);pip(523,.12,1.6,0);}
+      await sleep(3800);if(!ok())return;T.style.background='#0000';await sleep(1200);if(!ok())return;T.style.opacity=0;await sleep(1400);if(!ok())return;T.style.display='none';
+      $('words').style.display='';}
+    else T.style.display='none';
+    for(;introAt<INTRO.length;introAt++){const x=INTRO[introAt];const got=await waitBuf(x.id,ok);if(!ok())return;if(!got)continue;sayText(x.t);play(x.id,'clear');LOG.told.push({id:x.id,t0:Date.now(),t1:Date.now()+BUF[x.id].duration*1000});await sleep((BUF[x.id].duration+.55)*1000);if(!ok())return;}
+    await sleep(600);if(!ok())return;endIntro();}
+  function endIntro(){clearWords();document.body.classList.remove('intro');intro=false;introDone=true;placeMark();layoutButtons();}
   /* ════════════ end of the prototype's radio ════════════ */
 
   /* the sound control in the corner: the radio's whole level */
@@ -663,7 +679,58 @@ body.intro #credit{display:none}
 
   /* ── by hand: the radio waits while a film plays or a block is walked ── */
   var held = false, filmOn = false;
-  function hold(on) { held = on || inside || filmOn; stage.classList.toggle('held', held); $('find').hidden = inside; $('tup').hidden = !inside; $('tin').hidden = !inside; }
+  function hold(on) { held = on || inside || filmOn || !!credHeld; stage.classList.toggle('held', held); layoutButtons(); }
+
+  /* ── the viewer's control (6.6): Stop, Back to the film, Skip the opening, Stop this film ── */
+  var begun = false, stopped = false, quietR = false, stopAt = null;
+  function resumeAudio() { if (AC && AC.state !== 'running') quiet(AC.resume()); }
+  function filmRunning() { return begun && !stopped && !done; }
+  function layoutButtons() {
+    var st = $('stop'), opening = begun && !introDone;
+    st.hidden = !begun || inside || (done && !filmOn);
+    st.textContent = filmOn ? 'Stop this film' : stopped ? 'Back to the film' : 'Stop';
+    st.setAttribute('aria-pressed', String(stopped && !filmOn));
+    $('skipop').hidden = inside || filmOn || !opening || !introStopped;
+    $('find').hidden = inside || opening;
+    $('tup').hidden = !inside; $('tin').hidden = !inside;
+  }
+  /* Stop: everything playing stops at once (the narrator, the clip, the static, the whispers, any pips); the radio goes quiet
+     until the dial is turned; the sky and the stars are the viewer's; the tuning that was stopped will start again from its beginning */
+  function stopFilm() {
+    if (!filmRunning()) return false;
+    stopAt = { f: f, locked: mLocked, intro: intro && !introDone };
+    LOG.ctl.push({ k: 'stop', t: Date.now(), intro: stopAt.intro, locked: mLocked, pi: pi, introAt: introAt });
+    stopped = true; quietR = true;
+    if (intro) { introRun++; intro = false; introStopped = true; var T = $('title'); T.style.display = 'none'; T.style.opacity = 0; document.body.classList.remove('intro'); }
+    mLocked = false; mRun++; beat = 0; clipOn = false; dragging = false;
+    try { vid.pause(); } catch (e) { /* not playing */ }
+    if (vg) vg.gain.value = 0;
+    stopLife();
+    pipSet.forEach(function (o) { try { o.stop(); } catch (e) { /* already done */ } }); pipSet.clear();
+    pxOn++; pxc.style.display = 'none'; vid.style.filter = ''; showPic(null); clearWords();
+    if (AC) { var tn = AC.currentTime; [bus.life.g, bus.mara.g, bus.ghost.g, stG].forEach(function (g) { g.gain.cancelScheduledValues(tn); g.gain.setValueAtTime(0, tn); }); }
+    layoutButtons(); return true;
+  }
+  function glideNeedle(to, ms) { var from = f, t0 = performance.now(); dragging = true; (function st() { var u = Math.min(1, (performance.now() - t0) / ms), e = u * u * (3 - 2 * u); f = from + (to - from) * e; if (u < 1) requestAnimationFrame(st); else dragging = false; })(); }
+  /* Back to the film: the opening picks up at the line it was stopped on; otherwise the needle goes back to where the film was,
+     and the tuning that was stopped starts again from its beginning and plays on */
+  function backToFilm() {
+    if (!stopped || filmOn || inside) return;
+    resumeAudio(); stopped = false; quietR = false;
+    var at = stopAt || { f: f };
+    LOG.ctl.push({ k: 'back', t: Date.now(), intro: !!at.intro, locked: !!at.locked, pi: pi, introAt: introAt });
+    if (at.intro && !introDone) runIntro(true);
+    else glideNeedle(at.locked && !done ? curM().f : at.f, 900);
+    layoutButtons();
+  }
+  function skipOpening() {
+    if (introDone) return;
+    resumeAudio(); introRun++; stopLife(); introAt = INTRO.length; $('title').style.display = 'none';
+    stopped = false; quietR = false; LOG.ctl.push({ k: 'skip', t: Date.now() });
+    endIntro();
+  }
+  $('stop').addEventListener('click', function () { resumeAudio(); if (filmOn) { stopHand(); layoutButtons(); return; } if (stopped) backToFilm(); else stopFilm(); });
+  $('skipop').addEventListener('click', skipOpening);
 
   /* the paper card: a block's words, a film's title */
   var elCard = $('wcard'), elLine = $('wline'), ctyping = 0, cardTop = -1;
@@ -721,9 +788,9 @@ body.intro #credit{display:none}
     for (var i = 0; i < M.cols * M.rows; i++) { var q = (M.RND[i] + ph) % 1; if (q > rev * (1 - M.EDGE[i] * 0.9)) { if (Math.random() < 0.05) { var v = 60 + Math.random() * 170; a[i * 4] = a[i * 4 + 1] = a[i * 4 + 2] = v; a[i * 4 + 3] = 200; } else a[i * 4 + 3] = 0; } }
     og.putImageData(id, 0, 0); ctx.imageSmoothingEnabled = false; ctx.drawImage(oc, R.x, R.y, R.w, R.h); ctx.imageSmoothingEnabled = true;
   }
-  function filmStop() { elFilm._tok = (elFilm._tok || 0) + 1; try { elFilm.pause(); } catch (e) { /* not playing */ } tuned = null; if (filmOn) { filmOn = false; hold(false); } }
+  function filmStop() { elFilm._tok = (elFilm._tok || 0) + 1; try { elFilm.pause(); } catch (e) { /* not playing */ } tuned = null; if (filmOn) { filmOn = false; quietR = false; card(''); hold(false); resumeAudio(); } }
   async function playFilm(F) {
-    stopHand(); closeStar(); var r = hrun;
+    stopFilm(); stopHand(); closeStar(); var r = hrun;
     filmOn = true; hold(true);
     card('', F.title + '. A film made from the block ' + F.block + '.');
     var rec = { title: F.title, t0: Date.now(), seen: 0, ended: false }; LOG.films.push(rec);
@@ -747,7 +814,7 @@ body.intro #credit{display:none}
       });
       tuned.rev = 0.99; await tween(tuned, 'rev', 0, 420, r, lin);
     } catch (e) { /* a new hand took over */ }
-    if (r === hrun) { tuned = null; elFilm.pause(); filmOn = false; card(''); hold(false); }
+    if (r === hrun) { tuned = null; elFilm.pause(); filmOn = false; quietR = false; card(''); hold(false); resumeAudio(); }
   }
 
   /* ── walking a block by hand: its real branches in a ring around the point we stand on; the band shows their digits ── */
@@ -806,7 +873,7 @@ body.intro #credit{display:none}
     closeStar(); card(''); flying = true; radioF = inside ? radioF : f; hold(true);
     var s = starOf(name), at = name === FILM ? filmPos() : s ? s.p : orb.tgt.slice(); flyAt = at.slice();
     readout('going in'); glideTo({ tgt: at.slice(), dist: 0.035 }, 1.5, easeIn);
-    quiet(tween(V, 'b', 1, 1500, r)); await nap(1500, r);
+    await tween(V, 'b', 1, 1500, r);   /* the glow of going in finishes before it is put out (a timer racing it once left it lit) */
     flying = false; glide = null; inside = true; wb = { name: name, root: json, film: name === FILM }; path = []; sel = null; V.b = 0;
     orb.tgt = [0, 0, 0]; orb.dist = restDist(); orb.pitch = 0.55; SK.dim = DIMIN; hold(true);
     bandForRing(); needleAt(0.5); readout(wb.film ? 'film:the-approach' : name); pointCardHere(); setAddr(); update();
@@ -814,7 +881,7 @@ body.intro #credit{display:none}
   }
   function leaveBlock() {
     var from = wb && !wb.film && starOf(wb.name) ? starOf(wb.name).p : filmPos();
-    stopHand(); inside = false; wb = null; path = []; sel = null; SK.dim = 1; card(''); setAddr();
+    stopHand(); inside = false; wb = null; path = []; sel = null; SK.dim = 1; V.b = 0; flyAt = null; card(''); setAddr();
     buildBand(); needleAt(radioF); placeMark(); hold(false);
     orb.tgt = from.slice(); orb.dist = 0.06; glideTo({ tgt: [0, 0, 0], dist: restDist(), pitch: 0.55 }, 2.4, easeOut); touchT = now(); update();
   }
@@ -885,7 +952,6 @@ body.intro #credit{display:none}
   function at(e) { var r = stage.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
   function two() { var k = Object.keys(pts); return k.length >= 2 ? [pts[k[0]], pts[k[1]]] : null; }
   canvas.addEventListener('pointerdown', function (e) {
-    if (intro) return;   /* the opening plays through; the sky is the listener's once the dial rises */
     if (inside || flying) { tapIn = { p: at(e), t: now() }; return; }
     var p = at(e); pts[e.pointerId] = p;
     gest = { moved: 0, t: now(), dist: 0, d0: orb.dist, many: Object.keys(pts).length > 1 };
@@ -912,13 +978,13 @@ body.intro #credit{display:none}
   canvas.addEventListener('pointerup', lift);
   canvas.addEventListener('pointercancel', lift);
   canvas.addEventListener('contextmenu', function (e) { if (!inside) e.preventDefault(); });
-  canvas.addEventListener('wheel', function (e) { if (inside || flying || intro) return; e.preventDefault(); orb.dist = clamp(orb.dist * Math.exp(e.deltaY * 0.0012), DMIN, DMAX); touchT = now(); }, { passive: false });
+  canvas.addEventListener('wheel', function (e) { if (inside || flying) return; e.preventDefault(); orb.dist = clamp(orb.dist * Math.exp(e.deltaY * 0.0012), DMIN, DMAX); touchT = now(); }, { passive: false });
   function tapSky(x, y) {
     basis();
     var best = null, bd = 28, q = oproj(filmPos()), i;
     if (q && Math.hypot(q[0] - x, q[1] - y) < 44) best = starOf(FILM) || { name: FILM, p: FILM_AT.slice(), size: 0 };
     else for (i = 0; i < B3.length; i++) { if (B3[i].name === FILM) continue; q = oproj(B3[i].p); if (!q) continue; var d = Math.hypot(q[0] - x, q[1] - y) - (B3[i].fic ? 10 : 0); if (d < bd) { bd = d; best = B3[i]; } }
-    if (best) openStar(best); else closeStar();
+    if (best) { stopFilm(); openStar(best); } else closeStar();   /* a star tapped while the film runs stops it first (6.6) */
   }
   function bytesOf(name) { return Number(((index && index.bytes) || {})[name]) || 0; }
   function openStar(s) {
@@ -953,7 +1019,7 @@ body.intro #credit{display:none}
   }
   $('sclose').addEventListener('click', closeStar);
   elSWalk.addEventListener('click', function () { if (picked) walkBlock(picked.name); });
-  elSFic.addEventListener('click', function () { if (picked && picked.fic) quiet(playFilm(picked.fic)); });
+  elSFic.addEventListener('click', function () { resumeAudio(); if (picked && picked.fic) quiet(playFilm(picked.fic)); });
   function tendSky(t) {
     var dt = Math.min(0.1, Math.max(0, t - lastSky)); lastSky = t;
     if (intro) { if (!CALM) orb.yaw += dt * 0.054; return; }   /* the opening turns the sky a little faster, as the prototype's does */
@@ -1021,7 +1087,7 @@ body.intro #credit{display:none}
     g2.fillStyle = m; g2.fillRect(0, 0, S, S); g2.globalCompositeOperation = 'source-over';
   }
   function openCredits(roll) {
-    stopHand(); credHeld = true; held = true; stage.classList.add('held');
+    stopFilm(); stopHand(); credHeld = true; held = true; stage.classList.add('held');
     elCredits.hidden = false; stage.classList.add('credited'); $('end').style.display = 'none';
     [].forEach.call(elRoll.querySelectorAll('[data-face]'), function (pn) { pn.removeAttribute('data-started'); var c = pn.querySelector('canvas'); c.getContext('2d').clearRect(0, 0, c.width, c.height); });
     faces = []; holds = [].slice.call(elRoll.querySelectorAll('[data-hold]')); holdAt = 0; holdTill = 0; rollStop = false; rollLast = now(); ghostNext = now() + 3;
@@ -1094,7 +1160,7 @@ body.intro #credit{display:none}
   /* ── what the checks read ── */
   window.__t = { get s() { return { f: f, pi: pi, beat: beat, mLocked: mLocked, heard: heard, showTom: showTom, done: done, cur: cur && cur.who }; }, setF: function (x) { f = x; } };
   window.theApproach = {
-    state: function () { return { intro: intro, recentK: +recentK.toFixed(2), recent: RECENT.length, f: f, pi: pi, mLocked: mLocked, heard: heard, showTom: showTom, done: done, cur: cur && cur.who, clipOn: clipOn, held: held, inside: inside, block: wb ? wb.name : '', path: path.join(''), sel: sel, filmOn: filmOn, tuned: !!tuned, rev: tuned ? tuned.rev : 0, card: elCard.hidden ? '' : elLine.textContent, read: $('read').textContent, say: $('say').textContent, who: $('who').textContent, ac: AC ? AC.state : 'none', loaded: Object.keys(BUF).length, sM: sMnow, marka: curM() ? curM().f : null }; },
+    state: function () { return { vb: +V.b.toFixed(3), stopped: stopped, quietR: quietR, begun: begun, introAt: introAt, introDone: introDone, btn: $('stop').hidden ? '' : $('stop').textContent, skip: !$('skipop').hidden, find: !$('find').hidden, needle: $('needle').style.left, vidPaused: vid.paused, frameOn: fr.classList.contains('on'), stG: stG ? +stG.gain.value.toFixed(3) : -1, ghostG: bus.ghost ? +bus.ghost.g.gain.value.toFixed(3) : -1, live: live.size, intro: intro, recentK: +recentK.toFixed(2), recent: RECENT.length, f: f, pi: pi, mLocked: mLocked, heard: heard, showTom: showTom, done: done, cur: cur && cur.who, clipOn: clipOn, held: held, inside: inside, block: wb ? wb.name : '', path: path.join(''), sel: sel, filmOn: filmOn, tuned: !!tuned, rev: tuned ? tuned.rev : 0, card: elCard.hidden ? '' : elLine.textContent, read: $('read').textContent, say: $('say').textContent, who: $('who').textContent, ac: AC ? AC.state : 'none', loaded: Object.keys(BUF).length, sM: sMnow, marka: curM() ? curM().f : null }; },
     log: function () { return JSON.parse(JSON.stringify(LOG)); },
     lives: function () { return LIVES.map(function (L) { return { f: L.f, who: L.who }; }); },
     mara: function () { return MARA.map(function (P) { return P.f; }).concat([TOM.f]); },
