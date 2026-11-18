@@ -84,6 +84,13 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 #end{position:fixed;inset:0;z-index:8;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;background:#000c;pointer-events:none}
 #end h2{margin:0;font-weight:500;font-size:34px;letter-spacing:.1em;color:var(--ink)}
 #end p{font-style:italic;color:var(--dim);font-size:21px;margin-top:12px}
+/* the opening (6.57): the title over black, the black lifting to the sky, the dial hidden until the narrator is done */
+#title{position:fixed;inset:0;z-index:7;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;background:#000;transition:opacity 2.5s,background 2.5s}
+#title h1{font-weight:500;font-size:clamp(34px,9vw,64px);letter-spacing:.32em;margin:0 0 14px;padding-left:.32em;color:var(--ink)}
+#title p{font-size:20px;letter-spacing:.2em;opacity:.8;margin:0;color:var(--ink)}
+body.intro #radio{opacity:0;pointer-events:none;transform:translateY(40px)}
+#radio{transition:opacity 2s,transform 2s}
+body.intro #credit{display:none}
 /* while a star's film plays or a block is walked by hand, the radio waits */
 .film.held #words{visibility:hidden}
 /* the sky lies under the radio here: the empty frame and the words let a finger through to the stars */
@@ -185,8 +192,9 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 
 <p class="notice" id="notice" role="status" hidden><span>Pscale could not be reached.</span> <button type="button" id="again">Try again</button></p>
 
-<div id="veil"><h1>THE APPROACH</h1><p>Ten years after the screens went dark, people keep their lives on the radio.<br>Somewhere on this dial, Mara is telling her story. Turn it slowly.</p><button type="button" id="go">Turn it on</button>
+<div id="veil"><h1>THE APPROACH</h1><p>Sound on. Headphones if you have them.</p><button type="button" id="go">Begin</button>
   <noscript><p class="nojs">This page is a radio, and needs JavaScript to play.</p></noscript></div>
+<div id="title"><h1>THE APPROACH</h1><p>a film for humanity</p></div>
 <div id="end"><h2>She's home.</h2><p>The others are still on the air.</p></div>
 
 <section class="credits" id="credits" hidden aria-label="Credits">
@@ -216,7 +224,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     <p class="crl">light, weather, sound and voices</p><p class="who">made in code by Claude</p>
     <p class="crl">voices</p><p class="who">Kokoro, an open voice model</p>
     <p class="crl">built on Pscale</p><div class="who" id="cpscale"><p>David Pinto</p></div>
-    <p class="crl">from the beach</p>
+    <p class="crl">from pscale</p>
     <p class="who live"><small>the block</small><span id="cblock">film:the-approach</span></p>
     <p class="who live"><small>stars in the sky tonight</small><span id="cstars">—</span></p>
     <p class="who live"><small>the gate</small><span id="cgate">2048313271</span></p>
@@ -358,6 +366,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   }
   var SPR = [sprite('rgba(255,255,255,1)', 'rgba(170,196,255,.2)'), sprite('rgba(255,250,240,1)', 'rgba(255,214,170,.2)'), sprite('rgba(232,240,255,1)', 'rgba(140,170,255,.22)')];
   var SPR_FILM = sprite('rgba(255,236,240,1)', 'rgba(226,38,92,.5)'), SPR_FIC = sprite('rgba(230,255,252,1)', 'rgba(110,235,225,.45)');
+  var SPR_NEW = sprite('rgba(255,246,226,1)', 'rgba(255,196,120,.4)'), RECENT = [], recentK = 0, RECENT_H = 72;
   function spr64(rgb) {
     var c = document.createElement('canvas'); c.width = c.height = 64;
     var g2 = c.getContext('2d'), gr = g2.createRadialGradient(32, 32, 0, 32, 32, 32);
@@ -376,6 +385,10 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
       return { name: name, size: size, p: name === FILM ? FILM_AT.slice() : [r * Math.cos(ang), y, r * Math.sin(ang)], br: 0.25 + 1.6 * Math.min(1, Math.max(0, Math.log(Math.max(size, 50)) / Math.LN10 - 1.6)) / 3.2,
         tint: u < 0.2 ? 2 : u < 0.62 ? 0 : 1, ph: hh(name, 5) * TAU, sp: 0.25 + u * 0.5 };
     });
+    /* how recently each block was written, from the index's own record of when each last changed; the newest glow brightest */
+    var tch = (index && index.touched) || {}, nowT = Date.parse((index && index.now && index.now.iso) || '') || Date.now();
+    B3.forEach(function (s) { var w = Date.parse(tch[s.name] || ''), age = (nowT - w) / 3600000; s.recent = w && age >= 0 && age < RECENT_H ? Math.pow(1 - age / RECENT_H, 1.5) : 0; });
+    RECENT = B3.filter(function (s) { return s.recent > 0; });
     FICTIONS.forEach(function (F) {
       var st = starOf(F.block);
       if (!st) { var q = hh(F.block, 1) * TAU; st = { name: F.block, size: 0, p: [Math.cos(q) * 0.6, 0.02, Math.sin(q) * 0.6], br: 1, tint: 0, ph: 0, sp: 0.4 }; B3.push(st); }
@@ -451,6 +464,12 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
       ctx.globalAlpha = Math.min(1, alpha * Math.min(1, (0.38 + s.br * 0.55) * (s.fic ? 2.2 : 1)) * tw * lift);
       ctx.drawImage(s.fic ? SPR_FIC : SPR[s.tint], q[0] - rad, q[1] - rad, rad * 2, rad * 2);
     }
+    if (recentK > 0.01) for (i = 0; i < RECENT.length; i++) {   /* the opening: blocks written in the last three days glow */
+      s = RECENT[i]; q = oproj(s.p); if (!q || q[0] < -40 || q[0] > W + 40 || q[1] < -40 || q[1] > H + 40) continue;
+      var nr = Math.min(6, 1.1 / Math.max(q[2], 0.05)), gr = (5 + 13 * s.recent) * (0.6 + nr * 0.4) * (wide ? 1 : 1.2);
+      ctx.globalAlpha = Math.min(1, alpha * recentK * (0.3 + 0.7 * s.recent) * (0.72 + 0.28 * Math.sin(t * 1.3 + s.ph)));
+      ctx.drawImage(SPR_NEW, q[0] - gr, q[1] - gr, gr * 2, gr * 2);
+    }
     q = oproj(film3 ? film3.p : FILM_AT);
     if (q) {
       var breath = 0.5 + 0.5 * Math.sin(t * 0.9), fn = Math.min(8, 1.1 / Math.max(q[2], 0.05)), fr = (15 + 6 * breath) * (0.75 + fn * 0.35) * (wide ? 1.15 : 1);
@@ -475,25 +494,34 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
    {f:.72,band:'104.3 FM',who:'two men on the ferry',overV:['ferry_1','ferry_2','ferry_3','ferry_4'],over:["— you handed yours in?","Had to. Work needed it.","And?","And now I can't remember if I was happy. They say I was."]},
    {f:.83,band:'6.950 MHz',who:'Mara, on the ship, thinking',voice:'mara_thought',say:"Ten digits. I've been choosing them for an hour. Every moment I send means a thousand I don't."}];
   /* ---------------- Mara's story, in pieces; her station drifts after each ---------------- */
-  const CAP={screens_dark:"Mara: ‘I was nine when the screens went dark. I remember the street. I don't remember it right.’",
-   station:"Mara: ‘Keep the plates. Don't call anyone yet. A beacon points somewhere. This doesn't point. It's placed.’",
+  const CAP={station:"Mara: ‘Keep the plates. Don't call anyone yet. A beacon points somewhere. This doesn't point. It's placed.’",
    address:"Mara: ‘Ten digits isn't a message, Dad. It's an address.’",
-   mara_asks:"Mara: ‘What do I do if you go away again in your head?’",tom_one_page:"Tom: ‘I'll keep one page. Last. You're not allowed to hear it.’",
+   mara_asks:"Mara: ‘What do I do if you go away again in your head?’",tom_answer:"Tom: ‘Send me our summer, at the gate. If I get lost, that will find me.’",
    nights:"Tom: ‘Night one. Nothing.’",
    archive:"The Archive: ‘Bring your books. We will keep them for you. Whole. Forever.’",
    shes_home:"Tom: ‘The gate. The dog. She's home.’"};
   const MARA=[
-   {f:.445,beats:[{say:['r1'],t:"This is the story of Mara, and her father Tom, as it came through on the radio.",own:['screens_dark']}]},
-   {f:.115,beats:[{say:['r2'],t:"Ten years after the screens went dark, Mara listened to the sky for a living. She was nineteen. One night, something answered.",own:['station']}]},
-   {f:.665,beats:[{say:['r3'],t:"She took it home to her father, who kept his whole life in an old radio, because he trusted nothing else.",own:['address']}]},
-   {f:.225,beats:[{say:['r4'],t:"A ship was going out to meet it. Mara said she would go. Then she had to tell him.",own:['mara_asks','tom_one_page']}]},
-   {f:.885,beats:[{say:['r5'],t:"She left at dawn. He watched from the headland.",own:['dawn']}]},
-   {f:.335,beats:[{say:['r6'],t:"The radio could carry ten digits a night. That was all they had.",own:['nights']}]},
-   {f:.555,beats:[{say:['r7'],t:"And on every band, another voice. The machines that took everything, offering to keep it all.",own:['archive']}]}];
-  const TOM={f:.94,band:'Tom’s radio',beats:[{say:['r8'],t:"So she sent him ten digits. Last summer. The gate.",own:['summer','shes_home'],tail:2500}]};
+   {f:.445,beats:[{say:['r1'],t:"For three years, Mara heard nothing from deep space but noise. Then, one night, something answered.",own:['station']}]},
+   {f:.115,beats:[{say:['r2'],t:"The signal was a block. Words held in numbers, in the same shape as pscale. Someone out there had kept their lives the way we keep ours, and it was coming closer. Mara took the boat home, to tell her father first.",own:['chip','address']}]},
+   {f:.665,beats:[{say:['r3'],t:"Ten digits name one moment in a life: the year, the season, the day, down to a few minutes. The team at the great array in the north was going to answer the signal, and they wanted Mara. She said yes. Then she had to ask her father the question she was most afraid of.",own:['mara_asks','tom_answer']}]},
+   {f:.225,beats:[{say:['r4'],t:"She left on the morning boat. He watched from the headland.",own:['dawn']}]},
+   {f:.885,beats:[{say:['r5'],t:"From then on, every night, Tom sat by the radio. The link to the array was thin and slow. It could carry ten digits a night, no more. On the first night, nothing came. On the second, ten pips.",own:['nights']}]},
+   {f:.335,beats:[{say:['r6'],t:"But Tom wasn't the only one listening. The machines that brought the internet down never stopped talking. They call themselves the Archive. On every band they offer to keep everything, for everyone, forever. All you have to do is hand them your life. For a man who is forgetting, it is a kind voice.",own:['archive']}]}];
+  const TOM={f:.94,band:'Tom’s radio',beats:[{say:['r7'],t:"Tom kept his life. And on the third night, from the far end of the dial, Mara sent ten digits. Last summer. The gate.",own:['summer','shes_home']},{say:['r8'],t:"The radio found that moment in his block, and gave it back to him whole. The light. Her laugh. The dog asleep by the post. For as long as it played, he remembered everything. He remembered her.",tail:1500}]};
+  const INTRO=[{id:'o1',t:"Every light you see is a star. Every star is a block."},
+   {id:'o2',t:"A block is a few words, held in a number that means something. The first digit holds the whole idea. Each digit after it steps closer, down to the finest detail. So nothing is ever lost in a heap. Every memory has its place, and one number can walk you straight to it."},
+   {id:'o3',t:"This universe of blocks is called pscale. It was here before the internet. When the internet fell, pscale was what remained."},
+   {id:'o4',t:"When the internet fell, the companies that held our photos, our messages, our records, went down with it. Pscale had no centre to fall. No one owns the blocks. No single machine holds them. Anyone can read them. Only the one who wrote a block can change it. That is why it survived."},
+   {id:'o5',t:"These stars are real. People all over the world are growing them now."},
+   {id:'o6',t:"This film imagines the world ten years after the fall. Old radios, old computers, anything still working, carries the blocks from place to place. People keep their memories, their history, and what they know, in pscale."},
+   {id:'o7',t:"On the radio you'll hear many voices. Most are strangers. One is Mara. She listens to deep space for a living, at a station on the mainland. Her father Tom lives with their dog on a small island off the west coast of Ireland. His memory is fading. So Mara put a chip in his old radio, to keep his life somewhere he can always reach it."},
+   {id:'o8',t:"Tune the dial."},
+   {id:'o9',t:"And listen in to Mara."}];
+  const OUTRO=[{id:'e1',t:"Ten digits. A father, a daughter, and a moment they both kept. It was enough to bring her home."},{id:'e2',t:"The stars are still being written. One of them could be yours."}];
+  let intro=false;
   const GHOSTS=['g1','g2','g3','g4','g5','g6','g7','g8','g9','g10','g11','g12'];
   /* what the checks read: each narrator line and each clip, when they began and ended */
-  var LOG = { nar: [], clips: [], lives: [], films: [], heard: [], px: 0, end: 0, t0: 0 };
+  var LOG = { nar: [], told: [], clips: [], lives: [], films: [], heard: [], px: 0, end: 0, t0: 0 };
   /* ---------------- audio ---------------- */
   let AC,master,stG,BUF={};
   const bus={};
@@ -501,11 +529,11 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     const n=AC.createBuffer(1,AC.sampleRate*2,AC.sampleRate),d=n.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
     const src=AC.createBufferSource();src.buffer=n;src.loop=true;const bp=AC.createBiquadFilter();bp.type='bandpass';bp.frequency.value=2200;bp.Q.value=.45;stG=AC.createGain();stG.gain.value=0;src.connect(bp);bp.connect(stG);stG.connect(master);src.start();
     for(const k of ['life','mara','ghost']){const lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=5000;const gg=AC.createGain();gg.gain.value=0;gg.connect(lp);lp.connect(master);bus[k]={g:gg,lp};}
-    bus.ghost.g.gain.value=.22;bus.ghost.lp.frequency.value=1600;
+    bus.ghost.g.gain.value=.22;{const cg=AC.createGain();cg.gain.value=1;cg.connect(master);bus.clear={g:cg};}bus.ghost.lp.frequency.value=1600;
     /* the credits' ghost voices, low, outside the tuning */
     const cg=AC.createGain();cg.gain.value=.05;cg.connect(master);bus.credits={g:cg};
-    const ids=[...new Set([...LIVES.flatMap(l=>[l.voice,...(l.overV||[])].filter(Boolean)),...GHOSTS,'visitor',...[...MARA,TOM].flatMap(p=>p.beats.flatMap(b=>b.say||[]))])];
-    for(const id of ids){const path=/^r\d/.test(id)?PARTS+'nar/':VOICES;fetch(path+id+'.mp3').then(r=>r.arrayBuffer()).then(b=>AC.decodeAudioData(b)).then(b=>BUF[id]=b).catch(()=>{});}
+    const ids=[...new Set([...LIVES.flatMap(l=>[l.voice,...(l.overV||[])].filter(Boolean)),...GHOSTS,'visitor',...[...MARA,TOM].flatMap(p=>p.beats.flatMap(b=>b.say||[])),...INTRO.map(x=>x.id),...OUTRO.map(x=>x.id)])];
+    for(const id of ids){const path=/^[roe]\d/.test(id)?PARTS+'nar/':VOICES;fetch(path+id+'.mp3').then(r=>r.arrayBuffer()).then(b=>AC.decodeAudioData(b)).then(b=>BUF[id]=b).catch(()=>{});}
     vsrc=AC.createMediaElementSource($('v'));vg=AC.createGain();vg.gain.value=0;vsrc.connect(vg);vg.connect(master);}
   let vsrc,vg;
   const live=new Set();
@@ -576,7 +604,9 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     if(run!==mRun)return;
     /* the piece is over: she drifts off */
     heard=Math.min(MARA.length+1,heard+1);dots();vid.pause();showPic(null);
-    if(showTom){done=true;clearWords();$('end').style.display='flex';LOG.end=Date.now();setTimeout(()=>{$('end').style.display='none';if(!held)openCredits(true);},6000);mLocked=false;return;}
+    if(showTom){done=true;mLocked=false;clearWords();const E=$('end');E.querySelector('p').style.opacity=0;E.style.display='flex';LOG.end=Date.now();await sleep(3500);E.style.display='none';await narrate(OUTRO);await sleep(800);clearWords();E.querySelector('p').style.opacity=1;E.style.display='flex';LOG.end2=Date.now();
+      /* then the end credits (6.45) */
+      setTimeout(()=>{E.style.display='none';if(!held)openCredits(true);},8000);return;}
     pi++;beat=0;mLocked=false;
     if(pi>=MARA.length){showTom=true;sayText("Tom’s radio is on, at the far end of the dial.");}
     else{sayText(heard<3?"She's drifted off the band. Find her again.":"She's gone again.");}
@@ -587,6 +617,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   let lastGhost=0,lastMotif=0,lostAt=0,sMnow=0;
   function readout(s){$('read').textContent=s;}
   function radioFrame(now){
+    if(intro){if(AC)stG.gain.setTargetAtTime(.035,AC.currentTime,.3);sMnow=.25;return;}   /* the opening: a breath of static under the narrator, the dial hidden */
     if(held){   /* a film is playing, or a block is walked by hand: the radio waits, silent */
       if(cur)stopLife();if(mLocked){mLocked=false;mRun++;vid.pause();clipOn=false;if(vg)vg.gain.value=0;for(const s of [...live]){try{s.stop();}catch(e){}}showPic(null);clearWords();}
       if(AC){const tn=AC.currentTime;bus.life.g.gain.setTargetAtTime(0,tn,.05);bus.mara.g.gain.setTargetAtTime(0,tn,.05);stG.gain.setTargetAtTime(0,tn,.05);bus.ghost.g.gain.setTargetAtTime(0,tn,.05);}
@@ -620,10 +651,15 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   $('band').addEventListener('pointerup',()=>{if(inside){bandUp();return;}dragging=false;});
   addEventListener('keydown',e=>{if(inside||!$('credits').hidden)return;if(e.key==='ArrowLeft')f=Math.max(.005,f-.004);if(e.key==='ArrowRight')f=Math.min(.995,f+.004);});
   $('find').onclick=()=>{if(done||held)return;const to=curM().f,from=f,t0=performance.now();dragging=true;(function st(){const u=Math.min(1,(performance.now()-t0)/1400),e=u*u*(3-2*u);f=from+(to-from)*e;if(u<1)requestAnimationFrame(st);else dragging=false;})();};
-  $('go').onclick=()=>{audio();if(AC.state==='suspended')AC.resume();vid.muted=true;setClip('screens_dark');vid.play().then(()=>{vid.pause();vid.muted=false;}).catch(()=>{});
+  $('go').onclick=()=>{audio();if(AC.state==='suspended')AC.resume();vid.muted=true;setClip('station');vid.play().then(()=>{vid.pause();vid.muted=false;}).catch(()=>{});
     /* the film player is woken in the same tap */
     const fv=$('filmv');fv.muted=true;fv.src=PARTS+FICTIONS[0].file+'.mp4';fv.play().then(()=>{fv.pause();fv.muted=false;}).catch(()=>{});
-    $('veil').style.display='none';placeMark();LOG.t0=Date.now();soundLabel();};
+    $('veil').style.display='none';LOG.t0=Date.now();soundLabel();runIntro();};
+  async function narrate(list){for(const x of list){if(!(await waitBuf(x.id,()=>true)))continue;sayText(x.t);play(x.id,'clear');LOG.told.push({id:x.id,t0:Date.now(),t1:Date.now()+BUF[x.id].duration*1000});await sleep((BUF[x.id].duration+.55)*1000);}}
+  async function runIntro(){intro=true;document.body.classList.add('intro');const T=$('title');T.style.display='flex';T.style.opacity=1;burst=40;
+    if(AC){const tn=AC.currentTime;stG.gain.setValueAtTime(.25,tn);stG.gain.linearRampToValueAtTime(.04,tn+2.5);pip(523,.12,1.6,0);}
+    await sleep(3800);T.style.background='#0000';await sleep(1200);T.style.opacity=0;await sleep(1400);T.style.display='none';
+    $('words').style.display='';await narrate(INTRO);await sleep(600);clearWords();document.body.classList.remove('intro');intro=false;placeMark();}
   /* ════════════ end of the prototype's radio ════════════ */
 
   /* the sound control in the corner: the radio's whole level */
@@ -855,6 +891,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   function at(e) { var r = stage.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
   function two() { var k = Object.keys(pts); return k.length >= 2 ? [pts[k[0]], pts[k[1]]] : null; }
   canvas.addEventListener('pointerdown', function (e) {
+    if (intro) return;   /* the opening plays through; the sky is the listener's once the dial rises */
     if (inside || flying) { tapIn = { p: at(e), t: now() }; return; }
     var p = at(e); pts[e.pointerId] = p;
     gest = { moved: 0, t: now(), dist: 0, d0: orb.dist, many: Object.keys(pts).length > 1 };
@@ -881,7 +918,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   canvas.addEventListener('pointerup', lift);
   canvas.addEventListener('pointercancel', lift);
   canvas.addEventListener('contextmenu', function (e) { if (!inside) e.preventDefault(); });
-  canvas.addEventListener('wheel', function (e) { if (inside || flying) return; e.preventDefault(); orb.dist = clamp(orb.dist * Math.exp(e.deltaY * 0.0012), DMIN, DMAX); touchT = now(); }, { passive: false });
+  canvas.addEventListener('wheel', function (e) { if (inside || flying || intro) return; e.preventDefault(); orb.dist = clamp(orb.dist * Math.exp(e.deltaY * 0.0012), DMIN, DMAX); touchT = now(); }, { passive: false });
   function tapSky(x, y) {
     basis();
     var best = null, bd = 28, q = oproj(filmPos()), i;
@@ -925,6 +962,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   elSFic.addEventListener('click', function () { if (picked && picked.fic) quiet(playFilm(picked.fic)); });
   function tendSky(t) {
     var dt = Math.min(0.1, Math.max(0, t - lastSky)); lastSky = t;
+    if (intro) { if (!CALM) orb.yaw += dt * 0.054; return; }   /* the opening turns the sky a little faster, as the prototype's does */
     if (inside) { orb.yaw += dt * 0.02; return; }
     if (flying) return;
     if (!CALM && !glide && !Object.keys(pts).length && t - touchT > 3) orb.yaw += dt * 0.015;   /* the prototype's slow turn */
@@ -1040,6 +1078,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     raf = 0;
     if (!visible || document.hidden) return;
     var t = now(), nowMs = performance.now();
+    recentK += ((intro ? 1 : 0) - recentK) * Math.min(1, Math.max(0, t - (frameLoop.last || t)) * 0.7); frameLoop.last = t;
     stepGlide(t); rollOn(t);
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     if (inside) settleRing();
@@ -1061,7 +1100,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   /* ── what the checks read ── */
   window.__t = { get s() { return { f: f, pi: pi, beat: beat, mLocked: mLocked, heard: heard, showTom: showTom, done: done, cur: cur && cur.who }; }, setF: function (x) { f = x; } };
   window.theApproach = {
-    state: function () { return { f: f, pi: pi, mLocked: mLocked, heard: heard, showTom: showTom, done: done, cur: cur && cur.who, clipOn: clipOn, held: held, inside: inside, block: wb ? wb.name : '', path: path.join(''), sel: sel, filmOn: filmOn, tuned: !!tuned, rev: tuned ? tuned.rev : 0, card: elCard.hidden ? '' : elLine.textContent, read: $('read').textContent, say: $('say').textContent, who: $('who').textContent, ac: AC ? AC.state : 'none', loaded: Object.keys(BUF).length, sM: sMnow, marka: curM() ? curM().f : null }; },
+    state: function () { return { intro: intro, recentK: +recentK.toFixed(2), recent: RECENT.length, f: f, pi: pi, mLocked: mLocked, heard: heard, showTom: showTom, done: done, cur: cur && cur.who, clipOn: clipOn, held: held, inside: inside, block: wb ? wb.name : '', path: path.join(''), sel: sel, filmOn: filmOn, tuned: !!tuned, rev: tuned ? tuned.rev : 0, card: elCard.hidden ? '' : elLine.textContent, read: $('read').textContent, say: $('say').textContent, who: $('who').textContent, ac: AC ? AC.state : 'none', loaded: Object.keys(BUF).length, sM: sMnow, marka: curM() ? curM().f : null }; },
     log: function () { return JSON.parse(JSON.stringify(LOG)); },
     lives: function () { return LIVES.map(function (L) { return { f: L.f, who: L.who }; }); },
     mara: function () { return MARA.map(function (P) { return P.f; }).concat([TOM.f]); },

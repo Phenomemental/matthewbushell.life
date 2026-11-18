@@ -2,14 +2,14 @@
  "clips": [
   "address",
   "archive",
+  "chip",
   "dawn",
   "mara_asks",
   "nights",
-  "screens_dark",
   "shes_home",
   "station",
   "summer",
-  "tom_one_page"
+  "tom_answer"
  ],
  "fictions": [
   "archive-function-lero-helper-2026-10-03",
@@ -24,6 +24,17 @@
   "ways-tickets-weft"
  ],
  "nar": [
+  "e1",
+  "e2",
+  "o1",
+  "o2",
+  "o3",
+  "o4",
+  "o5",
+  "o6",
+  "o7",
+  "o8",
+  "o9",
   "r1",
   "r2",
   "r3",
@@ -36,13 +47,13 @@
  "poster": [
   "address",
   "archive",
+  "chip",
   "dawn",
   "mara_asks",
   "nights",
-  "screens_dark",
   "shes_home",
   "station",
   "summer",
-  "tom_one_page"
+  "tom_answer"
  ]
 }
