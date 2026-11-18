@@ -522,43 +522,46 @@ class TheFilmPage(Base):
             self.assertTrue(url.startswith(ROOT + '/'), '%s="%s"' % (attr, url))
 
     def test_its_parts_are_carried_beside_it_with_a_list_of_what_is_there(self):
-        """Version four (film:the-approach 2.696 and 6.4): the working piece's own folders beside the page (clips,
-        img, nar, voices, fictions) and a manifest listing what is there."""
+        """Version five (film:the-approach 6.5): the radio's own folders beside the page (clips, poster, nar,
+        voices) and the ten block films, with a manifest listing what is there."""
         self.run_with(blocks())
         files = self.run_.files()
         here = os.path.join(fixture.REPO, 'the-approach')
-        kinds = (('clips', '.mp4'), ('img', '.jpg'), ('nar', '.mp3'), ('fictions', '.mp4'))
+        kinds = (('clips', '.mp4'), ('poster', '.jpg'), ('nar', '.mp3'), ('fictions', '.mp4'))
         for kind, ext in kinds:
             names = sorted(fn[:-len(ext)] for fn in os.listdir(os.path.join(here, kind)) if fn.endswith(ext))
             self.assertTrue(names, kind)
             for n in names:
                 self.assertIn('the-approach/%s/%s%s' % (kind, n, ext), files)
-        src = os.path.join(here, 'clips', 'ch1_s3_06.mp4')
-        self.assertEqual(os.path.getsize(os.path.join(self.run_.out, 'the-approach', 'clips', 'ch1_s3_06.mp4')), os.path.getsize(src))
+        src = os.path.join(here, 'clips', 'shes_home.mp4')
+        self.assertEqual(os.path.getsize(os.path.join(self.run_.out, 'the-approach', 'clips', 'shes_home.mp4')), os.path.getsize(src))
         listed = json.loads(self.read('the-approach/manifest.json'))
-        self.assertEqual(sorted(listed), ['clips', 'fictions', 'img', 'nar'])
-        for clip in ('ch1_s2_06', 'ch1_s2_07', 'ch1_s3_06', 'mara_station', 'tom_smile', 'hands_book', 'ink_kitchen', 'light_archive', 'g_face'):
-            self.assertIn(clip, listed['clips'])
-        self.assertEqual(len(listed['nar']), 27)
-        self.assertEqual(len(listed['fictions']), 5)
+        self.assertEqual(sorted(listed), ['clips', 'fictions', 'nar', 'poster'])
+        story = ['address', 'archive', 'dawn', 'mara_asks', 'nights', 'screens_dark', 'shes_home', 'station', 'summer', 'tom_one_page']
+        self.assertEqual(listed['clips'], story)
+        self.assertEqual(listed['poster'], story)   # every clip shows its own first frame before it plays
+        self.assertEqual(listed['nar'], ['r%d' % i for i in range(1, 9)])
+        self.assertEqual(len(listed['fictions']), 10)
+        self.assertIn('the-approach/fictions/fictions.json', files)
         h = self.read(self.FILE)
         self.assertIn('data-parts="%s/the-approach/"' % ROOT, h)
 
-    def test_the_moments_the_opening_and_the_third_versions_parts_are_retired(self):
+    def test_the_fourth_versions_story_and_the_older_parts_are_retired(self):
         self.run_with(blocks())
         files = self.run_.files()
         self.assertEqual([f for f in files if f.startswith(('the-approach/moments/', 'the-approach/plates/', 'the-approach/glimpses/',
-                                                            'the-approach/stills/'))], [])
+                                                            'the-approach/stills/', 'the-approach/img/'))], [])
+        self.assertEqual([f for f in files if re.fullmatch(r'the-approach/nar/[mt]\d+[ab]?\.mp3', f)], [])
         self.assertNotIn('the-approach/walk.json', files)
         voices = [f for f in files if re.fullmatch(r'the-approach/voices/[a-z0-9_]+\.mp3', f)]
-        self.assertEqual(len(voices), 31)   # the radio's 27 and the piece's four
-        self.assertEqual(sorted(f for f in voices if '/w_' in f), ['the-approach/voices/w_%s.mp3' % w for w in ('books', 'dial', 'gate', 'keep')])
+        self.assertEqual(len(voices), 27)   # the kept lives and the whispers
+        self.assertEqual([f for f in voices if '/w_' in f], [])
         self.assertIn('the-approach/credits/mara.jpg', files)
         self.assertIn('the-approach/credits/tom.jpg', files)
         h = self.read(self.FILE)
         self.assertIn('data-voices="%s/the-approach/voices/"' % ROOT, h)
         self.assertIn('data-credits="%s/the-approach/credits/"' % ROOT, h)
-        for gone in ('the-approach/moments/', 'the-approach/plates/', 'data-moments', 'id="skip"', 'Ten years ago, everything we kept online was lost.'):
+        for gone in ('the-approach/moments/', 'data-moments', 'id="skip"', 'Walk the film', 'beachsky.js'):
             self.assertNotIn(gone, h)
 
     def test_it_is_in_no_menu_and_no_sitemap(self):
