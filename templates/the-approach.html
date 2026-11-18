@@ -99,6 +99,9 @@ body.intro #radio #band{pointer-events:none}   /* the dial hidden in the opening
 .film.held #words{visibility:hidden}
 /* the sky lies under the radio here: the empty frame and the words let a finger through to the stars */
 #frame:not(.on),#words{pointer-events:none}
+/* nothing empty may darken the sky (6.7 ZERO): the words box has no background or shadow while it holds nothing */
+#words{transition:background-color .35s,box-shadow .35s}
+#words.empty{background:none;box-shadow:none}
 
 /* a star's card, opened by a tap on the sky; the paper card for a block's words and a film's title (6.44) */
 .film.insky #sky{cursor:grab}
@@ -671,6 +674,11 @@ body.intro #radio #band{pointer-events:none}   /* the dial hidden in the opening
     await sleep(600);if(!ok())return;endIntro();}
   function endIntro(){clearWords();document.body.classList.remove('intro');intro=false;introDone=true;placeMark();layoutButtons();}
   /* ════════════ end of the prototype's radio ════════════ */
+
+  /* the words box is wholly invisible whenever it holds nothing (6.7 ZERO): it was the dark block over the sky */
+  function wordsLook() { var e = !$('who').textContent && !$('say').textContent && !$('over').textContent && $('diary').style.display !== 'block'; $('words').classList.toggle('empty', e); }
+  if (window.MutationObserver) new MutationObserver(wordsLook).observe($('words'), { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['style'] });
+  wordsLook();
 
   /* the sound control in the corner: the radio's whole level */
   var soundOn = true;
