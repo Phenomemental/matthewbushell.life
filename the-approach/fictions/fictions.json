@@ -1,7 +1,12 @@
 [
-  {"block": "spine:ai-inoculation", "title": "The Dose", "file": "spine-ai-inoculation.mp4", "seconds": 37, "style": "light on dark", "made": "2026-11-17", "by": "Claude, in Matthew's session"},
-  {"block": "spine:community-recovery-design", "title": "The Door", "file": "spine-community-recovery-design.mp4", "seconds": 39, "style": "ink and crimson on paper", "made": "2026-11-17", "by": "Claude, in Matthew's session"},
-  {"block": "strata:keel", "title": "The Fork", "file": "strata-keel.mp4", "seconds": 32, "style": "silhouettes at dusk", "made": "2026-11-17", "by": "Claude, in Matthew's session"},
-  {"block": "archive:function:meeting-protocol:2026-10-09", "title": "The Third Point", "file": "archive-function-meeting-protocol-2026-10-09.mp4", "seconds": 33, "style": "chalk on slate", "made": "2026-11-17", "by": "Claude, in Matthew's session"},
-  {"block": "guide:brighton-room", "title": "With Her Yes", "file": "guide-brighton-room.mp4", "seconds": 34, "style": "cut paper by the sea", "made": "2026-11-17", "by": "Claude, in Matthew's session"}
+  {"block": "spine:ai-inoculation", "title": "The Dose", "file": "spine-ai-inoculation.mp4", "seconds": 37, "style": "light on dark", "made": "2026-11-17"},
+  {"block": "spine:community-recovery-design", "title": "The Door", "file": "spine-community-recovery-design.mp4", "seconds": 39, "style": "ink and crimson on paper", "made": "2026-11-17"},
+  {"block": "strata:keel", "title": "The Fork", "file": "strata-keel.mp4", "seconds": 32, "style": "silhouettes at dusk", "made": "2026-11-17"},
+  {"block": "archive:function:meeting-protocol:2026-10-09", "title": "The Third Point", "file": "archive-function-meeting-protocol-2026-10-09.mp4", "seconds": 33, "style": "chalk on slate", "made": "2026-11-17"},
+  {"block": "guide:brighton-room", "title": "With Her Yes", "file": "guide-brighton-room.mp4", "seconds": 34, "style": "cut paper by the sea", "made": "2026-11-17"},
+  {"block": "ways:tickets:weft", "title": "The Ticket", "file": "ways-tickets-weft.mp4", "seconds": 32, "style": "fairground poster", "made": "2026-11-17"},
+  {"block": "archive:genome:reflexive:2026-08-13", "title": "The Moving Moment", "file": "archive-genome-reflexive-2026-08-13.mp4", "seconds": 33, "style": "typewriter and a line of light", "made": "2026-11-17"},
+  {"block": "function:proposal", "title": "Go, Not Yet, Change", "file": "function-proposal.mp4", "seconds": 33, "style": "botanical engraving", "made": "2026-11-17"},
+  {"block": "state-of-play:happyseaurchin", "title": "Green, But", "file": "state-of-play-happyseaurchin.mp4", "seconds": 33, "style": "blueprint", "made": "2026-11-17"},
+  {"block": "archive:function:lero-helper:2026-10-03", "title": "Nothing Is Kept", "file": "archive-function-lero-helper-2026-10-03.mp4", "seconds": 34, "style": "rain on a window at night", "made": "2026-11-17"}
 ]
