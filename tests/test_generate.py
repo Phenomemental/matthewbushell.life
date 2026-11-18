@@ -537,10 +537,11 @@ class TheFilmPage(Base):
         self.assertEqual(os.path.getsize(os.path.join(self.run_.out, 'the-approach', 'clips', 'shes_home.mp4')), os.path.getsize(src))
         listed = json.loads(self.read('the-approach/manifest.json'))
         self.assertEqual(sorted(listed), ['clips', 'fictions', 'nar', 'poster'])
-        story = ['address', 'archive', 'dawn', 'mara_asks', 'nights', 'screens_dark', 'shes_home', 'station', 'summer', 'tom_one_page']
+        story = ['address', 'archive', 'chip', 'dawn', 'mara_asks', 'nights', 'shes_home', 'station', 'summer', 'tom_answer']
         self.assertEqual(listed['clips'], story)
         self.assertEqual(listed['poster'], story)   # every clip shows its own first frame before it plays
-        self.assertEqual(listed['nar'], ['r%d' % i for i in range(1, 9)])
+        # the narrator: the opening o1 to o9, the story r1 to r8, the ending e1 and e2 (6.53, 6.57)
+        self.assertEqual(listed['nar'], ['e1', 'e2'] + ['o%d' % i for i in range(1, 10)] + ['r%d' % i for i in range(1, 9)])
         self.assertEqual(len(listed['fictions']), 10)
         self.assertIn('the-approach/fictions/fictions.json', files)
         h = self.read(self.FILE)
@@ -552,6 +553,8 @@ class TheFilmPage(Base):
         self.assertEqual([f for f in files if f.startswith(('the-approach/moments/', 'the-approach/plates/', 'the-approach/glimpses/',
                                                             'the-approach/stills/', 'the-approach/img/'))], [])
         self.assertEqual([f for f in files if re.fullmatch(r'the-approach/nar/[mt]\d+[ab]?\.mp3', f)], [])
+        for gone in ('screens_dark', 'tom_one_page'):   # out of the story since 18 November (6.53)
+            self.assertEqual([f for f in files if gone in f], [])
         self.assertNotIn('the-approach/walk.json', files)
         voices = [f for f in files if re.fullmatch(r'the-approach/voices/[a-z0-9_]+\.mp3', f)]
         self.assertEqual(len(voices), 27)   # the kept lives and the whispers
@@ -561,7 +564,7 @@ class TheFilmPage(Base):
         h = self.read(self.FILE)
         self.assertIn('data-voices="%s/the-approach/voices/"' % ROOT, h)
         self.assertIn('data-credits="%s/the-approach/credits/"' % ROOT, h)
-        for gone in ('the-approach/moments/', 'data-moments', 'id="skip"', 'Walk the film', 'beachsky.js'):
+        for gone in ('the-approach/moments/', 'data-moments', 'id="skip"', 'Walk the film', 'beachsky.js', 'screens_dark', 'tom_one_page'):
             self.assertNotIn(gone, h)
 
     def test_it_is_in_no_menu_and_no_sitemap(self):
