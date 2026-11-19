@@ -60,6 +60,12 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 .ushow input:focus-visible{outline:2px solid #ff5d86;outline-offset:3px}
 .ushow .udot{flex:none;width:12px;height:12px;border-radius:50%;box-sizing:border-box}
 .uni.walking .ushow{display:none}
+.ushow{max-height:calc(100vh - 84px);max-height:calc(100svh - 84px);overflow-y:auto;overscroll-behavior:contain}
+.uarr{display:flex;flex-direction:column;gap:6px;margin:2px 0 10px}
+.uarr button{display:block;width:100%;box-sizing:border-box;text-align:left;padding:8px 12px 9px;border-radius:10px;border:1.5px solid #5d5340;background:#0b0f1e;font-size:19px;font-weight:600;line-height:1.15;color:#f1ebdd}
+.uarr button small{display:block;margin-top:2px;font-size:15px;font-weight:500;font-style:italic;color:var(--dim)}
+.uarr button:hover{background:rgba(44,50,76,.7)}
+.uarr button[aria-checked="true"]{border-color:#ff8aa6;background:#3a1424;box-shadow:0 0 14px rgba(194,29,78,.35)}
 .ushow .ubtn{width:100%;margin-top:8px;border-radius:8px}
 .utime{position:absolute;z-index:7;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom));width:min(620px,calc(100% - 24px));box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:18px;background:rgba(6,9,22,.94);border:1px solid rgba(238,242,255,.3);box-shadow:0 10px 40px rgba(0,0,0,.6)}
 .utime .utmid{flex:1;min-width:0}
@@ -70,7 +76,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 .uni.replaying .ustar{bottom:calc(92px + env(safe-area-inset-bottom))}
 .uni.replaying .uhint{bottom:calc(104px + env(safe-area-inset-bottom))}
 .uni.walking .utime{display:none}
-@media (max-width:599px){.ucorner{top:calc(54px + env(safe-area-inset-top));gap:4px}.ucorner .ubtn{padding:0 10px;font-size:17px}.ushow{top:calc(116px + env(safe-area-inset-top))}.utime{padding-top:30px}.utime p{position:absolute;left:14px;right:14px;top:8px;margin:0}.uni.replaying .ustar{bottom:calc(112px + env(safe-area-inset-bottom))}.uni.replaying .uhint{bottom:calc(124px + env(safe-area-inset-bottom))}.uchip{top:calc(118px + env(safe-area-inset-top))}.ufind{top:calc(116px + env(safe-area-inset-top))}}
+@media (max-width:599px){.ucorner{top:calc(54px + env(safe-area-inset-top));gap:4px}.ucorner .ubtn{padding:0 10px;font-size:17px}.ushow{top:calc(116px + env(safe-area-inset-top));max-height:calc(100vh - 132px);max-height:calc(100svh - 132px)}.utime{padding-top:30px}.utime p{position:absolute;left:14px;right:14px;top:8px;margin:0}.uni.replaying .ustar{bottom:calc(112px + env(safe-area-inset-bottom))}.uni.replaying .uhint{bottom:calc(124px + env(safe-area-inset-bottom))}.uchip{top:calc(118px + env(safe-area-inset-top))}.ufind{top:calc(116px + env(safe-area-inset-top))}}
 .umark{position:absolute;z-index:3;top:calc(14px + env(safe-area-inset-top));left:calc(16px + env(safe-area-inset-left));margin:0;max-width:calc(100% - 170px);font-size:13px;letter-spacing:.3em;line-height:1.5;color:#cdbf9f;text-shadow:0 0 8px #000;pointer-events:none;white-space:nowrap}
 .umark b{display:block;font-size:15px;letter-spacing:.08em;font-weight:500;font-style:italic;color:var(--dim);overflow:hidden;text-overflow:ellipsis}
 
@@ -125,12 +131,18 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 </div>
 
 <div class="ushow" id="show" hidden>
+  <h2>ARRANGEMENT</h2>
+  <div class="uarr" role="radiogroup" aria-label="How the stars are arranged">
+    <button type="button" role="radio" aria-checked="true" data-arr="galaxy">The galaxy<small>an arm for each kind of block; the rest is chance</small></button>
+    <button type="button" role="radio" aria-checked="false" data-arr="kin">Time and kin<small>out from the centre, when it was born; round the circle, whose it is</small></button>
+  </div>
   <h2>SHOW</h2>
   <label><input type="checkbox" role="switch" data-show="ripples"><span class="udot" style="border:1.5px solid #ffd9a0"></span><span>Being written<small>rings on stars written in the last ten minutes</small></span></label>
   <label><input type="checkbox" role="switch" data-show="glow"><span class="udot" style="background:#ffc478;box-shadow:0 0 8px #ffc478"></span><span>Recently written<small>a glow on stars written in the last three days</small></span></label>
   <label><input type="checkbox" role="switch" data-show="born"><span class="udot" style="background:linear-gradient(#fff,#fff) center/100% 1.5px no-repeat,linear-gradient(#fff,#fff) center/1.5px 100% no-repeat;border-radius:0"></span><span>Newly born<small>a spark on stars that arrived in the last day</small></span></label>
   <label><input type="checkbox" role="switch" data-show="present"><span class="udot" style="border:2px solid #78ebe1"></span><span>Who is present<small>anyone who has said they are here</small></span></label>
   <label><input type="checkbox" role="switch" data-show="names"><span class="udot" style="background:#cdbf9f;border-radius:2px;height:3px"></span><span>Names<small>on the stars nearest you</small></span></label>
+  <label><input type="checkbox" role="switch" data-show="compass"><span class="udot" style="border:1px solid #8fa2e8"></span><span>Compass<small>rings of time and names round the rim, in Time and kin</small></span></label>
   <label><input type="checkbox" role="switch" data-show="dust"><span class="udot" style="background:#b8c8ff;width:4px;height:4px;margin:0 4px"></span><span>Far dust<small>the faint points behind the stars</small></span></label>
   <label><input type="checkbox" role="switch" data-show="turn"><span class="udot" style="border:1.5px dashed #cdbf9f"></span><span>The sky turning<small>slowly, when left alone</small></span></label>
   <button type="button" class="ubtn" id="tshow">Watch the stars being born</button>
@@ -202,6 +214,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     return get(WIRE).then(function (j) {
       if (!j || typeof j !== 'object' || !Array.isArray(j.blocks)) throw new Error('not an index');
       applyIndex(j); readPresence();
+      if (ARR === 'kin') { orb.dist = restFor('kin'); orb.pitch = 0.98; orb.yaw = Math.PI; KB = 1; BAS = null; }
       if (!polling) polling = setInterval(function () { if (!document.hidden) refresh(); }, EVERY * 1000);
       showHint(coarse ? 'Drag to turn the sky. Pinch to come closer. Tap a star to read it.' : 'Drag to turn the sky. Scroll to come closer. Click a star to read it.');
     }).catch(function () { if (mine === reading) elNotice.hidden = false; });
@@ -283,13 +296,14 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   var SPR = [sprite('rgba(255,255,255,1)', 'rgba(170,196,255,.2)'), sprite('rgba(255,250,240,1)', 'rgba(255,214,170,.2)'), sprite('rgba(232,240,255,1)', 'rgba(140,170,255,.22)')];
   var SPR_NEW = sprite('rgba(255,246,226,1)', 'rgba(255,196,120,.4)'), RECENT = [], RECENT_K = 0.55, RECENT_H = 72;
   function beachStars() {
+    var prev = null; if (MORPH) { prev = {}; B3.forEach(function (s0) { prev[s0.name] = s0; }); }   /* stars in flight between arrangements carry on from where they are */
     var bytes = (index && index.bytes) || {}, names = ((index && index.blocks) || []).map(function (b) { return typeof b === 'string' ? b : (b && b.name) || ''; }).filter(Boolean);
     B3 = names.map(function (name) {
       var kind = name.split(':')[0], arm = ARMS.indexOf(kind), r, ang, y, size = Number(bytes[name]) || 300;
       if (arm >= 0) { r = 0.15 + 0.85 * Math.pow(hh(name, 1), 0.7); ang = arm * TAU / 9 + r * 3.2 + (hh(name, 2) - 0.5) * 0.35; y = (hh(name, 3) - 0.5) * 0.05; }
       else { ang = hh(name, 2) * TAU; r = 0.1 + 0.95 * Math.pow(hh(name, 1), 0.5); y = (hh(name, 3) - 0.5) * 0.25; }
       var u = hh(name, 4);
-      return { name: name, size: size, p: [r * Math.cos(ang), y, r * Math.sin(ang)], br: 0.25 + 1.6 * Math.min(1, Math.max(0, Math.log(Math.max(size, 50)) / Math.LN10 - 1.6)) / 3.2,
+      return { name: name, size: size, pg: [r * Math.cos(ang), y, r * Math.sin(ang)], dl: hh(name, 7) * 0.3, br: 0.25 + 1.6 * Math.min(1, Math.max(0, Math.log(Math.max(size, 50)) / Math.LN10 - 1.6)) / 3.2,
         tint: u < 0.2 ? 2 : u < 0.62 ? 0 : 1, ph: hh(name, 5) * TAU, sp: 0.25 + u * 0.5 };
     });
     /* how recently each block was written, from the index's own record; the newest glow amber */
@@ -306,9 +320,11 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
        name carries, or failing that to the family its name ends in (the date an archive ends in is passed over) */
     SOMEONE = {}; names.forEach(function (n) { var pp = n.split(':'); if ((pp[0] === 'passport' || pp[0] === 'shell') && pp[1]) SOMEONE[pp[1]] = 1; });
     GROUP = {}; B3.forEach(function (s) { s.key = keyFor(s.name); s.lit = false; if (s.key) (GROUP[s.key] = GROUP[s.key] || []).push(s); });
+    arrangeKin(nowT);
+    B3.forEach(function (s) { var o = prev && prev[s.name]; if (o && o.p) { s.p = o.p; s.p0 = o.p0 || null; } else s.p = dest(s).slice(); });
     if (LIT) light(LIT.key, true);
   }
-  var SHOW = { ripples: true, glow: true, born: true, present: true, names: true, dust: true, turn: true };
+  var SHOW = { ripples: true, glow: true, born: true, present: true, names: true, compass: true, dust: true, turn: true };
   /* stars being born: the index records when each block first arrived (those from before the stamp existed have none, and stand
      in the sky from the start). RP is the replay: while it is open the sky is drawn as it stood at RP.T. */
   var RP = null, RP_S = 45, BORN = [], BSTARS = [], NEWBORN = [], ARRIVED = {};
@@ -342,11 +358,108 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     LIT = { key: key, n: m.length, lines: threads(m) };
     var c = $('chip'); c.hidden = false; c.textContent = key + ' · ' + m.length + (m.length === 1 ? ' star' : ' stars') + '  ×'; c.setAttribute('aria-label', 'Showing the ' + m.length + ' stars named ' + key + '. Show every star again.');
     if (keep) return;
-    var cx = 0, cy = 0, cz = 0, rr = 0; m.forEach(function (s) { cx += s.p[0]; cy += s.p[1]; cz += s.p[2]; }); cx /= m.length; cy /= m.length; cz /= m.length;
-    m.forEach(function (s) { rr = Math.max(rr, Math.hypot(s.p[0] - cx, s.p[1] - cy, s.p[2] - cz)); });
-    closeStar(); hideHint(); touchT = now(); glideTo({ tgt: [cx, cy, cz], dist: clamp(rr * 2.3 + 0.35, 0.7, 3.2), pitch: 0.8 }, 1.8, ease);
+    var fr = frameOf(m);
+    closeStar(); hideHint(); touchT = now(); glideTo({ tgt: fr.c, dist: fr.dist, pitch: ARR === 'kin' ? 0.98 : 0.8 }, 1.8, ease);
   }
   function unlight() { LIT = null; B3.forEach(function (s) { s.lit = false; }); $('chip').hidden = true; if (picked && !elStar.hidden) allButton(picked); }
+  /* ── two arrangements of the same stars. 'galaxy' is the sky as it has been: an arm for each of nine kinds of block and the rest
+        by a scramble of the name, so nothing in it but the arm is true of the block. 'kin' is laid out from what the index records:
+        the distance from the centre is when the block was born (those from before the record stand in the core), and the direction
+        is whose it is: people and agents first, then families from the largest to the smallest, then the stars that stand alone.
+        A star keeps both places (pg and pk); p is where it is drawn, and moves between them. ── */
+  var ARR = 'galaxy', MORPH = null, KB = 0, K_CORE = 0.64, K_R0 = 0.70, K_A = 0.0142, K_GAP = 0.05;
+  var KIN = { rim: 1.15, t0: 0, rings: [], names: [], sectors: [] };
+  try { if (localStorage.getItem('universe.arrange') === 'kin') ARR = 'kin'; } catch (e) { /* nothing kept: the galaxy */ }   /* which arrangement was left showing, kept in this browser */
+  function kinR(ms, t0) { return Math.sqrt(K_R0 * K_R0 + K_A * Math.max(0, (ms - t0) / 86400000)); }   /* equal time, equal area: the sky grows outward like the rings of a tree, and a star once placed keeps its distance */
+  function shortDate(ms, year) { try { return new Date(ms).toLocaleDateString('en-GB', year ? { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' } : { day: 'numeric', month: 'short', timeZone: 'UTC' }); } catch (e) { return ''; } }
+  function arrangeKin(nowT) {
+    var t0 = BORN.length ? BORN[0] : nowT, G = {}, list = [], tw = 0;
+    B3.forEach(function (s) { var k = s.key ? 'k:' + s.key : 'n:' + s.name, g = G[k]; if (!g) { g = G[k] = { key: s.key || s.name, who: !!(s.key && SOMEONE[s.key]), stars: [] }; list.push(g); } g.stars.push(s); });
+    list.forEach(function (g) { g.n = g.stars.length; g.sec = g.who ? 0 : g.n > 1 ? 1 : 2; g.w = g.sec === 2 ? 1 : g.n + 1.2; tw += g.w; });
+    list.sort(function (a, b) { return a.sec - b.sec || b.n - a.n || (a.key < b.key ? -1 : a.key > b.key ? 1 : 0); });
+    var secs = 0, cur = -1; list.forEach(function (g) { if (g.sec !== cur) { cur = g.sec; secs++; } });
+    var span = TAU - K_GAP * secs, a = K_GAP / 2; cur = -1;
+    KIN.sectors = []; KIN.names = [];
+    list.forEach(function (g) {
+      if (g.sec !== cur) { if (cur >= 0) a += K_GAP; cur = g.sec; KIN.sectors.push({ label: ['PEOPLE AND AGENTS', 'FAMILIES', 'ALONE'][cur], a0: a, a1: a, n: 0, groups: 0 }); }
+      var wd = span * g.w / (tw || 1), m = wd * 0.06, sc = KIN.sectors[KIN.sectors.length - 1];
+      g.stars.forEach(function (s) {
+        var ang = a + m + (wd - 2 * m) * hh(s.name, 2);
+        var r = s.born ? kinR(s.born, t0) + (hh(s.name, 6) - 0.5) * 0.008 : 0.06 + (K_CORE - 0.06) * Math.sqrt(hh(s.name, 1));
+        s.pk = [r * Math.cos(ang), (hh(s.name, 3) - 0.5) * 0.03, r * Math.sin(ang)];
+      });
+      if (g.n >= 8) KIN.names.push({ text: g.key, a: a + wd / 2, n: g.n });
+      a += wd; sc.a1 = a; sc.n += g.n; sc.groups++;
+    });
+    KIN.names.sort(function (x, y) { return y.n - x.n; }); KIN.names = KIN.names.slice(0, 28);
+    KIN.rim = kinR(nowT, t0); KIN.t0 = t0;
+    KIN.rings = [{ r: K_R0, label: shortDate(t0, true) }];
+    var d0 = new Date(t0), yr = d0.getUTCFullYear(), mo = d0.getUTCMonth() + 1, ms = Date.UTC(yr, mo, 1);
+    while (ms < nowT && KIN.rings.length < 120) { KIN.rings.push({ r: kinR(ms, t0), label: shortDate(ms, new Date(ms).getUTCMonth() === 0) }); mo++; ms = Date.UTC(yr, mo, 1); }
+    KIN.rings.push({ r: KIN.rim, label: 'today' });
+  }
+  function dest(s) { return ARR === 'kin' && s.pk ? s.pk : s.pg; }
+  function restFor(arr) { return arr === 'kin' ? (wide ? 2.3 : 2.75) * KIN.rim : wide ? 2.2 : 2.5; }
+  function dmax() { return Math.max(DMAX, ARR === 'kin' ? KIN.rim * 4 : 0); }
+  function frameOf(m) {
+    var c = [0, 0, 0], rr = 0; if (!m.length) return { c: c, dist: restFor(ARR) };
+    m.forEach(function (s) { var d = dest(s); c[0] += d[0] / m.length; c[1] += d[1] / m.length; c[2] += d[2] / m.length; });
+    m.forEach(function (s) { var d = dest(s); rr = Math.max(rr, Math.hypot(d[0] - c[0], d[1] - c[1], d[2] - c[2])); });
+    return { c: c, dist: clamp(rr * 2.3 + 0.35, 0.7, Math.max(3.2, restFor(ARR))) };
+  }
+  function settle() { B3.forEach(function (s) { var d = dest(s); s.p[0] = d[0]; s.p[1] = d[1]; s.p[2] = d[2]; s.p0 = null; }); }
+  function setArrangement(arr, silent) {
+    arr = arr === 'kin' ? 'kin' : 'galaxy';
+    var same = arr === ARR; ARR = arr;
+    try { localStorage.setItem('universe.arrange', arr); } catch (e) { /* not kept, no matter */ }
+    markArrangement();
+    if (same || !B3.length) return;
+    if (CALM) { MORPH = null; settle(); if (LIT) light(LIT.key, true); }
+    else { B3.forEach(function (s) { s.p0 = s.p.slice(); }); MORPH = { t0: now(), dur: 3 }; }
+    var held = picked && !elStar.hidden, to, f;
+    if (held) to = { tgt: dest(picked).slice(), dist: Math.min(orb.dist, wide ? 1.4 : 1.2) };   /* a star in hand is followed to its other place */
+    else if (LIT) { f = frameOf(GROUP[LIT.key] || []); to = { tgt: f.c, dist: f.dist, pitch: arr === 'kin' ? 0.98 : 0.8 }; }
+    else to = { tgt: [0, 0, 0], dist: restFor(arr), pitch: arr === 'kin' ? 0.98 : 0.72 };
+    if (arr === 'kin' && !held) to.yaw = orb.yaw + mwrap(Math.PI - orb.yaw);   /* the gap between the last direction and the first comes to the top, where the dates are written */
+    touchT = now(); glideTo(to, 3, ease);
+    if (!silent) showHint(arr === 'kin' ? 'Out from the centre is when a star was born. Round the circle is whose it is.' : 'The galaxy: an arm for each kind of block. The rest is chance.');
+  }
+  function morphTick(t) {
+    if (!MORPH) return;
+    var u = (t - MORPH.t0) / MORPH.dur, i, s, d, k;
+    for (i = 0; i < B3.length; i++) { s = B3[i]; if (!s.p0) continue; d = dest(s); k = ease((u - s.dl) / 0.7); s.p[0] = lerp(s.p0[0], d[0], k); s.p[1] = lerp(s.p0[1], d[1], k); s.p[2] = lerp(s.p0[2], d[2], k); }
+    if (u >= 1) { MORPH = null; settle(); if (LIT) light(LIT.key, true); }
+  }
+  /* the compass of 'kin': a ring for the start of the record, one for the first of each month and one for today; the dates up the
+     line where the directions begin; the names of the largest round the rim; and what each stretch of the circle holds */
+  function compassRings(alpha) {
+    var a = alpha * KB, i, k, q; if (a < 0.02 || !SHOW.compass || inside) return;
+    function ring(R) { var on = false; ctx.beginPath(); for (k = 0; k <= 240; k++) { var an = k / 240 * TAU; q = oproj([R * Math.cos(an), 0, R * Math.sin(an)]); if (!q) { on = false; continue; } if (on) ctx.lineTo(q[0], q[1]); else { ctx.moveTo(q[0], q[1]); on = true; } } ctx.stroke(); }
+    ctx.lineWidth = 1; ctx.strokeStyle = '#7f92dc';
+    for (i = 0; i < KIN.rings.length; i++) { ctx.globalAlpha = a * (i === 0 || i === KIN.rings.length - 1 ? 0.42 : 0.26); ring(KIN.rings[i].r); }
+    if (RP && RP.T >= KIN.t0) { ctx.strokeStyle = '#ffd9a0'; ctx.globalAlpha = a * 0.7; ring(kinR(Math.min(RP.T, RP.t1), KIN.t0)); }   /* the replay's own moment, sweeping outward */
+  }
+  function compassLabels(alpha) {
+    var a = alpha * KB, i, q; if (a < 0.02 || !SHOW.compass || inside) return;
+    var c = oproj([0, 0, 0]), cx = c ? c[0] : W / 2, taken = [];
+    function put(text, x, y, al, align) {   /* a label gives way to one already written where it would stand */
+      if (x < -90 || x > W + 90 || y < 10 || y > H + 10) return;
+      var w = ctx.measureText(text).width, x0 = align === 'left' ? x : align === 'right' ? x - w : x - w / 2, y0 = y - 12;
+      x0 = clamp(x0, 8, Math.max(8, W - 8 - w));
+      for (var k = 0; k < taken.length; k++) { var b = taken[k]; if (x0 < b[2] + 6 && x0 + w + 6 > b[0] && y0 < b[3] + 2 && y0 + 14 > b[1]) return; }
+      taken.push([x0, y0, x0 + w, y0 + 14]); ctx.textAlign = 'left'; ctx.globalAlpha = al; ctx.fillText(text, x0, y);
+    }
+    function side(x) { return x > cx + 24 ? 'left' : x < cx - 24 ? 'right' : 'center'; }
+    ctx.shadowColor = '#000'; ctx.shadowBlur = 5;
+    ctx.font = '500 11px ui-monospace,Menlo,Consolas,monospace'; ctx.fillStyle = '#aab6ee';
+    var order = [KIN.rings.length - 1, 0]; for (i = KIN.rings.length - 2; i >= 1; i--) order.push(i);
+    for (i = 0; i < order.length; i++) { var rg = KIN.rings[order[i]]; if (!rg || (order[i] === 0 && i !== 1)) continue; q = oproj([rg.r, 0, 0]); if (q) put(rg.label, q[0], q[1] - 4, a * 0.85, 'center'); }
+    ctx.font = '600 11px "Cormorant Garamond",Georgia,serif'; ctx.fillStyle = '#cdbf9f';
+    for (i = 0; i < KIN.sectors.length; i++) { var sc = KIN.sectors[i], am = (sc.a0 + sc.a1) / 2, R2 = KIN.rim + 0.24; q = oproj([R2 * Math.cos(am), 0, R2 * Math.sin(am)]); if (q) put(sc.label.split('').join(' '), q[0], q[1] + 4, a * 0.7, side(q[0])); }
+    ctx.font = '600 12px ui-monospace,Menlo,Consolas,monospace'; ctx.fillStyle = '#e8c98a';
+    for (i = 0; i < KIN.names.length; i++) { var nm = KIN.names[i], R1 = KIN.rim + 0.07; q = oproj([R1 * Math.cos(nm.a), 0, R1 * Math.sin(nm.a)]); if (!q || q[0] < -80 || q[0] > W + 80 || q[1] < -20 || q[1] > H + 20) continue; put(nm.text, q[0], q[1] + 4, a * (LIT && LIT.key !== nm.text ? 0.35 : 0.9), side(q[0])); }
+    ctx.shadowBlur = 0; ctx.textAlign = 'center';
+  }
   var W = 0, H = 0, DPR = 1, wide = false, coarse = !!(window.matchMedia && matchMedia('(pointer: coarse)').matches);
   var orb = { yaw: 0.6, pitch: 0.72, dist: 2.4, tgt: [0, 0, 0] }, glide = null, DMIN = 0.22, DMAX = 4.6, BAS = null;
   function seat() { return H * (wide ? 0.44 : 0.4); }
@@ -381,6 +494,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     if (b.tgt) for (i = 0; i < 3; i++) orb.tgt[i] = lerp(a.tgt[i], b.tgt[i], k);
     if (b.dist != null) orb.dist = a.dist * Math.pow(b.dist / a.dist, k);
     if (b.pitch != null) orb.pitch = lerp(a.pitch, b.pitch, k);
+    if (b.yaw != null) orb.yaw = lerp(a.yaw, b.yaw, k);
     if (t - glide.t0 >= glide.dur) { var d = glide.done; glide = null; if (d) d(); }
   }
   var SK = { dim: 1, to: 1 }, DIMIN = 0.3, NAMED = [];
@@ -399,7 +513,8 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
       ctx.globalAlpha = alpha; ctx.fillStyle = hz; ctx.fillRect(0, 0, W, H);
     }
     ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = '#b8c8ff';
-    if (SHOW.dust) for (i = 0; i < dust.length; i++) { q = oproj(dust[i]); if (!q || q[0] < 0 || q[0] > W || q[1] < 0 || q[1] > H) continue; ctx.globalAlpha = Math.min(1, alpha * dust[i][3]); ctx.fillRect(q[0], q[1], 1.2, 1.2); }
+    if (SHOW.dust) for (i = 0; i < dust.length; i++) { q = oproj(dust[i]); if (!q || q[0] < 0 || q[0] > W || q[1] < 0 || q[1] > H) continue; ctx.globalAlpha = Math.min(1, alpha * dust[i][3] * (1 - 0.7 * KB)); ctx.fillRect(q[0], q[1], 1.2, 1.2); }
+    compassRings(alpha);
     NAMED.length = 0;
     if (LIT && LIT.lines.length) {
       ctx.strokeStyle = '#e8c98a'; ctx.lineWidth = 1; ctx.globalAlpha = alpha * 0.34; ctx.beginPath();
@@ -459,6 +574,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
       }
       ctx.shadowBlur = 0;
     }
+    compassLabels(alpha);
     /* close to, the nearest stars wear their names */
     if (NAMED.length && SHOW.names && !inside) {
       NAMED.sort(function (u, w) { return u[0] - w[0]; });
@@ -711,7 +827,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   function enterBlock(name, json) {
     if (inside) return;
     closeStar(); hideHint(); closeFind(); closeShow();
-    var s = starOf(name), at = s ? s.p : orb.tgt.slice();
+    var s = starOf(name), at = s ? dest(s) : orb.tgt.slice();
     inside = true; wb = { name: name, root: json, floor: floorOf(json) }; path = []; KC = {}; M.nodes = {}; M.cardKey = ''; M.lastD = null; M.hits.length = 0;
     flying = true; stage.classList.add('walking');
     glideTo({ tgt: at.slice(), dist: Math.min(orb.dist, 0.55), pitch: 0.5 }, 2.3, ease);
@@ -728,7 +844,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     function finish() {
       inside = false; wb = null; path = []; sel = null; flying = false; M.tr = null; M.hits.length = 0; SK.to = 1; KC = {};
       $('place').hidden = true; stage.classList.remove('walking'); hideHint(); touchT = now();
-      var s = starOf(name); glideTo({ tgt: (s ? s.p : orb.tgt).slice(), dist: 1.2, pitch: 0.6 }, 1.6, easeOut);
+      var s = starOf(name); glideTo({ tgt: (s ? dest(s) : orb.tgt).slice(), dist: 1.2, pitch: 0.6 }, 1.6, easeOut);
     }
     if (CALM) { finish(); return; }
     if (M.tr) return;
@@ -797,7 +913,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     if (flying || !pts[e.pointerId] || !gest) return;
     var p = at(e), was = pts[e.pointerId]; pts[e.pointerId] = p; touchT = now();
     var pair = two();
-    if (pair) { var dist = Math.max(8, Math.hypot(pair[0][0] - pair[1][0], pair[0][1] - pair[1][1])); if (!gest.dist) { gest.dist = dist; gest.d0 = orb.dist; } else { orb.dist = clamp(gest.d0 * gest.dist / dist, DMIN, DMAX); maybeMoons(); } gest.moved = 99; gest.many = true; return; }
+    if (pair) { var dist = Math.max(8, Math.hypot(pair[0][0] - pair[1][0], pair[0][1] - pair[1][1])); if (!gest.dist) { gest.dist = dist; gest.d0 = orb.dist; } else { orb.dist = clamp(gest.d0 * gest.dist / dist, DMIN, dmax()); maybeMoons(); } gest.moved = 99; gest.many = true; return; }
     var dx = p[0] - was[0], dy = p[1] - was[1]; gest.moved += Math.abs(dx) + Math.abs(dy);
     if (gest.moved > 8) { orb.yaw += dx * 0.006; orb.pitch = clamp(orb.pitch + dy * 0.005, -1.2, 1.45); hideHint(); }
   });
@@ -812,7 +928,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   canvas.addEventListener('pointerup', lift);
   canvas.addEventListener('pointercancel', lift);
   canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
-  canvas.addEventListener('wheel', function (e) { e.preventDefault(); if (inside) { mzoom(e.deltaY < 0 ? 1 : -1); return; } if (flying) return; if (glide) glide = null; orb.dist = clamp(orb.dist * Math.exp(e.deltaY * 0.0012), DMIN, DMAX); touchT = now(); hideHint(); maybeMoons(); }, { passive: false });
+  canvas.addEventListener('wheel', function (e) { e.preventDefault(); if (inside) { mzoom(e.deltaY < 0 ? 1 : -1); return; } if (flying) return; if (glide) glide = null; orb.dist = clamp(orb.dist * Math.exp(e.deltaY * 0.0012), DMIN, dmax()); touchT = now(); hideHint(); maybeMoons(); }, { passive: false });
   function tapSky(x, y) {
     basis();
     var best = null, bd = 28, q, i;
@@ -874,6 +990,10 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   function closeShow() { if (elShow.hidden) return; elShow.hidden = true; $('showb').setAttribute('aria-expanded', 'false'); }
   function openShow() { if (inside || flying) return; closeFind(); for (var i = 0; i < switches.length; i++) switches[i].checked = !!SHOW[switches[i].getAttribute('data-show')]; elShow.hidden = false; $('showb').setAttribute('aria-expanded', 'true'); hideHint(); }
   $('showb').addEventListener('click', function () { if (elShow.hidden) openShow(); else closeShow(); });
+  var arrBtns = elShow.querySelectorAll('button[data-arr]');
+  function markArrangement() { for (var i = 0; i < arrBtns.length; i++) arrBtns[i].setAttribute('aria-checked', String(arrBtns[i].getAttribute('data-arr') === ARR)); }
+  for (var ai = 0; ai < arrBtns.length; ai++) arrBtns[ai].addEventListener('click', function () { var to = this.getAttribute('data-arr'); closeShow(); setArrangement(to); });
+  markArrangement();
   elShow.addEventListener('change', function (e) {
     var k = e.target && e.target.getAttribute && e.target.getAttribute('data-show'); if (!k || !(k in SHOW)) return;
     SHOW[k] = !!e.target.checked; touchT = now();
@@ -895,7 +1015,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     var t1 = serverNow(), t0 = BORN[0] - (t1 - BORN[0]) * 0.03;
     RP = { x: 0, T: t0, t0: t0, t1: t1, flash: (t1 - t0) * 0.028, playing: false };
     elTime.hidden = false; stage.classList.add('replaying'); rpSet(0); rpPlay(true); touchT = now();
-    if (!LIT) glideTo({ tgt: [0, 0, 0], dist: wide ? 2.2 : 2.5, pitch: 0.78 }, 1.6, ease);
+    if (!LIT) glideTo({ tgt: [0, 0, 0], dist: restFor(ARR), pitch: ARR === 'kin' ? 0.98 : 0.78 }, 1.6, ease);
   }
   function closeReplay() { if (!RP) return; RP = null; elTime.hidden = true; stage.classList.remove('replaying'); }
   function rpTick(dt) {
@@ -911,7 +1031,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   elShow.addEventListener('keydown', function (e) { if (e.key === 'Escape') { e.preventDefault(); closeShow(); $('showb').focus(); } });
   function openStar(s) {
     picked = s; hideHint();
-    glideTo({ tgt: s.p.slice(), dist: Math.min(orb.dist, wide ? 1.4 : 1.2) }, 1.4, ease);
+    glideTo({ tgt: dest(s).slice(), dist: Math.min(orb.dist, wide ? 1.4 : 1.2) }, 1.4, ease);
     var name = s.name, size = bytesOf(name);
     elSName.textContent = name; elSMeta.textContent = metaOf(name); elStar.hidden = false; allButton(s);
     /* on a touch screen the click that follows the tap lands where the card has just appeared: for a third of a second the card
@@ -970,9 +1090,10 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
       if (flying) return;
       if (e.key === 'Escape') { if (!elShow.hidden) closeShow(); else if (!elStar.hidden) closeStar(); else if (RP) closeReplay(); else if (LIT) unlight(); return; }
       if (e.key === '/') { e.preventDefault(); openFind(); return; }
+      if (e.key === 'a' || e.key === 'A') { e.preventDefault(); closeShow(); setArrangement(ARR === 'kin' ? 'galaxy' : 'kin'); return; }
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); orb.yaw += e.key === 'ArrowLeft' ? 0.08 : -0.08; touchT = now(); }
       else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') { e.preventDefault(); orb.pitch = clamp(orb.pitch + (e.key === 'ArrowUp' ? 0.06 : -0.06), -1.2, 1.45); touchT = now(); }
-      else if (e.key === '+' || e.key === '=' || e.key === '-') { e.preventDefault(); glide = null; orb.dist = clamp(orb.dist * (e.key === '-' ? 1.15 : 0.87), DMIN, DMAX); touchT = now(); maybeMoons(); }
+      else if (e.key === '+' || e.key === '=' || e.key === '-') { e.preventDefault(); glide = null; orb.dist = clamp(orb.dist * (e.key === '-' ? 1.15 : 0.87), DMIN, dmax()); touchT = now(); maybeMoons(); }
       else if (e.key === 'Enter' && picked && el === document.body) { e.preventDefault(); walkBlock(picked.name); }
       return;
     }
@@ -990,7 +1111,8 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     raf = 0;
     if (!visible || document.hidden) return;
     var t = now(), dt = Math.min(0.1, Math.max(0, t - (lastF || t))); lastF = t;
-    moonsTick(Math.min(0.05, dt)); stepGlide(t); musicTick(); rpTick(dt);
+    moonsTick(Math.min(0.05, dt)); stepGlide(t); musicTick(); rpTick(dt); morphTick(t);
+    KB += ((ARR === 'kin' ? 1 : 0) - KB) * (1 - Math.exp(-dt * 1.8));
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     tendSky(t); drawSky(t, 1); drawPicked(t);
     if (inside) drawMoons();
@@ -1009,6 +1131,8 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     names: function () { return { someone: Object.keys(SOMEONE).length, groups: Object.keys(GROUP).length, keyed: B3.filter(function (s) { return s.key; }).length, lit: LIT ? { key: LIT.key, n: LIT.n, lines: LIT.lines.length } : null, chip: $('chip').hidden ? '' : $('chip').textContent, all: $('sall').hidden ? '' : $('sall').textContent, findOpen: !elFind.hidden }; },
     search: function (t) { return search(t).map(function (f) { return f.group ? '[' + f.group + ' ' + f.n + ']' : f.star.name; }); },
     keyFor: keyFor,
+    arrange: function (a) { if (a) setArrangement(a); return { arr: ARR, morph: !!MORPH, kb: +KB.toFixed(2), rim: +KIN.rim.toFixed(3), rings: KIN.rings.map(function (r) { return r.label + ' ' + r.r.toFixed(2); }), sectors: KIN.sectors.map(function (c) { return c.label + ' ' + Math.round(c.a0 * 180 / Math.PI) + '-' + Math.round(c.a1 * 180 / Math.PI) + ' deg, ' + c.n + ' stars in ' + c.groups; }), names: KIN.names.map(function (n) { return n.text; }), dist: +orb.dist.toFixed(2), pitch: +orb.pitch.toFixed(2), checked: [].map.call(arrBtns, function (b) { return b.getAttribute('data-arr') + ':' + b.getAttribute('aria-checked'); }) }; },
+    where: function (name) { var s = starOf(name); if (!s) return null; var d = s.pk || [0, 0, 0]; return { key: s.key, born: s.born ? new Date(s.born).toISOString().slice(0, 10) : '', kinR: +Math.hypot(d[0], d[2]).toFixed(3), kinDeg: +((Math.atan2(d[2], d[0]) * 180 / Math.PI + 360) % 360).toFixed(1), at: s.p.map(function (v) { return +v.toFixed(3); }), galaxy: s.pg.map(function (v) { return +v.toFixed(3); }) }; },
     born: function () { return { stamped: BORN.length, first: BORN.length ? new Date(BORN[0]).toISOString() : '', newborn: NEWBORN.length, arrived: LOG.born.slice(), replay: RP ? { x: +RP.x.toFixed(3), playing: RP.playing, label: $('twhen').textContent, btn: $('tplay').textContent, drawn: B3.filter(function (s) { return !unborn(s); }).length } : null }; },
     scrub: function (x) { if (RP) { RP.playing = false; rpSet(x); } },
     pretendBorn: function (name) { var j = JSON.parse(JSON.stringify(index)); j.now = { iso: new Date(serverNow()).toISOString() }; j.blocks.push(name); j.touched[name] = j.born[name] = j.now.iso; j.bytes[name] = 1200; applyIndex(j); },

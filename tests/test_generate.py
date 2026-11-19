@@ -513,6 +513,8 @@ class TheUniversePage(Base):
         for gone in ('<video', 'id="band"', 'id="needle"', 'id="veil"', 'data-parts', '.mp4', '.mp3', 'site.css'):
             self.assertNotIn(gone, h)
         self.assertIn('?block=presence', h)
+        for arr in ('galaxy', 'kin'):
+            self.assertIn('data-arr="%s"' % arr, h)
         ids = re.findall(r'id="([^"]+)"', h)
         self.assertEqual(len(ids), len(set(ids)))
         self.assertEqual([f for f in self.run_.files() if f.startswith("universe/")], [self.FILE])
