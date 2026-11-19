@@ -101,7 +101,7 @@ const METER = `(() => {
   await T.sleep(Math.max(0, tPlay + 1000 - Date.now())); await T.shot('b05-play-near-1s');
   await T.sleep(Math.max(0, tPlay + 2600 - Date.now())); await T.shot('b06-title');
   await T.sleep(Math.max(0, tPlay + 3300 - Date.now())); const after3 = await LV(), m3 = await MU();
-  await T.sleep(Math.max(0, tPlay + 9200 - Date.now())); await T.shot('b07-rest-o1');
+  await T.sleep(Math.max(0, tPlay + 12300 - Date.now())); await T.shot('b07-rest-o1');   /* ten pips come before the first line since the retelling (6.9) */
   S = await samples(); L = await T.log();
   const p0 = atT(S, tPlay, 0), p15 = atT(S, tPlay, 1.5), hold = Math.min(p0.dist, Math.max(0.396, Math.min(p0.dist * 0.8, 0.7)));
   const jump = Math.max(...S.filter(x => x.t >= tPlay && x.t <= tPlay + 1400).map(x => Math.hypot(x.home[0] - p0.home[0], x.home[1] - p0.home[1])));
@@ -109,7 +109,7 @@ const METER = `(() => {
   T.ok('and nothing on screen jumps: the star keeps its place until the title is up', jump < 12, Math.round(jump) + 'px at most');
   T.ok('the opening rests close (0.36) on the red star with its moons', near(s = (await A()).dist, 0.36, 0.01), s);
   const first = L.told.find(x => x.id === 'o1');
-  T.ok('the first line is 7.8 seconds after Play', !!first && near((first.t0 - L.play) / 1000, 7.8, 0.3), first ? ((first.t0 - L.play) / 1000).toFixed(2) + 's' : 'none');
+  T.ok('the first line is about 11 seconds after Play, after the ten pips', !!first && near((first.t0 - L.play) / 1000, 10.9, 0.4), first ? ((first.t0 - L.play) / 1000).toFixed(2) + 's' : 'none');
   T.ok('the sound is gone three seconds after Play, and does not come back', !m3.on && after3.low < 0.1 * L0, 'at 3.3s low ' + after3.low + ' of ' + L0 + ', on ' + m3.on);
 
   // THREE: stopped
@@ -151,7 +151,7 @@ const METER = `(() => {
   // ══ FIVE: after the end, Close credits hands the sky over as Explore does ══
   if (!QUICK) {
     await T.tap('#stop'); await T.sleep(800); await T.tap('#skipop'); await T.sleep(3000);
-    for (let k = 0; k < 7; k++) { await T.tap('#find'); await T.until(() => window.theApproach.state().mLocked, 9000); await T.until(() => { const x = window.theApproach.state(); return !x.mLocked || x.done; }, 150000, null, 300); if (k < 6) await T.sleep(2800); }
+    for (let k = 0; k < 8; k++) { await T.tap('#find'); await T.until(() => window.theApproach.state().mLocked, 9000); await T.until(() => { const x = window.theApproach.state(); return !x.mLocked || x.done; }, 170000, null, 300); if (k < 7) await T.sleep(2800); }   /* the retelling's eight stops */
     const credits = await T.until(() => window.theApproach.credits().open, 90000, null, 300);
     await T.sleep(3000); await T.tap('#cclose'); await T.sleep(600);
     const c = await T.ev(() => window.theApproach.credits()); s = await A();

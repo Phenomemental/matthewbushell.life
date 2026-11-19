@@ -76,13 +76,14 @@ The film page has its own checks, in `tests/the-approach/`. They play the made p
 ```bash
 python3 tools/generate.py --out /tmp/made --root "" --site http://127.0.0.1:8770 --record /tmp/record.json
 node tests/the-approach/serve.js /tmp/made 8770 &
-node tests/the-approach/film.js  --size phone --shots /tmp/shots   # the whole film, Begin to the credits (about seven minutes)
+node tests/the-approach/film.js  --size phone --shots /tmp/shots   # the whole film, Begin to the credits: the retelling's eight stops (film:the-approach 1.7, 6.9; about eleven minutes)
+node tests/the-approach/opening.js --size phone   # the opening alone: its sounds, and every line between the red star and Stop (also --size small, 360 by 640, and tall, 412 by 740)
 node tests/the-approach/hands.js --size phone   # the viewer's controls (film:the-approach 6.6)
 node tests/the-approach/dial.js  --size phone   # the way in, Signal lost, the dial that turns the universe (6.7)
 node tests/the-approach/moons.js --size phone   # the nine moons (6.8)
-node tests/the-approach/out.js   --size phone   # the way out: Explore the pscale universe, and after the end (6.72)
+node tests/the-approach/out.js   --size phone   # the way out: Explore the pscale universe, and after the end (6.72); the Archive's whispers and the visitor's station (6.9)
 node tests/the-approach/begin.js --size phone   # Begin draws you in: the approach, the invitation as it arrives, the sound before the film (6.73)
 node tests/the-approach/timing.js --size phone  # the film's own timings, to set one build beside another
 ```
 
-Each takes `--size desktop` and `--url` (the live page, for instance). They need `playwright-core` and an installed Chrome.
+Each takes `--size desktop` and `--url` (the live page, for instance). They need `playwright-core` and an installed Chrome. What the film tells, in order, is written once in `tests/the-approach/lib.js` (`STORY`); a change to the story is made there.
