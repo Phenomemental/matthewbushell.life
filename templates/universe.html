@@ -60,7 +60,17 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 .ushow input:focus-visible{outline:2px solid #ff5d86;outline-offset:3px}
 .ushow .udot{flex:none;width:12px;height:12px;border-radius:50%;box-sizing:border-box}
 .uni.walking .ushow{display:none}
-@media (max-width:599px){.ucorner{top:calc(54px + env(safe-area-inset-top));gap:4px}.ucorner .ubtn{padding:0 10px;font-size:17px}.ushow{top:calc(116px + env(safe-area-inset-top))}.uchip{top:calc(118px + env(safe-area-inset-top))}.ufind{top:calc(116px + env(safe-area-inset-top))}}
+.ushow .ubtn{width:100%;margin-top:8px;border-radius:8px}
+.utime{position:absolute;z-index:7;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom));width:min(620px,calc(100% - 24px));box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:18px;background:rgba(6,9,22,.94);border:1px solid rgba(238,242,255,.3);box-shadow:0 10px 40px rgba(0,0,0,.6)}
+.utime .utmid{flex:1;min-width:0}
+.utime p{margin:0 2px 2px;font:500 13px ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em;color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.utime input{display:block;width:100%;height:28px;margin:0;accent-color:#c21d4e;cursor:pointer}
+.utime .ubtn{min-width:78px;padding:0 12px;border-radius:8px}
+.utime .uclose{min-width:48px;width:48px;padding:0;font-size:26px}
+.uni.replaying .ustar{bottom:calc(92px + env(safe-area-inset-bottom))}
+.uni.replaying .uhint{bottom:calc(104px + env(safe-area-inset-bottom))}
+.uni.walking .utime{display:none}
+@media (max-width:599px){.ucorner{top:calc(54px + env(safe-area-inset-top));gap:4px}.ucorner .ubtn{padding:0 10px;font-size:17px}.ushow{top:calc(116px + env(safe-area-inset-top))}.utime{padding-top:30px}.utime p{position:absolute;left:14px;right:14px;top:8px;margin:0}.uni.replaying .ustar{bottom:calc(112px + env(safe-area-inset-bottom))}.uni.replaying .uhint{bottom:calc(124px + env(safe-area-inset-bottom))}.uchip{top:calc(118px + env(safe-area-inset-top))}.ufind{top:calc(116px + env(safe-area-inset-top))}}
 .umark{position:absolute;z-index:3;top:calc(14px + env(safe-area-inset-top));left:calc(16px + env(safe-area-inset-left));margin:0;max-width:calc(100% - 170px);font-size:13px;letter-spacing:.3em;line-height:1.5;color:#cdbf9f;text-shadow:0 0 8px #000;pointer-events:none;white-space:nowrap}
 .umark b{display:block;font-size:15px;letter-spacing:.08em;font-weight:500;font-style:italic;color:var(--dim);overflow:hidden;text-overflow:ellipsis}
 
@@ -118,10 +128,17 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   <h2>SHOW</h2>
   <label><input type="checkbox" role="switch" data-show="ripples"><span class="udot" style="border:1.5px solid #ffd9a0"></span><span>Being written<small>rings on stars written in the last ten minutes</small></span></label>
   <label><input type="checkbox" role="switch" data-show="glow"><span class="udot" style="background:#ffc478;box-shadow:0 0 8px #ffc478"></span><span>Recently written<small>a glow on stars written in the last three days</small></span></label>
+  <label><input type="checkbox" role="switch" data-show="born"><span class="udot" style="background:linear-gradient(#fff,#fff) center/100% 1.5px no-repeat,linear-gradient(#fff,#fff) center/1.5px 100% no-repeat;border-radius:0"></span><span>Newly born<small>a spark on stars that arrived in the last day</small></span></label>
   <label><input type="checkbox" role="switch" data-show="present"><span class="udot" style="border:2px solid #78ebe1"></span><span>Who is present<small>anyone who has said they are here</small></span></label>
   <label><input type="checkbox" role="switch" data-show="names"><span class="udot" style="background:#cdbf9f;border-radius:2px;height:3px"></span><span>Names<small>on the stars nearest you</small></span></label>
   <label><input type="checkbox" role="switch" data-show="dust"><span class="udot" style="background:#b8c8ff;width:4px;height:4px;margin:0 4px"></span><span>Far dust<small>the faint points behind the stars</small></span></label>
   <label><input type="checkbox" role="switch" data-show="turn"><span class="udot" style="border:1.5px dashed #cdbf9f"></span><span>The sky turning<small>slowly, when left alone</small></span></label>
+  <button type="button" class="ubtn" id="tshow">Watch the stars being born</button>
+</div>
+<div class="utime" id="time" hidden>
+  <button type="button" class="ubtn" id="tplay">Pause</button>
+  <div class="utmid"><p id="twhen" aria-live="off"></p><input type="range" id="tr" min="0" max="1000" value="0" aria-label="When in the life of the sky"></div>
+  <button type="button" class="ubtn uclose" id="tclose" aria-label="Back to now">×</button>
 </div>
 
 <aside class="ustar" id="starcard" hidden aria-live="polite">
@@ -197,14 +214,17 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   var EVERY = 60, polling = 0, idxNow = 0, idxPerf = 0, lastRead = 0, HOT = [], HOT_S = 600, PRES_RAW = [], PRES = [], PRES_H = 6, presI = 0;
   function serverNow() { return idxNow + (performance.now() - idxPerf); }
   function applyIndex(j) {
-    var old = index && index.touched, changed = [], n;
+    var old = index && index.touched, changed = [], n, had = null, fresh = [];
+    if (index) { had = {}; B3.forEach(function (s0) { had[s0.name] = 1; }); }
     index = j; idxNow = Date.parse((j.now && j.now.iso) || '') || Date.now(); idxPerf = performance.now(); lastRead = now();
     if (old) { var tc = j.touched || {}; for (n in tc) if (tc[n] !== old[n]) changed.push(n); }
     beachStars();
+    if (had) B3.forEach(function (s1) { if (!had[s1.name]) { ARRIVED[s1.name] = s1.arrived = now(); fresh.push(s1.name); } });
     changed.forEach(function (nm) { if (!(wb && wb.name === nm)) delete BLOCKS[nm]; delete LINES_READ[nm]; });
     if (picked) picked = starOf(picked.name) || picked;
     placePresence();
-    if (changed.length) { LOG.written = LOG.written.concat(changed).slice(-40); if (!inside && SHOW.ripples) showHint('Written just now: ' + changed.slice(0, 3).join(', ') + (changed.length > 3 ? ' and ' + (changed.length - 3) + ' more' : '')); }
+    if (fresh.length) { LOG.born = LOG.born.concat(fresh).slice(-40); if (!inside && !RP && SHOW.born) showHint((fresh.length === 1 ? 'A new star: ' : 'New stars: ') + fresh.slice(0, 3).join(', ') + (fresh.length > 3 ? ' and ' + (fresh.length - 3) + ' more' : '')); }
+    else if (changed.length) { LOG.written = LOG.written.concat(changed).slice(-40); if (!inside && SHOW.ripples) showHint('Written just now: ' + changed.slice(0, 3).join(', ') + (changed.length > 3 ? ' and ' + (changed.length - 3) + ' more' : '')); }
   }
   function refresh() {
     quiet(get(WIRE).then(function (j) { if (j && typeof j === 'object' && Array.isArray(j.blocks)) applyIndex(j); }));
@@ -239,7 +259,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     var on = PRES.filter(function (p) { return p.star; }); if (!on.length || inside || flying) return;
     openStar(on[presI++ % on.length].star);
   });
-  var LOG = { written: [] };
+  var LOG = { written: [], born: [] };
   function sealed(n) { return !!n && typeof n === 'object' && n['9'] && typeof n['9'] === 'object' && n['9']._ === 'gray'; }
   function lineOf(n) {
     if (sealed(n)) return 'This line is sealed.';
@@ -277,13 +297,23 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     B3.forEach(function (s) { var w = Date.parse(tch[s.name] || ''), age = (nowT - w) / 3600000; s.wrote = w || 0; s.recent = w && age >= 0 && age < RECENT_H ? Math.pow(1 - age / RECENT_H, 1.5) : 0; });
     RECENT = B3.filter(function (s) { return s.recent > 0; });
     HOT = B3.filter(function (s) { return s.wrote && nowT - s.wrote < HOT_S * 1000; });
+    var bn = (index && index.born) || {};
+    B3.forEach(function (s) { s.born = Date.parse(bn[s.name] || '') || 0; s.arrived = ARRIVED[s.name] || 0; });
+    BSTARS = B3.filter(function (s) { return s.born; }).sort(function (a, b) { return a.born - b.born; });
+    BORN = BSTARS.map(function (s) { return s.born; });
+    NEWBORN = BSTARS.filter(function (s) { return nowT - s.born < 86400000; });
     /* whose stars are whose, as far as names say: anyone with a passport or a shell is someone; a star belongs to the someone its
        name carries, or failing that to the family its name ends in (the date an archive ends in is passed over) */
     SOMEONE = {}; names.forEach(function (n) { var pp = n.split(':'); if ((pp[0] === 'passport' || pp[0] === 'shell') && pp[1]) SOMEONE[pp[1]] = 1; });
     GROUP = {}; B3.forEach(function (s) { s.key = keyFor(s.name); s.lit = false; if (s.key) (GROUP[s.key] = GROUP[s.key] || []).push(s); });
     if (LIT) light(LIT.key, true);
   }
-  var SHOW = { ripples: true, glow: true, present: true, names: true, dust: true, turn: true };
+  var SHOW = { ripples: true, glow: true, born: true, present: true, names: true, dust: true, turn: true };
+  /* stars being born: the index records when each block first arrived (those from before the stamp existed have none, and stand
+     in the sky from the start). RP is the replay: while it is open the sky is drawn as it stood at RP.T. */
+  var RP = null, RP_S = 45, BORN = [], BSTARS = [], NEWBORN = [], ARRIVED = {};
+  function unborn(s) { return !!RP && s.born > RP.T; }
+  function dateOf(ms) { try { return new Date(ms).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }); } catch (e) { return ''; } }
   try { var kept = JSON.parse(localStorage.getItem('universe.show') || '{}'); for (var sk in SHOW) if (typeof kept[sk] === 'boolean') SHOW[sk] = kept[sk]; } catch (e) { /* nothing kept: everything shows */ }
   var SOMEONE = {}, GROUP = {}, LIT = null, DATED = /^\d{4}-\d\d-\d\d\w?(-\w+)?$/;
   function keyFor(name) {
@@ -373,11 +403,11 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     NAMED.length = 0;
     if (LIT && LIT.lines.length) {
       ctx.strokeStyle = '#e8c98a'; ctx.lineWidth = 1; ctx.globalAlpha = alpha * 0.34; ctx.beginPath();
-      for (i = 0; i < LIT.lines.length; i++) { var qa = oproj(LIT.lines[i][0].p), qb = oproj(LIT.lines[i][1].p); if (qa && qb) { ctx.moveTo(qa[0], qa[1]); ctx.lineTo(qb[0], qb[1]); } }
+      for (i = 0; i < LIT.lines.length; i++) { var qa = oproj(LIT.lines[i][0].p), qb = oproj(LIT.lines[i][1].p); if (qa && qb && !unborn(LIT.lines[i][0]) && !unborn(LIT.lines[i][1])) { ctx.moveTo(qa[0], qa[1]); ctx.lineTo(qb[0], qb[1]); } }
       ctx.stroke();
     }
     for (i = 0; i < B3.length; i++) {
-      s = B3[i];
+      s = B3[i]; if (RP && s.born > RP.T) continue;
       q = oproj(s.p); if (!q || q[0] < -30 || q[0] > W + 30 || q[1] < -30 || q[1] > H + 30) continue;
       if (LIT) { var nr2 = Math.min(6, 1.1 / Math.max(q[2], 0.05)), r2 = (1.4 + s.br * 3.2) * (0.55 + nr2 * 0.45) * (wide ? 1 : 1.3) * (s.lit ? 1.7 : 1); ctx.globalAlpha = Math.min(1, alpha * (s.lit ? 1 : 0.16)); ctx.drawImage(s.lit ? SPR[1] : SPR[s.tint], q[0] - r2, q[1] - r2, r2 * 2, r2 * 2); if (s.lit && (q[2] < 0.9 || LIT.n <= 14)) NAMED.push([q[2], q[0], q[1] + r2 * 0.5 + 15, s.name]); continue; }
       var near = Math.min(6, 1.1 / Math.max(q[2], 0.05)), tw = 0.86 + 0.14 * Math.sin(t * s.sp + s.ph);
@@ -386,7 +416,26 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
       ctx.drawImage(SPR[s.tint], q[0] - rad, q[1] - rad, rad * 2, rad * 2);
       if (q[2] < 0.62) NAMED.push([q[2], q[0], q[1] + rad * 0.5 + 15, s.name]);
     }
-    if (SHOW.glow) for (i = 0; i < RECENT.length; i++) {   /* blocks written in the last three days glow */
+    if (RP) {   /* the replay: each star flares as its moment passes */
+      for (i = 0; i < BSTARS.length; i++) {
+        s = BSTARS[i]; var bk = 1 - (RP.T - s.born) / RP.flash; if (bk <= 0 || bk > 1) continue;
+        q = oproj(s.p); if (!q) continue; var bR = (7 + 26 * bk) * (wide ? 1 : 1.15);
+        ctx.globalAlpha = Math.min(1, alpha * bk * 1.1); ctx.drawImage(SPR[1], q[0] - bR, q[1] - bR, bR * 2, bR * 2);
+      }
+    } else if (SHOW.born) {
+      ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.2;
+      for (i = 0; i < NEWBORN.length; i++) {   /* arrived in the last day: a four-pointed spark */
+        s = NEWBORN[i]; q = oproj(s.p); if (!q || q[0] < -30 || q[0] > W + 30 || q[1] < -30 || q[1] > H + 30) continue;
+        var sl = (8 + 2.5 * Math.sin(t * 1.7 + s.ph)) * (LIT && !s.lit ? 0.6 : 1); ctx.globalAlpha = alpha * (LIT && !s.lit ? 0.2 : 0.62 + 0.25 * Math.sin(t * 1.7 + s.ph));
+        ctx.beginPath(); ctx.moveTo(q[0] - sl, q[1]); ctx.lineTo(q[0] + sl, q[1]); ctx.moveTo(q[0], q[1] - sl); ctx.lineTo(q[0], q[1] + sl); ctx.stroke();
+      }
+      for (i = 0; i < NEWBORN.length; i++) {   /* arrived while you watched: it bursts into place */
+        s = NEWBORN[i]; if (!s.arrived || t - s.arrived > 9) continue; q = oproj(s.p); if (!q) continue;
+        var ak = 1 - (t - s.arrived) / 9, aR = 10 + 46 * ak * ak; ctx.globalAlpha = alpha * ak; ctx.drawImage(SPR[1], q[0] - aR, q[1] - aR, aR * 2, aR * 2);
+        ctx.globalAlpha = alpha * ak * 0.8; ctx.beginPath(); ctx.arc(q[0], q[1], 8 + (1 - ak) * 60, 0, TAU); ctx.stroke();
+      }
+    }
+    if (SHOW.glow && !RP) for (i = 0; i < RECENT.length; i++) {   /* blocks written in the last three days glow */
       s = RECENT[i]; q = oproj(s.p); if (!q || q[0] < -40 || q[0] > W + 40 || q[1] < -40 || q[1] > H + 40) continue;
       var nr = Math.min(6, 1.1 / Math.max(q[2], 0.05)), gr = (5 + 13 * s.recent) * (0.6 + nr * 0.4) * (wide ? 1 : 1.2);
       ctx.globalAlpha = Math.min(1, alpha * RECENT_K * (LIT && !s.lit ? 0.15 : 1) * (0.3 + 0.7 * s.recent) * (0.72 + 0.28 * Math.sin(t * 1.3 + s.ph)));
@@ -394,12 +443,12 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     }
     ctx.globalCompositeOperation = 'source-over';
     var tS = serverNow();
-    if (SHOW.ripples) for (i = 0; i < HOT.length; i++) {   /* written in the last ten minutes: two rings spreading from the star, fainter as the writing recedes */
+    if (SHOW.ripples && !RP) for (i = 0; i < HOT.length; i++) {   /* written in the last ten minutes: two rings spreading from the star, fainter as the writing recedes */
       s = HOT[i]; var hk = 1 - (tS - s.wrote) / (HOT_S * 1000); if (hk <= 0) continue;
       q = oproj(s.p); if (!q || q[0] < -60 || q[0] > W + 60 || q[1] < -60 || q[1] > H + 60) continue;
       for (var w2 = 0; w2 < 2; w2++) { var ph = CALM ? 0.35 + w2 * 0.4 : ((t * 0.45 + s.ph + w2 * 0.5) % 1); ctx.globalAlpha = alpha * (1 - ph) * (0.25 + 0.75 * hk); ctx.strokeStyle = '#ffd9a0'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(q[0], q[1], 6 + ph * (16 + 14 * hk), 0, TAU); ctx.stroke(); }
     }
-    if (PRES.length && SHOW.present && !inside) {   /* those present: a sea-green ring on the star they stand at, their name and how long since their heartbeat */
+    if (PRES.length && SHOW.present && !inside && !RP) {   /* those present: a sea-green ring on the star they stand at, their name and how long since their heartbeat */
       ctx.font = '600 12px ui-monospace,Menlo,Consolas,monospace'; ctx.textAlign = 'center'; ctx.shadowColor = '#000'; ctx.shadowBlur = 6;
       for (i = 0; i < PRES.length; i++) {
         var P = PRES[i]; if (!P.star) continue; q = oproj(P.star.p); if (!q || q[0] < -60 || q[0] > W + 60 || q[1] < -60 || q[1] > H + 60) continue;
@@ -767,7 +816,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   function tapSky(x, y) {
     basis();
     var best = null, bd = 28, q, i;
-    for (i = 0; i < B3.length; i++) { q = oproj(B3[i].p); if (!q) continue; var d = Math.hypot(q[0] - x, q[1] - y); if (d < bd) { bd = d; best = B3[i]; } }
+    for (i = 0; i < B3.length; i++) { if (unborn(B3[i])) continue; q = oproj(B3[i].p); if (!q) continue; var d = Math.hypot(q[0] - x, q[1] - y); if (d < bd) { bd = d; best = B3[i]; } }
     if (best) { if (picked && picked.name === best.name && !elStar.hidden) { walkBlock(best.name); return; } openStar(best); } else closeStar();
   }
   function bytesOf(name) { return Number(((index && index.bytes) || {})[name]) || 0; }
@@ -776,7 +825,8 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   function metaOf(name) {
     var size = bytesOf(name), w = Date.parse(((index && index.touched) || {})[name] || ''), fresh = w && serverNow() - w < 86400000, when = fresh ? ago(serverNow() - w) : writtenAt(name);
     var here = hereAt(name).map(function (p) { return p.who + ' here, ' + ago(serverNow() - p.when); }).join('; ');
-    return (size ? kb(size) : '') + (size && when ? '  ·  ' : '') + (when ? (fresh ? 'written ' : 'last written ') + when : '') + (here ? '  ·  ' + here : '');
+    var st = starOf(name), bornOn = st && st.born ? dateOf(st.born) : '';
+    return (size ? kb(size) : '') + (size && when ? '  ·  ' : '') + (when ? (fresh ? 'written ' : 'last written ') + when : '') + (bornOn ? '  ·  born ' + bornOn : '') + (here ? '  ·  ' + here : '');
   }
   function allButton(s) {
     var b = $('sall'), m = (s.key && GROUP[s.key]) || [];
@@ -830,6 +880,34 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     try { localStorage.setItem('universe.show', JSON.stringify(SHOW)); } catch (err) { /* not kept, no matter */ }
     if (k === 'present') placePresence();
   });
+  var elTime = $('time'), elTR = $('tr'), rpPip = 0;
+  function bornBy(T) { var lo = 0, hi = BORN.length; while (lo < hi) { var mid = (lo + hi) >> 1; if (BORN[mid] <= T) lo = mid + 1; else hi = mid; } return lo; }
+  function rpSet(x) {
+    if (!RP) return; RP.x = clamp(x, 0, 1); RP.T = RP.t0 + RP.x * (RP.t1 - RP.t0);
+    var nn = B3.length - BORN.length + bornBy(RP.T);
+    elTR.value = String(Math.round(RP.x * 1000));
+    $('twhen').textContent = (RP.T < BORN[0] ? 'Before ' + dateOf(BORN[0]) : RP.x >= 1 ? 'Now' : dateOf(RP.T)) + ' · ' + nn.toLocaleString('en-GB') + (nn === 1 ? ' star' : ' stars');
+  }
+  function rpPlay(on) { if (!RP) return; if (on && RP.x >= 1) rpSet(0); RP.playing = on; $('tplay').textContent = on ? 'Pause' : RP.x >= 1 ? 'Again' : 'Play'; }
+  function openReplay() {
+    if (!BORN.length || inside || flying) return;
+    closeShow(); closeFind(); closeStar(); hideHint();
+    var t1 = serverNow(), t0 = BORN[0] - (t1 - BORN[0]) * 0.03;
+    RP = { x: 0, T: t0, t0: t0, t1: t1, flash: (t1 - t0) * 0.028, playing: false };
+    elTime.hidden = false; stage.classList.add('replaying'); rpSet(0); rpPlay(true); touchT = now();
+    if (!LIT) glideTo({ tgt: [0, 0, 0], dist: wide ? 2.2 : 2.5, pitch: 0.78 }, 1.6, ease);
+  }
+  function closeReplay() { if (!RP) return; RP = null; elTime.hidden = true; stage.classList.remove('replaying'); }
+  function rpTick(dt) {
+    if (!RP || !RP.playing || inside) return;
+    var was = bornBy(RP.T); rpSet(RP.x + dt / RP_S); var is = bornBy(RP.T);
+    if (is > was && now() - rpPip > 0.11) { rpPip = now(); pip(MNOTE[BSTARS[is - 1].name.length % 9], 0.03, 0.3); }   /* with the sound on, each arrival is a note */
+    if (RP.x >= 1) rpPlay(false);
+  }
+  $('tshow').addEventListener('click', openReplay);
+  $('tplay').addEventListener('click', function () { if (RP) rpPlay(!RP.playing); });
+  $('tclose').addEventListener('click', closeReplay);
+  elTR.addEventListener('input', function () { if (!RP) return; RP.playing = false; rpSet(Number(elTR.value) / 1000); $('tplay').textContent = RP.x >= 1 ? 'Again' : 'Play'; });
   elShow.addEventListener('keydown', function (e) { if (e.key === 'Escape') { e.preventDefault(); closeShow(); $('showb').focus(); } });
   function openStar(s) {
     picked = s; hideHint();
@@ -890,7 +968,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     if (e.metaKey || e.ctrlKey || e.altKey || (el && (/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || el.isContentEditable))) return;
     if (!inside) {
       if (flying) return;
-      if (e.key === 'Escape') { if (!elShow.hidden) closeShow(); else if (!elStar.hidden) closeStar(); else if (LIT) unlight(); return; }
+      if (e.key === 'Escape') { if (!elShow.hidden) closeShow(); else if (!elStar.hidden) closeStar(); else if (RP) closeReplay(); else if (LIT) unlight(); return; }
       if (e.key === '/') { e.preventDefault(); openFind(); return; }
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); orb.yaw += e.key === 'ArrowLeft' ? 0.08 : -0.08; touchT = now(); }
       else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') { e.preventDefault(); orb.pitch = clamp(orb.pitch + (e.key === 'ArrowUp' ? 0.06 : -0.06), -1.2, 1.45); touchT = now(); }
@@ -912,7 +990,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     raf = 0;
     if (!visible || document.hidden) return;
     var t = now(), dt = Math.min(0.1, Math.max(0, t - (lastF || t))); lastF = t;
-    moonsTick(Math.min(0.05, dt)); stepGlide(t); musicTick();
+    moonsTick(Math.min(0.05, dt)); stepGlide(t); musicTick(); rpTick(dt);
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     tendSky(t); drawSky(t, 1); drawPicked(t);
     if (inside) drawMoons();
@@ -931,6 +1009,9 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     names: function () { return { someone: Object.keys(SOMEONE).length, groups: Object.keys(GROUP).length, keyed: B3.filter(function (s) { return s.key; }).length, lit: LIT ? { key: LIT.key, n: LIT.n, lines: LIT.lines.length } : null, chip: $('chip').hidden ? '' : $('chip').textContent, all: $('sall').hidden ? '' : $('sall').textContent, findOpen: !elFind.hidden }; },
     search: function (t) { return search(t).map(function (f) { return f.group ? '[' + f.group + ' ' + f.n + ']' : f.star.name; }); },
     keyFor: keyFor,
+    born: function () { return { stamped: BORN.length, first: BORN.length ? new Date(BORN[0]).toISOString() : '', newborn: NEWBORN.length, arrived: LOG.born.slice(), replay: RP ? { x: +RP.x.toFixed(3), playing: RP.playing, label: $('twhen').textContent, btn: $('tplay').textContent, drawn: B3.filter(function (s) { return !unborn(s); }).length } : null }; },
+    scrub: function (x) { if (RP) { RP.playing = false; rpSet(x); } },
+    pretendBorn: function (name) { var j = JSON.parse(JSON.stringify(index)); j.now = { iso: new Date(serverNow()).toISOString() }; j.blocks.push(name); j.touched[name] = j.born[name] = j.now.iso; j.bytes[name] = 1200; applyIndex(j); },
     show: function () { return { open: !elShow.hidden, on: JSON.parse(JSON.stringify(SHOW)) }; },
     pretend: function (touched, present) { if (touched) { var j = JSON.parse(JSON.stringify(index)); j.now = { iso: new Date(serverNow()).toISOString() }; touched.forEach(function (n) { j.touched[n] = j.now.iso; }); applyIndex(j); } if (present) { PRES_RAW = present.map(function (p) { return { who: p.who, at: p.at, when: serverNow() - (p.minutes || 0) * 60000 }; }); placePresence(); } },
     star: function (name) { basis(); var s = starOf(name), q = s && oproj(s.p); return q ? { x: q[0], y: q[1], z: q[2] } : null; },
