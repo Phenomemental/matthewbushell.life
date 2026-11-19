@@ -36,7 +36,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 .ucorner{position:absolute;z-index:8;top:calc(8px + env(safe-area-inset-top));right:calc(8px + env(safe-area-inset-right));display:flex;gap:6px;padding:5px;border-radius:32px;background:rgba(3,5,12,.66);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .ucorner .ubtn{padding:0 14px;font-size:18px}
 .ucorner .uhere{border-color:#9ff2e6;color:#e6fffb}
-.uni.walking .ucorner .uhere,.uni.walking .ucorner .ufindb{display:none}
+.uni.walking .ucorner .uhere,.uni.walking .ucorner .ufindb,.uni.walking .ucorner #showb{display:none}
 .uchip{position:absolute;z-index:7;top:calc(62px + env(safe-area-inset-top));left:calc(12px + env(safe-area-inset-left));min-height:40px;padding:0 14px;font-size:17px;border-color:#e8c98a;color:#ffeccb;max-width:calc(100% - 24px);overflow:hidden;text-overflow:ellipsis;display:inline-block}
 .uni.walking .uchip{display:none}
 .ufind{position:absolute;z-index:9;top:calc(64px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);width:min(460px,calc(100% - 24px));box-sizing:border-box;padding:10px;border-radius:18px;background:rgba(6,9,22,.96);border:1px solid rgba(238,242,255,.3);box-shadow:0 10px 40px rgba(0,0,0,.6)}
@@ -48,7 +48,19 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 .ufind li button.grp{color:#e8c98a;font:600 18px 'Cormorant Garamond',Georgia,serif;letter-spacing:.03em}
 .ufind .unone{margin:8px 4px 2px;font-style:italic;font-size:18px;color:var(--dim)}
 .ustar .uall{margin-top:12px;margin-left:6px;min-height:48px}
-@media (max-width:599px){.ucorner{top:calc(54px + env(safe-area-inset-top))}.uchip{top:calc(118px + env(safe-area-inset-top))}.ufind{top:calc(116px + env(safe-area-inset-top))}}
+.ushow{position:absolute;z-index:9;top:calc(64px + env(safe-area-inset-top));right:calc(12px + env(safe-area-inset-right));width:min(340px,calc(100% - 24px));box-sizing:border-box;padding:8px 10px 10px;border-radius:18px;background:rgba(6,9,22,.96);border:1px solid rgba(238,242,255,.3);box-shadow:0 10px 40px rgba(0,0,0,.6)}
+.ushow h2{margin:6px 6px 4px;font-size:13px;font-weight:500;letter-spacing:.3em;color:#cdbf9f}
+.ushow label{display:flex;align-items:center;gap:12px;min-height:48px;padding:0 6px;border-radius:8px;font-size:19px;line-height:1.15;color:#f1ebdd;cursor:pointer}
+.ushow label:hover{background:rgba(44,50,76,.6)}
+.ushow label small{display:block;font-size:15px;font-style:italic;color:var(--dim)}
+.ushow input{appearance:none;-webkit-appearance:none;flex:none;position:relative;width:44px;height:26px;margin:0;border-radius:13px;border:1.5px solid #8a6a3a;background:#0b0f1e;cursor:pointer;transition:background .2s,border-color .2s}
+.ushow input::after{content:'';position:absolute;top:3px;left:3px;width:17px;height:17px;border-radius:50%;background:#8a7a5c;transition:transform .2s,background .2s}
+.ushow input:checked{background:#5a1830;border-color:#ff8aa6}
+.ushow input:checked::after{transform:translateX(18px);background:#fff3e6}
+.ushow input:focus-visible{outline:2px solid #ff5d86;outline-offset:3px}
+.ushow .udot{flex:none;width:12px;height:12px;border-radius:50%;box-sizing:border-box}
+.uni.walking .ushow{display:none}
+@media (max-width:599px){.ucorner{top:calc(54px + env(safe-area-inset-top));gap:4px}.ucorner .ubtn{padding:0 10px;font-size:17px}.ushow{top:calc(116px + env(safe-area-inset-top))}.uchip{top:calc(118px + env(safe-area-inset-top))}.ufind{top:calc(116px + env(safe-area-inset-top))}}
 .umark{position:absolute;z-index:3;top:calc(14px + env(safe-area-inset-top));left:calc(16px + env(safe-area-inset-left));margin:0;max-width:calc(100% - 170px);font-size:13px;letter-spacing:.3em;line-height:1.5;color:#cdbf9f;text-shadow:0 0 8px #000;pointer-events:none;white-space:nowrap}
 .umark b{display:block;font-size:15px;letter-spacing:.08em;font-weight:500;font-style:italic;color:var(--dim);overflow:hidden;text-overflow:ellipsis}
 
@@ -92,6 +104,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 <div class="ucorner">
   <button type="button" class="ubtn uhere" id="present" hidden>Present: 1</button>
   <button type="button" class="ubtn ufindb" id="findb" aria-expanded="false">Find</button>
+  <button type="button" class="ubtn" id="showb" aria-expanded="false">Show</button>
   <button type="button" class="ubtn" id="sound" aria-pressed="false">Sound: off</button>
 </div>
 
@@ -99,6 +112,16 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 <div class="ufind" id="find" hidden>
   <input id="q" type="search" placeholder="Find a star by name" aria-label="Find a star by name" autocomplete="off" autocapitalize="off" spellcheck="false">
   <ul id="hits"></ul>
+</div>
+
+<div class="ushow" id="show" hidden>
+  <h2>SHOW</h2>
+  <label><input type="checkbox" role="switch" data-show="ripples"><span class="udot" style="border:1.5px solid #ffd9a0"></span><span>Being written<small>rings on stars written in the last ten minutes</small></span></label>
+  <label><input type="checkbox" role="switch" data-show="glow"><span class="udot" style="background:#ffc478;box-shadow:0 0 8px #ffc478"></span><span>Recently written<small>a glow on stars written in the last three days</small></span></label>
+  <label><input type="checkbox" role="switch" data-show="present"><span class="udot" style="border:2px solid #78ebe1"></span><span>Who is present<small>anyone who has said they are here</small></span></label>
+  <label><input type="checkbox" role="switch" data-show="names"><span class="udot" style="background:#cdbf9f;border-radius:2px;height:3px"></span><span>Names<small>on the stars nearest you</small></span></label>
+  <label><input type="checkbox" role="switch" data-show="dust"><span class="udot" style="background:#b8c8ff;width:4px;height:4px;margin:0 4px"></span><span>Far dust<small>the faint points behind the stars</small></span></label>
+  <label><input type="checkbox" role="switch" data-show="turn"><span class="udot" style="border:1.5px dashed #cdbf9f"></span><span>The sky turning<small>slowly, when left alone</small></span></label>
 </div>
 
 <aside class="ustar" id="starcard" hidden aria-live="polite">
@@ -181,7 +204,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     changed.forEach(function (nm) { if (!(wb && wb.name === nm)) delete BLOCKS[nm]; delete LINES_READ[nm]; });
     if (picked) picked = starOf(picked.name) || picked;
     placePresence();
-    if (changed.length) { LOG.written = LOG.written.concat(changed).slice(-40); if (!inside) showHint('Written just now: ' + changed.slice(0, 3).join(', ') + (changed.length > 3 ? ' and ' + (changed.length - 3) + ' more' : '')); }
+    if (changed.length) { LOG.written = LOG.written.concat(changed).slice(-40); if (!inside && SHOW.ripples) showHint('Written just now: ' + changed.slice(0, 3).join(', ') + (changed.length > 3 ? ' and ' + (changed.length - 3) + ' more' : '')); }
   }
   function refresh() {
     quiet(get(WIRE).then(function (j) { if (j && typeof j === 'object' && Array.isArray(j.blocks)) applyIndex(j); }));
@@ -206,12 +229,12 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
       while (!s && nm.lastIndexOf(':') > 0) { nm = nm.slice(0, nm.lastIndexOf(':')); s = starOf(nm); }
       return { who: p.who, at: p.at, when: p.when, star: s };
     });
-    var b = $('present'); b.hidden = !PRES.some(function (p) { return p.star; }); b.textContent = 'Present: ' + PRES.length;
-    if (B3.length) $('ucount').textContent = B3.length.toLocaleString('en-GB') + ' stars, read live' + (PRES.length ? ' · ' + PRES.length + ' present' : '');
+    var b = $('present'); b.hidden = !SHOW.present || !PRES.some(function (p) { return p.star; }); b.textContent = 'Present: ' + PRES.length;
+    if (B3.length) $('ucount').textContent = B3.length.toLocaleString('en-GB') + ' stars, read live' + (PRES.length && SHOW.present ? ' · ' + PRES.length + ' present' : '');
     if (picked && !elStar.hidden) elSMeta.textContent = metaOf(picked.name);
   }
   function ago(ms) { var m = Math.round(ms / 60000); return m < 2 ? 'just now' : m < 90 ? m + ' min ago' : Math.round(m / 60) + ' h ago'; }
-  function hereAt(name) { return PRES.filter(function (p) { return p.star && p.star.name === name; }); }
+  function hereAt(name) { return !SHOW.present ? [] : PRES.filter(function (p) { return p.star && p.star.name === name; }); }
   $('present').addEventListener('click', function () {
     var on = PRES.filter(function (p) { return p.star; }); if (!on.length || inside || flying) return;
     openStar(on[presI++ % on.length].star);
@@ -260,6 +283,8 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     GROUP = {}; B3.forEach(function (s) { s.key = keyFor(s.name); s.lit = false; if (s.key) (GROUP[s.key] = GROUP[s.key] || []).push(s); });
     if (LIT) light(LIT.key, true);
   }
+  var SHOW = { ripples: true, glow: true, present: true, names: true, dust: true, turn: true };
+  try { var kept = JSON.parse(localStorage.getItem('universe.show') || '{}'); for (var sk in SHOW) if (typeof kept[sk] === 'boolean') SHOW[sk] = kept[sk]; } catch (e) { /* nothing kept: everything shows */ }
   var SOMEONE = {}, GROUP = {}, LIT = null, DATED = /^\d{4}-\d\d-\d\d\w?(-\w+)?$/;
   function keyFor(name) {
     var pp = name.split(':'), i; if (pp.length < 2) return '';
@@ -344,7 +369,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
       ctx.globalAlpha = alpha; ctx.fillStyle = hz; ctx.fillRect(0, 0, W, H);
     }
     ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = '#b8c8ff';
-    for (i = 0; i < dust.length; i++) { q = oproj(dust[i]); if (!q || q[0] < 0 || q[0] > W || q[1] < 0 || q[1] > H) continue; ctx.globalAlpha = Math.min(1, alpha * dust[i][3]); ctx.fillRect(q[0], q[1], 1.2, 1.2); }
+    if (SHOW.dust) for (i = 0; i < dust.length; i++) { q = oproj(dust[i]); if (!q || q[0] < 0 || q[0] > W || q[1] < 0 || q[1] > H) continue; ctx.globalAlpha = Math.min(1, alpha * dust[i][3]); ctx.fillRect(q[0], q[1], 1.2, 1.2); }
     NAMED.length = 0;
     if (LIT && LIT.lines.length) {
       ctx.strokeStyle = '#e8c98a'; ctx.lineWidth = 1; ctx.globalAlpha = alpha * 0.34; ctx.beginPath();
@@ -361,7 +386,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
       ctx.drawImage(SPR[s.tint], q[0] - rad, q[1] - rad, rad * 2, rad * 2);
       if (q[2] < 0.62) NAMED.push([q[2], q[0], q[1] + rad * 0.5 + 15, s.name]);
     }
-    for (i = 0; i < RECENT.length; i++) {   /* blocks written in the last three days glow */
+    if (SHOW.glow) for (i = 0; i < RECENT.length; i++) {   /* blocks written in the last three days glow */
       s = RECENT[i]; q = oproj(s.p); if (!q || q[0] < -40 || q[0] > W + 40 || q[1] < -40 || q[1] > H + 40) continue;
       var nr = Math.min(6, 1.1 / Math.max(q[2], 0.05)), gr = (5 + 13 * s.recent) * (0.6 + nr * 0.4) * (wide ? 1 : 1.2);
       ctx.globalAlpha = Math.min(1, alpha * RECENT_K * (LIT && !s.lit ? 0.15 : 1) * (0.3 + 0.7 * s.recent) * (0.72 + 0.28 * Math.sin(t * 1.3 + s.ph)));
@@ -369,12 +394,12 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     }
     ctx.globalCompositeOperation = 'source-over';
     var tS = serverNow();
-    for (i = 0; i < HOT.length; i++) {   /* written in the last ten minutes: two rings spreading from the star, fainter as the writing recedes */
+    if (SHOW.ripples) for (i = 0; i < HOT.length; i++) {   /* written in the last ten minutes: two rings spreading from the star, fainter as the writing recedes */
       s = HOT[i]; var hk = 1 - (tS - s.wrote) / (HOT_S * 1000); if (hk <= 0) continue;
       q = oproj(s.p); if (!q || q[0] < -60 || q[0] > W + 60 || q[1] < -60 || q[1] > H + 60) continue;
       for (var w2 = 0; w2 < 2; w2++) { var ph = CALM ? 0.35 + w2 * 0.4 : ((t * 0.45 + s.ph + w2 * 0.5) % 1); ctx.globalAlpha = alpha * (1 - ph) * (0.25 + 0.75 * hk); ctx.strokeStyle = '#ffd9a0'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(q[0], q[1], 6 + ph * (16 + 14 * hk), 0, TAU); ctx.stroke(); }
     }
-    if (PRES.length && !inside) {   /* those present: a sea-green ring on the star they stand at, their name and how long since their heartbeat */
+    if (PRES.length && SHOW.present && !inside) {   /* those present: a sea-green ring on the star they stand at, their name and how long since their heartbeat */
       ctx.font = '600 12px ui-monospace,Menlo,Consolas,monospace'; ctx.textAlign = 'center'; ctx.shadowColor = '#000'; ctx.shadowBlur = 6;
       for (i = 0; i < PRES.length; i++) {
         var P = PRES[i]; if (!P.star) continue; q = oproj(P.star.p); if (!q || q[0] < -60 || q[0] > W + 60 || q[1] < -60 || q[1] > H + 60) continue;
@@ -386,7 +411,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
       ctx.shadowBlur = 0;
     }
     /* close to, the nearest stars wear their names */
-    if (NAMED.length && !inside) {
+    if (NAMED.length && SHOW.names && !inside) {
       NAMED.sort(function (u, w) { return u[0] - w[0]; });
       ctx.font = '500 12px ui-monospace,Menlo,Consolas,monospace'; ctx.textAlign = 'center'; ctx.shadowColor = '#000'; ctx.shadowBlur = 5;
       for (i = 0; i < NAMED.length && i < 14; i++) { var nm = NAMED[i]; ctx.globalAlpha = alpha * (LIT ? 0.85 : clamp((0.62 - nm[0]) / 0.25, 0, 1) * 0.8); ctx.fillStyle = '#cdbf9f'; ctx.fillText(nm[3].length > 34 ? nm[3].slice(0, 33) + '…' : nm[3], nm[1], nm[2]); }
@@ -636,7 +661,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   /* coming close to a star: its places open round it as moons */
   function enterBlock(name, json) {
     if (inside) return;
-    closeStar(); hideHint(); closeFind();
+    closeStar(); hideHint(); closeFind(); closeShow();
     var s = starOf(name), at = s ? s.p : orb.tgt.slice();
     inside = true; wb = { name: name, root: json, floor: floorOf(json) }; path = []; KC = {}; M.nodes = {}; M.cardKey = ''; M.lastD = null; M.hits.length = 0;
     flying = true; stage.classList.add('walking');
@@ -784,7 +809,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     });
   }
   function choose(f) { if (!f) return; closeFind(); if (f.group) light(f.group); else { if (LIT && !f.star.lit) unlight(); orb.dist = Math.max(orb.dist, 0.9); openStar(f.star); } }
-  function openFind() { if (inside || flying || !B3.length) return; elFind.hidden = false; $('findb').setAttribute('aria-expanded', 'true'); elQ.value = ''; showFound(); hideHint(); try { elQ.focus(); } catch (e) { /* no focus, no matter */ } }
+  function openFind() { if (inside || flying || !B3.length) return; closeShow(); elFind.hidden = false; $('findb').setAttribute('aria-expanded', 'true'); elQ.value = ''; showFound(); hideHint(); try { elQ.focus(); } catch (e) { /* no focus, no matter */ } }
   function closeFind() { elFind.hidden = true; $('findb').setAttribute('aria-expanded', 'false'); try { elQ.blur(); } catch (e) { /* no matter */ } }
   $('findb').addEventListener('click', function () { if (elFind.hidden) openFind(); else closeFind(); });
   elQ.addEventListener('input', showFound);
@@ -793,7 +818,19 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     else if (e.key === 'Enter') { e.preventDefault(); choose(found[foundI]); }
     else if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && found.length) { e.preventDefault(); foundI = (foundI + (e.key === 'ArrowDown' ? 1 : found.length - 1)) % found.length; var bs = elHits.querySelectorAll('button'); for (var i = 0; i < bs.length; i++) bs[i].classList.toggle('on', i === foundI); if (bs[foundI] && bs[foundI].scrollIntoView) bs[foundI].scrollIntoView({ block: 'nearest' }); }
   });
-  canvas.addEventListener('pointerdown', function () { if (!elFind.hidden) closeFind(); });
+  canvas.addEventListener('pointerdown', function () { if (!elFind.hidden) closeFind(); closeShow(); });
+  /* ── Show: what is drawn over the stars, each thing switched on or off ── */
+  var elShow = $('show'), switches = elShow.querySelectorAll('input[data-show]');
+  function closeShow() { if (elShow.hidden) return; elShow.hidden = true; $('showb').setAttribute('aria-expanded', 'false'); }
+  function openShow() { if (inside || flying) return; closeFind(); for (var i = 0; i < switches.length; i++) switches[i].checked = !!SHOW[switches[i].getAttribute('data-show')]; elShow.hidden = false; $('showb').setAttribute('aria-expanded', 'true'); hideHint(); }
+  $('showb').addEventListener('click', function () { if (elShow.hidden) openShow(); else closeShow(); });
+  elShow.addEventListener('change', function (e) {
+    var k = e.target && e.target.getAttribute && e.target.getAttribute('data-show'); if (!k || !(k in SHOW)) return;
+    SHOW[k] = !!e.target.checked; touchT = now();
+    try { localStorage.setItem('universe.show', JSON.stringify(SHOW)); } catch (err) { /* not kept, no matter */ }
+    if (k === 'present') placePresence();
+  });
+  elShow.addEventListener('keydown', function (e) { if (e.key === 'Escape') { e.preventDefault(); closeShow(); $('showb').focus(); } });
   function openStar(s) {
     picked = s; hideHint();
     glideTo({ tgt: s.p.slice(), dist: Math.min(orb.dist, wide ? 1.4 : 1.2) }, 1.4, ease);
@@ -837,7 +874,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     var dt = Math.min(0.1, Math.max(0, t - lastSky)); lastSky = t;
     if (CALM || flying) return;
     if (inside) { orb.yaw += dt * 0.02; return; }
-    if (!glide && !Object.keys(pts).length && t - touchT > 3) orb.yaw += dt * 0.015;   /* left alone, the sky turns slowly */
+    if (SHOW.turn && !glide && !Object.keys(pts).length && t - touchT > 3) orb.yaw += dt * 0.015;   /* left alone, the sky turns slowly */
   }
   function drawPicked(t) {
     if (inside || !picked || flying) return;
@@ -853,7 +890,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     if (e.metaKey || e.ctrlKey || e.altKey || (el && (/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || el.isContentEditable))) return;
     if (!inside) {
       if (flying) return;
-      if (e.key === 'Escape') { if (!elStar.hidden) closeStar(); else if (LIT) unlight(); return; }
+      if (e.key === 'Escape') { if (!elShow.hidden) closeShow(); else if (!elStar.hidden) closeStar(); else if (LIT) unlight(); return; }
       if (e.key === '/') { e.preventDefault(); openFind(); return; }
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); orb.yaw += e.key === 'ArrowLeft' ? 0.08 : -0.08; touchT = now(); }
       else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') { e.preventDefault(); orb.pitch = clamp(orb.pitch + (e.key === 'ArrowUp' ? 0.06 : -0.06), -1.2, 1.45); touchT = now(); }
@@ -894,6 +931,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     names: function () { return { someone: Object.keys(SOMEONE).length, groups: Object.keys(GROUP).length, keyed: B3.filter(function (s) { return s.key; }).length, lit: LIT ? { key: LIT.key, n: LIT.n, lines: LIT.lines.length } : null, chip: $('chip').hidden ? '' : $('chip').textContent, all: $('sall').hidden ? '' : $('sall').textContent, findOpen: !elFind.hidden }; },
     search: function (t) { return search(t).map(function (f) { return f.group ? '[' + f.group + ' ' + f.n + ']' : f.star.name; }); },
     keyFor: keyFor,
+    show: function () { return { open: !elShow.hidden, on: JSON.parse(JSON.stringify(SHOW)) }; },
     pretend: function (touched, present) { if (touched) { var j = JSON.parse(JSON.stringify(index)); j.now = { iso: new Date(serverNow()).toISOString() }; touched.forEach(function (n) { j.touched[n] = j.now.iso; }); applyIndex(j); } if (present) { PRES_RAW = present.map(function (p) { return { who: p.who, at: p.at, when: serverNow() - (p.minutes || 0) * 60000 }; }); placePresence(); } },
     star: function (name) { basis(); var s = starOf(name), q = s && oproj(s.p); return q ? { x: q[0], y: q[1], z: q[2] } : null; },
     look: function (name) { var s = starOf(name); if (s) { orb.tgt = s.p.slice(); orb.dist = 1.2; BAS = null; } return !!s; },
