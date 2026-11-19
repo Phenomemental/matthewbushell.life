@@ -1,5 +1,7 @@
 // The way out (6.72): 'Explore the pscale universe' at the foot of the credits, and after the end the universe is the viewer's.
 //   node out.js --size phone|desktop [--url URL] [--shots DIR]
+// It plays the whole film once to reach the real end, and on the way checks what the retelling (6.9) put between and on the stations:
+// the Archive's whispers, the visitor's station, the credits' last words and the kept lives.
 // It plays the whole film once to reach the real end. Nothing is written to the beach: any request that is not a read is stopped
 // and counted as a failure.
 'use strict';
@@ -7,7 +9,8 @@ const { open, args } = require('./lib');
 const near = (a, b, e) => Math.abs(a - b) <= e;
 
 (async () => {
-  const o = args(), T = await open(o), P = T.page, W = T.size.width, H = T.size.height;
+  const o = args(); o.sound = true;
+  const T = await open(o), P = T.page, W = T.size.width, H = T.size.height;
   const writes = []; await P.context().route('**/*', r => { const q = r.request(); if (!/^(GET|HEAD|OPTIONS)$/.test(q.method())) { writes.push(q.method() + ' ' + q.url()); return r.abort(); } return r.fallback(); });
   const REST = W >= 900 ? 2.5 : 2.35, OUT0 = W >= 900 ? 2.3 : 2.7, OUT1 = W >= 900 ? 2.2 : 2.5;
   const A = () => T.ev(() => window.theApproach.state());
@@ -56,12 +59,24 @@ const near = (a, b, e) => Math.abs(a - b) <= e;
 
   // ── on to the real end ──
   await T.tap('#stop'); await T.sleep(300); await T.tap('#skipop'); await T.sleep(3000);
-  for (let k = 0; k < 7; k++) {
+  // between the stations (6.9 check 9): the needle is held clear of every station for a while after the first stop and after the sixth,
+  // and what is whispered there is counted. The Archive's four whispers take the place of the others, a little more at every stop.
+  const bandBox = await T.ev(() => { const r = document.getElementById('band').getBoundingClientRect(); return { l: r.left, w: r.width, y: r.top + r.height / 2 }; });
+  const whispers = async (secs) => { const n0 = (await T.log()).heard.length, x = bandBox.l + bandBox.w * 0.993;
+    await P.mouse.move(bandBox.l + bandBox.w * 0.97, bandBox.y); await P.mouse.down(); await P.mouse.move(x, bandBox.y, { steps: 5 });
+    for (let i = 0; i < secs * 2; i++) { await P.mouse.move(x - (i % 2), bandBox.y); await T.sleep(500); }
+    await P.mouse.up(); const h = (await T.log()).heard.slice(n0); return { archive: h.filter(id => /^a\d$/.test(id)).length, others: h.filter(id => /^g\d+$/.test(id)).length }; };
+  const between = {};
+  for (let k = 0; k < 8; k++) {
     await T.tap('#find');
-    if (!(await T.until(() => window.theApproach.state().mLocked, 9000))) { T.ok('Find Mara found her, tuning ' + (k + 1), false); break; }
-    await T.until(() => !window.theApproach.state().mLocked, 150000, null, 200);
-    if (k < 6) await T.sleep(2800);
+    if (!(await T.until(() => window.theApproach.state().mLocked, 9000))) { T.ok('the button found the station, stop ' + (k + 1), false); break; }
+    await T.until(() => !window.theApproach.state().mLocked, 170000, null, 200);
+    if (k < 7) await T.sleep(2800);
+    if (k === 0 || k === 2 || k === 5) between[k + 1] = await whispers(k === 2 ? 12 : 21);
   }
+  const b1 = between[1] || {}, b3 = between[3] || {}, b6 = between[6] || {};
+  T.ok('between the stations after the first stop the whispers are other lives, none the Archive\'s', b1.others >= 4 && b1.archive === 0, JSON.stringify(b1));
+  T.ok('after the sixth stop the Archive\'s whispers have taken their place', b6.archive >= 3 && b6.archive > b6.others && b6.archive + b6.others >= 4, JSON.stringify(b6) + ' (after the third stop ' + JSON.stringify(b3) + ')');
   s = await A(); T.ok('the film came to its end', s.done, '');
   await T.until(() => window.theApproach.log().end2, 60000);
   // after the end, before the credits: Find Mara has given way
@@ -69,6 +84,8 @@ const near = (a, b, e) => Math.abs(a - b) <= e;
   let foot = await T.ev(() => ({ find: !document.getElementById('find').hidden, again: (e => e && !e.hidden ? e.textContent : '')(document.getElementById('replay')) }));
   const opened = await T.until(() => window.theApproach.credits().open, 15000);
   T.ok('the credits open by themselves after the end card', !!opened);
+  const kept = await T.ev(() => document.getElementById('clives').textContent);
+  T.ok('the credits\' kept lives leave out Mara\'s own diary', /Aoife/.test(kept) && /Bríd/.test(kept) && /two men on the ferry/.test(kept) && !/Mara/.test(kept), kept);
   // (1) the button from the credits' first frame to their last
   const roll = []; let rest = null; const t0 = Date.now();
   while (Date.now() - t0 < 240000) { b = await btn(); roll.push(b); if (roll.length === 2) await T.shot('x05-credits-first-frames'); if (roll.length === 60) await T.shot('x06-credits-rolling'); if (b.call) { rest = b; break; } await T.sleep(500); }
@@ -79,7 +96,7 @@ const near = (a, b, e) => Math.abs(a - b) <= e;
   const atRest = await T.ev(() => { const L = document.querySelector('#roll .clast'), r = L.getBoundingClientRect(), roll = document.getElementById('roll'), m = getComputedStyle(L, '::after'), mb = r.bottom - parseFloat(m.bottom) ;
     const others = [].slice.call(roll.querySelectorAll('p, h2, a, input, button, canvas, img')).filter(e => !L.contains(e) && e.offsetParent && e.getBoundingClientRect().height > 0).filter(e => { const q = e.getBoundingClientRect(); return q.bottom > 4 && q.top < innerHeight - 4; }).map(e => (e.textContent || e.tagName).slice(0, 30));
     return { text: L.textContent.replace(/\s+/g, ' ').trim(), top: Math.round(r.top), h: Math.round(r.height), others: others, mark: m.content !== 'none' && parseFloat(m.width) > 8 && m.borderBottomStyle === 'solid', markY: Math.round(mb), more: roll.scrollHeight - roll.scrollTop - roll.clientHeight }; });
-  T.ok('at rest the last line stands alone over the sky', /We kept our lives in this shape\.\s*Keep one of us\./.test(atRest.text) && atRest.others.length === 0 && atRest.h >= H - 2, JSON.stringify({ text: atRest.text, others: atRest.others, h: atRest.h }));
+  T.ok('at rest the last line stands alone over the sky', atRest.text === 'Keep one of us.' && atRest.others.length === 0 && atRest.h >= H - 2, JSON.stringify({ text: atRest.text, others: atRest.others, h: atRest.h }));
   T.ok('a small mark above the button says there is more beneath, and the button calls', atRest.mark && atRest.markY < rest.t && atRest.markY > rest.t - 60 && rest.call && atRest.more > 100, 'mark at ' + atRest.markY + ', button at ' + rest.t + ', ' + atRest.more + 'px beneath');
   // the sheet and the site's link are reached by scrolling; the reader tools still work (8)
   await T.ev(() => { const r = document.getElementById('roll'), f = r.querySelector('[data-tool="door"] input'); r.scrollTop = f.getBoundingClientRect().top + r.scrollTop - innerHeight * 0.35; }); await T.sleep(500);
@@ -140,6 +157,12 @@ const near = (a, b, e) => Math.abs(a - b) <= e;
   const band = await T.ev(() => { const r = document.getElementById('band').getBoundingClientRect(); return { l: r.left, w: r.width, y: r.top + r.height / 2 }; });
   await P.mouse.move(band.l + band.w * 0.45, band.y); await P.mouse.down(); await P.mouse.move(band.l + band.w * 0.5, band.y, { steps: 8 }); await T.sleep(3500); await P.mouse.up();
   s = await A(); T.ok('the dial still carries the kept lives', /visitor/.test(s.who) || /visitor/.test(s.cur || ''), s.who + ' / ' + s.cur);
+  // the visitor's station (6.9 check 8): ten pips, over and over, and ten digits naming a night in spring still to come
+  const vis0 = Date.now(); await P.mouse.down(); await T.sleep(12000); await P.mouse.up();
+  const visSay = await T.ev(() => ({ say: document.getElementById('say').textContent, big: document.getElementById('say').classList.contains('big'), who: document.getElementById('who').textContent }));
+  const visPips = (await T.ev(() => window.__snd.osc)).filter(x => x.f === 880 && x.t > vis0 - 8000 && x.t < vis0 + 12000), runs = []; visPips.forEach((x, i) => { if (i === 0 || x.t - visPips[i - 1].t > 1000) runs.push(1); else runs[runs.length - 1]++; });
+  T.ok('the visitor\'s station carries ten pips, over and over', runs.length >= 3 && runs.slice(1, -1).every(n => n === 10)   /* the first and last runs may be cut by the edges of the listening */, 'runs of ' + runs.join(', '));
+  T.ok('and the digits 2049214293, a night in spring, still to come, in place of its old spoken line', visSay.say === '2049214293\na night in spring, still to come' && visSay.big && /1420 MHz/.test(visSay.who) && !(await T.log()).heard.includes('visitor') && !(await T.ev(() => performance.getEntriesByType('resource').some(r => /voices\/visitor\.mp3/.test(r.name)))), JSON.stringify(visSay));
   await T.shot('x14-a-kept-life-after-the-end');
   // (5) it starts the page from its beginning
   await T.ev(() => document.getElementById('sclose').click());

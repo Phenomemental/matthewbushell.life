@@ -537,11 +537,19 @@ class TheFilmPage(Base):
         self.assertEqual(os.path.getsize(os.path.join(self.run_.out, 'the-approach', 'clips', 'shes_home.mp4')), os.path.getsize(src))
         listed = json.loads(self.read('the-approach/manifest.json'))
         self.assertEqual(sorted(listed), ['clips', 'fictions', 'nar', 'poster'])
-        story = ['address', 'archive', 'chip', 'dawn', 'mara_asks', 'nights', 'shes_home', 'station', 'summer', 'tom_answer']
+        # the retelling (film:the-approach 1.74, 6.9): fifteen clips, nine as they were and six made on 19 November 2026
+        story = ['address', 'archive', 'chip', 'dawn', 'gate_night', 'helper', 'mara_asks', 'nights', 'numbers', 'seasons', 'shes_home',
+                 'station', 'summer', 'tom_answer', 'voice']
         self.assertEqual(listed['clips'], story)
         self.assertEqual(listed['poster'], story)   # every clip shows its own first frame before it plays
-        # the narrator: the opening o1 to o9, the story r1 to r8, the ending e1 and e2 (6.53, 6.57)
-        self.assertEqual(listed['nar'], ['e1', 'e2'] + ['o%d' % i for i in range(1, 10)] + ['r%d' % i for i in range(1, 9)])
+        # the narrator's 32 lines (1.731 to 1.733): the opening, the eight stops, the ending
+        self.assertEqual(listed['nar'], sorted('e1 e1b e1c e2 o1 o2 o3 o3a o3b o4 o5 o6 o7 o8 o9 r1 r2 r2b r3 r3b r4 r4a r5 r5b r5c r6 r6b r6c '
+                                               'r7 r7b r8 r8b'.split()))
+        h = self.read(self.FILE)
+        for name in story:   # every clip in the folder is one the film plays
+            self.assertRegex(h, r"own:\[[^\]]*'%s'" % name)
+        for line in listed['nar']:   # and every narrator file is one it tells
+            self.assertRegex(h, r"(say:\['%s'\]|\{id:'%s',)" % (line, line))
         self.assertEqual(len(listed['fictions']), 10)
         self.assertIn('the-approach/fictions/fictions.json', files)
         h = self.read(self.FILE)
@@ -557,7 +565,11 @@ class TheFilmPage(Base):
             self.assertEqual([f for f in files if gone in f], [])
         self.assertNotIn('the-approach/walk.json', files)
         voices = [f for f in files if re.fullmatch(r'the-approach/voices/[a-z0-9_]+\.mp3', f)]
-        self.assertEqual(len(voices), 27)   # the kept lives and the whispers
+        # the kept lives and the whispers (27, the visitor's old line among them, no longer loaded), and the retelling's six:
+        # the Archive between the stations (a1 to a4), 'Keep one of us.' and the opening's whisper
+        self.assertEqual(len(voices), 33)
+        for v in ('a1', 'a2', 'a3', 'a4', 'keep', 'whisper'):
+            self.assertIn('the-approach/voices/%s.mp3' % v, files)
         self.assertEqual([f for f in voices if '/w_' in f], [])
         self.assertIn('the-approach/credits/mara.jpg', files)
         self.assertIn('the-approach/credits/tom.jpg', files)
@@ -565,6 +577,21 @@ class TheFilmPage(Base):
         self.assertIn('data-voices="%s/the-approach/voices/"' % ROOT, h)
         self.assertIn('data-credits="%s/the-approach/credits/"' % ROOT, h)
         for gone in ('the-approach/moments/', 'data-moments', 'id="skip"', 'Walk the film', 'beachsky.js', 'screens_dark', 'tom_one_page'):
+            self.assertNotIn(gone, h)
+
+    def test_the_retelling_is_the_film_the_page_tells(self):
+        """The retelling (film:the-approach 1.7, 6.9): eight stops, the seventh the false voice; the visitor's station is ten pips
+        and ten digits; 'Keep one of us.' is the ending's and the credits' last words; the old telling's lines are gone."""
+        self.run_with(blocks())
+        h = self.read(self.FILE)
+        self.assertIn("{f:.555,strong:true,who:'Mara?',beats:[{say:['r7']", h)
+        self.assertIn("who:'the visitor',pips:true,say:\"2049214293\\na night in spring, still to come\",big:true}", h)
+        self.assertIn("{id:'keep',t:\"Keep one of us.\",big:true,all:true}", h)
+        self.assertIn("{id:'whisper',t:", h)
+        self.assertIn("$('find').textContent='Find the numbers'", h)
+        self.assertIn("'Keep one of us.'.split(", h)
+        for gone in ('A block is a few words', 'We kept our lives in this shape', "'visitor'", "She's drifted off the band", "She's gone again",
+                     'People all over the world are growing them now', 'down to a few minutes'):
             self.assertNotIn(gone, h)
 
     def test_a_star_card_does_not_take_the_tap_that_opened_it(self):

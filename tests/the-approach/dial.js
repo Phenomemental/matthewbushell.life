@@ -45,7 +45,7 @@ const near = (a, b, e) => Math.abs(a - b) <= e;
   T.ok('the sky turns while the viewer waits', yaw1 !== yaw0, (yaw1 - yaw0).toFixed(4));
 
   // ── Play glides into the red star and the opening plays ──
-  await T.tap('#play'); await T.sleep(9500);
+  await T.tap('#play'); await T.sleep(12600);   /* ten pips come before the first line since the retelling (6.9) */
   s = await A(); T.ok('Play dives into the red star and the opening is told from there (6.82)', s.intro && near(s.dist, 0.36, 0.01) && s.hs.a >= 0.99 && (await T.log()).told[0].id === 'o1', 'dist ' + s.dist);
   await T.tap('#stop'); await T.sleep(300); await T.tap('#skipop'); await T.sleep(3200);
   s = await A(); T.ok('the dial is the viewer\'s after the opening, the view wide', s.introDone && near(s.dist, REST, 0.05), s.dist);
