@@ -512,6 +512,7 @@ class TheUniversePage(Base):
         self.assertIn('<link rel="canonical" href="https://phenomemental.github.io/matthewbushell.life/universe/">', h)
         for gone in ('<video', 'id="band"', 'id="needle"', 'id="veil"', 'data-parts', '.mp4', '.mp3', 'site.css'):
             self.assertNotIn(gone, h)
+        self.assertIn('?block=presence', h)
         ids = re.findall(r'id="([^"]+)"', h)
         self.assertEqual(len(ids), len(set(ids)))
         self.assertEqual([f for f in self.run_.files() if f.startswith("universe/")], [self.FILE])
