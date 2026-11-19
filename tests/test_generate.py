@@ -497,6 +497,32 @@ class VisitCounting(Base):
             self.assertIn('without cookies', h)
 
 
+class TheUniversePage(Base):
+    """The Pscale universe stands outside the page map as the film's page does: the sky alone, no film and no dial."""
+    FILE = 'universe/index.html'
+
+    def test_it_is_carried_counted_and_holds_no_film(self):
+        rep = self.run_with(blocks())
+        self.assertEqual(rep['published'], ALL)
+        h = self.read(self.FILE)
+        self.assertIsNotNone(h)
+        self.assertNotIn('{{', h)
+        self.assertIn(VisitCounting.SCRIPT, h)
+        self.assertIn('<noscript><img class="counted" src="https://matthewbushell.goatcounter.com/count?p=/universe/" alt=""></noscript>', h)
+        self.assertIn('<link rel="canonical" href="https://phenomemental.github.io/matthewbushell.life/universe/">', h)
+        for gone in ('<video', 'id="band"', 'id="needle"', 'id="veil"', 'data-parts', '.mp4', '.mp3', 'site.css'):
+            self.assertNotIn(gone, h)
+        ids = re.findall(r'id="([^"]+)"', h)
+        self.assertEqual(len(ids), len(set(ids)))
+        self.assertEqual([f for f in self.run_.files() if f.startswith("universe/")], [self.FILE])
+
+    def test_it_is_in_no_menu_and_no_sitemap(self):
+        self.run_with(blocks())
+        self.assertNotIn('universe', self.read('sitemap.xml'))
+        for path in ALL:
+            self.assertNotIn('/universe/', self.page(path), path)
+
+
 class TheFilmPage(Base):
     """The Approach stands outside the page map: carried whole to its own folder while the site is up."""
     FILE = 'the-approach/index.html'

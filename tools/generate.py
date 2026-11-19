@@ -61,7 +61,7 @@ SITE = 'https://www.matthewbushell.life'
 ASSETS = ['site.css', 'site.js', 'mark.svg', 'mark-email.png', 'favicon.svg', 'beach.js', 'door.js', 'door.css', 'tools.js', 'living.js']
 # Pages that stand outside the page map: a template carried whole to its own folder while the site is up.
 # They are in no menu and no sitemap, and read their own words live in the reader's browser.
-STANDALONE = {'the-approach': '/the-approach/'}
+STANDALONE = {'the-approach': '/the-approach/', 'universe': '/universe/'}
 BASE64_RUN = re.compile(r'[A-Za-z0-9+/=_-]{32,}')
 HALF = 0.5
 
