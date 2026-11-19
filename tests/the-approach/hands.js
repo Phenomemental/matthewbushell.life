@@ -31,7 +31,7 @@ const near = (a, b, e) => Math.abs(a - b) <= e;
   let s = await A(); const grow = [];
   for (let i = 0; i < 60; i++) { s = await A(); grow.push({ d: s.dist, a: s.hs.a, R: s.hs.R }); if ((await moons()).inside) break; await P.mouse.move(s.home[0], s.home[1]); await P.mouse.wheel(0, -120); await T.sleep(110); if (near(s.dist, 0.5, 0.06)) await T.shot('h01-before-play-zooming-moons'); }
   const seen = grow.filter(g => g.a > 0.05 && g.a < 1), whole = grow.filter(g => g.a >= 1);
-  T.ok('before Play, zooming toward the red star shows its moons growing', seen.length >= 2 && whole.length >= 2 && whole[whole.length - 1].R > whole[0].R && grow.find(g => g.a > 0).d <= 0.95, grow.filter(g => g.a > 0).slice(0, 12).map(g => g.d + ':' + g.a + ':' + g.R).join(' '));
+  T.ok('before Play, zooming toward the red star shows its moons growing', seen.length >= 2 && whole.length >= 2 && whole[whole.length - 1].R > whole[0].R && grow.find(g => g.a > 0).d <= 1.25,   /* they show by the star's own depth (inside 0.95); zooming stops 6.73's approach while its target is still sliding onto the star, so the star stands a little nearer than the target */ grow.filter(g => g.a > 0).slice(0, 12).map(g => g.d + ':' + g.a + ':' + g.R).join(' '));
   let m = await T.until(() => { const z = window.theApproach.moons(); return z.inside && !z.tr ? z : null; }, 4000);
   T.ok('and coming closer than 0.3 opens the walk', !!m && m.block === 'film:the-approach' && grow[grow.length - 1].d < 0.31, m ? m.block + ' at ' + grow[grow.length - 1].d : 'no walk');
   await T.sleep(500); await T.shot('h02-before-play-walk');

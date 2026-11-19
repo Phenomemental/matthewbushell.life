@@ -814,7 +814,89 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
     return FIRST[name];
   }
   /* before the film: the universe is the viewer's, the red star in the centre; the invitation rises by itself or after a few touches */
-  function enterPrelude() { document.body.classList.add('prelude'); inviteAt = now() + 20; touches = 0; glideTo({ tgt: filmPos().slice(), dist: restDist(), pitch: 0.55 }, 2.2, ease); layoutButtons(); }
+  /* Begin draws the viewer in (6.73): the view sets off for the red star at once and comes in slowly, the star growing and its moons opening
+     round it; as it arrives the star calls and 'Play the film' rises. The viewer's hand on the sky stops it at any moment (the glide is
+     dropped at the first touch, as every glide is), and the invitation still comes at its time or after three touches. */
+  var NEAR_D = 0.52, APPROACH_S = 10;
+  function enterPrelude() {
+    document.body.classList.add('prelude'); touches = 0; layoutButtons(); musicOn();
+    inviteAt = now() + (CALM ? 0.3 : APPROACH_S - 1.6);
+    glideTo({ tgt: filmPos().slice(), dist: NEAR_D, pitch: 0.5 }, APPROACH_S, function (u) { u = clamp(u, 0, 1); return u * u * (3 - 2 * u); });
+  }
+  /* ── the sound of the universe before the film (6.73): made in code, nothing loaded. A low held chord that beats slowly against itself,
+        glass tones that swell and fade above it and hang in a long echo, a breath of air, and now and then three far pips, as if
+        something out there were answering. It is in G, so Mara's three-note call (G, B, D) rings true over it; the one strange note is a
+        C sharp that comes and goes. It starts at Begin and goes when Play is pressed; it is never under the narrator or a clip. ── */
+  function buildMusic(ac, out, far) {
+    var t0 = ac.currentTime, live = [], g = ac.createGain(); g.gain.value = 0; g.connect(out);
+    function keep(n) { live.push(n); return n; }
+    /* the space: two delays feeding each other, one to each ear */
+    var send = ac.createGain(), dA = ac.createDelay(2), dB = ac.createDelay(2), fA = ac.createGain(), fB = ac.createGain(), soft = ac.createBiquadFilter(), wet = ac.createGain();
+    dA.delayTime.value = 0.47; dB.delayTime.value = 0.71; fA.gain.value = 0.56; fB.gain.value = 0.56; soft.type = 'lowpass'; soft.frequency.value = 2400; wet.gain.value = 0.7;
+    send.connect(soft); soft.connect(dA); dA.connect(fA); fA.connect(dB); dB.connect(fB); fB.connect(dA);
+    var pan = function (v) { if (!ac.createStereoPanner) return null; var p = ac.createStereoPanner(); p.pan.value = v; return p; };
+    var pA = pan(-0.75), pB = pan(0.75);
+    if (pA) { dA.connect(pA); pA.connect(wet); dB.connect(pB); pB.connect(wet); } else { dA.connect(wet); dB.connect(wet); }
+    wet.connect(g);
+    /* one voice: an oscillator whose loudness breathes between (1 - depth) and 1 of vol, at its own slow rate, starting part-way through its breath */
+    function voice(type, hz, vol, rate, depth, turn, where, dry, echo, into) {
+      var o = keep(ac.createOscillator()), a = ac.createGain(), l = keep(ac.createOscillator()), ld = ac.createGain();
+      o.type = type; o.frequency.value = hz; a.gain.value = vol * (1 - depth / 2); l.frequency.value = rate; ld.gain.value = vol * depth / 2;
+      l.connect(ld); ld.connect(a.gain); o.connect(a);
+      var p = where ? pan(where) : null, end = a; if (p) { a.connect(p); end = p; }
+      if (dry) { var d = ac.createGain(); d.gain.value = dry; end.connect(d); d.connect(into || g); }
+      if (echo) { var e = ac.createGain(); e.gain.value = echo; end.connect(e); e.connect(send); }
+      o.start(t0); l.start(t0 + turn / rate);
+      return o;
+    }
+    /* the held chord, low enough to feel and high enough for a phone to carry: G and D, each doubled a hair apart so they beat */
+    var warm = ac.createBiquadFilter(); warm.type = 'lowpass'; warm.frequency.value = 760; warm.Q.value = 0.4; warm.connect(g);
+    voice('sine', 98.00, 0.060, 0.031, 0.5, 0.10, 0, 1, 0, warm);
+    voice('triangle', 196.00, 0.060, 0.047, 0.6, 0.55, -0.3, 1, 0.15, warm);
+    voice('triangle', 196.62, 0.060, 0.041, 0.6, 0.20, 0.3, 1, 0.15, warm);
+    voice('triangle', 293.66, 0.034, 0.053, 0.8, 0.70, -0.15, 1, 0.2, warm);
+    voice('triangle', 294.37, 0.034, 0.037, 0.8, 0.35, 0.15, 1, 0.2, warm);
+    voice('sine', 392.00, 0.034, 0.033, 0.9, 0.45, -0.4, 1, 0.3, null);    /* the same two notes an octave up, where a phone's speaker begins */
+    voice('sine', 392.83, 0.034, 0.039, 0.9, 0.90, 0.4, 1, 0.3, null);
+    voice('sine', 587.33, 0.024, 0.045, 1, 0.15, 0.1, 1, 0.4, null);
+    /* the glass: each tone rises out of nothing and sinks back in its own time, and hangs in the echo */
+    voice('sine', 783.99, 0.050, 0.043, 1, 0.75, -0.5, 0.5, 1, null);
+    voice('sine', 1174.66, 0.036, 0.061, 1, 0.30, 0.55, 0.5, 1, null);
+    voice('sine', 880.00, 0.030, 0.052, 1, 0.05, 0.2, 0.5, 1, null);
+    voice('sine', 1567.98, 0.016, 0.071, 1, 0.50, -0.2, 0.4, 1, null);
+    voice('sine', 1108.73, 0.030, 0.029, 1, 0.80, 0.4, 0.5, 1, null);   /* the strange note */
+    /* a breath of air, its colour drifting */
+    var nb = ac.createBuffer(1, Math.floor(ac.sampleRate * 3), ac.sampleRate), nd = nb.getChannelData(0), seed = 7;
+    for (var i = 0; i < nd.length; i++) { seed = (seed * 16807) % 2147483647; nd[i] = seed / 1073741823.5 - 1; }
+    var ns = keep(ac.createBufferSource()), bp = ac.createBiquadFilter(), ng = ac.createGain(), bl = keep(ac.createOscillator()), bd = ac.createGain();
+    ns.buffer = nb; ns.loop = true; bp.type = 'bandpass'; bp.frequency.value = 720; bp.Q.value = 1.6; ng.gain.value = 0.02;
+    bl.frequency.value = 0.027; bd.gain.value = 330; bl.connect(bd); bd.connect(bp.frequency);
+    ns.connect(bp); bp.connect(ng); ng.connect(g); var ne = ac.createGain(); ne.gain.value = 0.5; ng.connect(ne); ne.connect(send); ns.start(t0); bl.start(t0);
+    /* three far pips, into the echo only */
+    function pips(at) {
+      for (var k = 0; k < 3; k++) {
+        var o = ac.createOscillator(), a = ac.createGain(), t = at + k * 0.21; o.frequency.value = 1567.98;
+        a.gain.setValueAtTime(0, t); a.gain.linearRampToValueAtTime(0.03, t + 0.012); a.gain.exponentialRampToValueAtTime(0.0004, t + 0.26);
+        o.connect(a); a.connect(send); o.start(t); o.stop(t + 0.3);
+      }
+    }
+    (far || []).forEach(function (s) { pips(t0 + s); });
+    return {
+      gain: g, pips: pips,
+      level: function (v, tc) { g.gain.setTargetAtTime(v, ac.currentTime, tc); },
+      stop: function () { var t = ac.currentTime + 0.05; live.forEach(function (n) { try { n.stop(t); } catch (e) { /* already stopped */ } }); setTimeout(function () { try { g.disconnect(); } catch (e) { /* gone */ } }, 400); }
+    };
+  }
+  /* the prelude's sound comes in at Begin and goes at Play; it steps back under a walk, and stands aside for a block film or the credits */
+  var MUSIC = null, MUSIC_V = 1.2, musicAt = -1, farT = 0;
+  function musicOn() { if (!AC || MUSIC) return; MUSIC = buildMusic(AC, master, null); musicAt = -1; farT = now() + 3.5; }   /* the first far pips come during the approach; Mara's call answers them as it ends */
+  function musicTick() {
+    if (!MUSIC) return;
+    var want = (begun && !started && !filmOn && elCredits.hidden) ? (inside ? 0.4 : 1) * MUSIC_V : 0;
+    if (want !== musicAt) { MUSIC.level(want, musicAt < 0 ? 1.3 : 0.5); musicAt = want; }
+    if (want > 0 && !inside && now() > farT) { MUSIC.pips(AC.currentTime + 0.05); farT = now() + 10 + Math.random() * 6; }
+  }
+  function musicEnd() { if (!MUSIC) return; var m = MUSIC; MUSIC = null; m.level(0, 0.4); setTimeout(function () { m.stop(); }, 3200); }
   function callMara() { pulseT = now(); nextCall = now() + 25; LOG.calls.push(Date.now()); if (AC && soundOn) [784, 988, 1175].forEach(function (q, k) { pip(q, 0.12, 0.3, k * 0.16); }); }
   function invite() { if (inviting || started) return; inviting = true; LOG.invite = Date.now(); var p = $('play'); layoutButtons(); requestAnimationFrame(function () { p.classList.add('rise'); }); callMara(); }
   function preludeFrame(t) { if (!begun || started) return; if (!inviting && (t > inviteAt || touches >= 3)) invite(); else if (inviting && t > nextCall && !inside && !filmOn) callMara(); }
@@ -832,7 +914,7 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
   function seatNow() { var w = H * (wide ? 0.42 : 0.38); return HS.k > 0 && HS.seatY > 0 ? lerp(w, HS.seatY, HS.k) : w; }
   /* how far the view has come in from the wide sky to its close view of the red star: 0 wide, 1 home */
   function closeK() {
-    if (!started || inside) return 0;
+    if (!started || inside || (!intro && !introDone)) return 0;   /* through the second and a half before the title the star stays where the viewer was watching it; it takes its seat under the black */
     var p = filmPos(), d = Math.hypot(orb.tgt[0] - p[0], orb.tgt[1] - p[1], orb.tgt[2] - p[2]);
     return clamp(Math.log(restDist() / orb.dist) / Math.log(restDist() / HOME_D), 0, 1) * clamp(1 - d / 0.12, 0, 1);
   }
@@ -862,6 +944,8 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
         msystem([], q[0], q[1], Rr, 0, -1, a);
         var ks = kids([]);
         if (ks.length) for (var k9 = 1; k9 <= 9; k9++) if (ks.indexOf(k9) < 0) { var an = HS.rot + (k9 - 1) * MSTEP, ex = Rr * Math.cos(an), ey = Rr * MQ * Math.sin(an); ctx.strokeStyle = 'rgba(217,179,108,' + (0.45 * a).toFixed(3) + ')'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(q[0] + ex * MCT - ey * MST, q[1] + ex * MST + ey * MCT, 3, 0, TAU); ctx.stroke(); }
+        var pu = (now() - pulseT) / 1.8;   /* the call, seen: a crimson ripple running out along the orbit's own plane */
+        if (pu >= 0 && pu < 1) { ctx.strokeStyle = 'rgba(232,96,110,' + (0.75 * (1 - pu) * a).toFixed(3) + ')'; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(q[0], q[1], Rr * (0.3 + 0.95 * pu), Rr * (0.3 + 0.95 * pu) * MQ, MTILT, 0, TAU); ctx.stroke(); }
         wb = keep.wb; path = keep.path; M.rot = keep.rot;
         HS.a = a; HS.x = q[0]; HS.y = q[1]; HS.R = Rr; HS.bottom = q[1] + 0.6 * Rr;
       }
@@ -885,7 +969,8 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
     /* the dive (6.82): the view rushes at the red star and the title cuts in over black; under the black it holds; as the black lifts
        it is still arriving, the star swelling and its moons wheeling into place; it rests there, close, and the opening is told from there */
     var mine = ++diveRun; HS.diving = true;
-    glideTo({ tgt: filmPos().slice(), dist: Math.min(orb.dist, DIVE_MID), pitch: 0.5 }, CALM ? 0.01 : 1.4, function (u) { u = clamp(u, 0, 1); return u * u; });
+    musicEnd();
+    glideTo({ tgt: filmPos().slice(), dist: Math.min(orb.dist, Math.max(HOME_D * 1.1, Math.min(orb.dist * 0.8, DIVE_MID))), pitch: 0.5 }, CALM ? 0.01 : 1.4, function (u) { u = clamp(u, 0, 1); return u * u; });   /* from far it rushes to 0.7 as before; from near it still moves in at once */
     setTimeout(function () { if (started && !stopped && !intro && !introDone) runIntro(false); }, CALM ? 20 : 1400);
     setTimeout(function () { if (mine !== diveRun) return; HS.diving = false; if (started && !stopped && intro) { HS.swirl = 1.5; var hp = homePose(); glideTo({ tgt: hp.tgt, dist: hp.dist, pitch: hp.pitch }, CALM ? 0.01 : 3.6, easeOut); } }, CALM ? 30 : 4900);
   }
@@ -1340,7 +1425,7 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
   function bytesOf(name) { return Number(((index && index.bytes) || {})[name]) || 0; }
   function openStar(s) {
     picked = s; hideHint();
-    glideTo({ tgt: s.p.slice(), dist: Math.min(orb.dist, wide ? 1.4 : 1.2) }, 1.4, ease);
+    glideTo({ tgt: s.p.slice(), dist: Math.min(orb.dist, s.name === FILM ? NEAR_D : wide ? 1.4 : 1.2) }, s.name === FILM ? 1.8 : 1.4, ease);   /* the film's own star comes near enough for its moons to show */
     var name = s.name, size = bytesOf(name), isFilm = name === FILM;
     elSName.textContent = s.fic ? name + '  ·  ' + s.fic.title : name; elStar.hidden = false;
     /* on a touch screen the click that follows the tap lands where the card has just appeared: for a third of a second the card takes
@@ -1499,7 +1584,7 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
   }
   ['pointerdown', 'wheel', 'touchstart', 'keydown', 'focusin'].forEach(function (ev) { elRoll.addEventListener(ev, function () { rolling = false; }, { passive: true }); });
   $('credit').addEventListener('click', function () { openCredits(false); });
-  $('cclose').addEventListener('click', closeCredits);
+  $('cclose').addEventListener('click', function () { if (done) explore(); else closeCredits(); });   /* after the end both ways out of the credits invite the viewer to explore */
   /* ── the way out (6.72): 'Explore the pscale universe' closes the credits and gives the viewer the whole sky, from the very view the
         credits were turning over, with one line saying what a tap does. It works whenever the credits are open: after the end, in the
         middle of the film (which stays stopped, 'Back to the film' in reach), or before Play. ── */
@@ -1539,7 +1624,7 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
     var t = now(), nowMs = performance.now();
     var dtF = Math.min(0.1, Math.max(0, t - (frameLoop.last || t)));
     recentK += ((intro ? 1 : 0) - recentK) * Math.min(1, dtF * 0.7); frameLoop.last = t;
-    preludeFrame(t); pulled = pullFrame(dtF);
+    preludeFrame(t); musicTick(); pulled = pullFrame(dtF);
     moonsTick(Math.min(0.05, dtF));
     stepGlide(t); rollOn(t);
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
@@ -1577,6 +1662,7 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
     ring: function () { if (!inside || M.tr) return null; return { pts: M.hits.filter(function (h) { return h.has; }).sort(function (a, b) { return a.k - b.k; }).map(function (h) { return { k: h.k, x: h.x, y: h.y }; }) }; },
     oldring: function () { if (!inside) return null; var ks = kids(path); return { pts: ks.map(function (d, i) { var q = [0, 0]; return { k: d, x: q[0], y: q[1] }; }) }; },
     film: function () { return { src: (elFilm.currentSrc || '').split('/').pop(), t: elFilm.currentTime, paused: elFilm.paused, muted: elFilm.muted }; },
+    music: function () { return { on: !!MUSIC, level: musicAt, near: NEAR_D, approach: APPROACH_S, inviteIn: +(inviteAt - now()).toFixed(1) }; },
     credits: function () { return { open: !elCredits.hidden, faces: faces.length, voice: cvoice ? cvoice.src.split('/').pop() : '', explored: explored, hint: $('xhint').classList.contains('on') ? $('xhint').textContent : '', call: $('csky').classList.contains('call'), again: !$('replay').hidden, find: !$('find').hidden }; }
   };
 

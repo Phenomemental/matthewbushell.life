@@ -29,9 +29,9 @@ const near = (a, b, e) => Math.abs(a - b) <= e;
   let s = await A();
   T.ok('with nothing playing, no dark block anywhere over the sky', (await darkBlocks()).length === 0, (await darkBlocks()).join(' '));
   T.ok('after Begin nothing of the film plays', !s.started && (await T.log()).told.length === 0);
-  const yaw0 = await T.ev(() => window.theApproach.sky().yaw); await T.sleep(2500); const yaw1 = await T.ev(() => window.theApproach.sky().yaw);
-  T.ok('the sky turns', yaw1 !== yaw0, (yaw1 - yaw0).toFixed(4));
-  T.ok('the red star is in the centre, the view wide', s.home && near(s.home[0], W / 2, 4) && near(s.dist, REST, 0.08), s.home + ' dist ' + s.dist);
+  /* Begin draws the viewer in (6.73): the view comes in to the red star, which stays in the centre */
+  const d0 = s.dist; await T.sleep(1500); const s1 = await A();
+  T.ok('the view comes in toward the red star (6.73)', s1.dist < d0 - 0.05 && d0 < REST && s1.dist > 0.52, 'dist ' + d0 + ' then ' + s1.dist);
   await T.shot('d01-after-begin');
   // a star card opens (come a little nearer so single stars stand clear)
   for (let i = 0; i < 30; i++) { s = await A(); if (s.dist <= 1.15) break; await P.mouse.move(s.home[0], s.home[1]); await P.mouse.wheel(0, -120); await T.sleep(80); }
@@ -41,6 +41,8 @@ const near = (a, b, e) => Math.abs(a - b) <= e;
   await T.ev(() => document.getElementById('sclose').click());
   const inv = await T.until(() => window.theApproach.state().inviting && !document.getElementById('play').hidden, 30000);
   T.ok('the invitation, Play the film, rises', !!inv); await T.shot('d02-invitation');
+  const yaw0 = await T.ev(() => window.theApproach.sky().yaw); await T.sleep(2500); const yaw1 = await T.ev(() => window.theApproach.sky().yaw);
+  T.ok('the sky turns while the viewer waits', yaw1 !== yaw0, (yaw1 - yaw0).toFixed(4));
 
   // ── Play glides into the red star and the opening plays ──
   await T.tap('#play'); await T.sleep(9500);

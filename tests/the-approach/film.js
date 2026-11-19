@@ -1,4 +1,4 @@
-// The uninterrupted film, Begin to the credits, with the checks of 6.82 (the film begins in the red star).
+// The uninterrupted film, Begin to the credits, with the checks of 6.82 (the film begins in the red star) and of 6.73 (Begin draws you in).
 //   node film.js --size phone|desktop [--url URL] [--shots DIR]
 // The first tuning is found by dragging the needle slowly (6.82 check 4); the others by 'Find Mara'.
 'use strict';
@@ -24,18 +24,21 @@ const near = (a, b, e) => Math.abs(a - b) <= e;
   });
   const samples = () => T.ev(() => window.__S);
 
-  // ── Begin: nothing of the film plays, and the invitation comes by itself ──
+  // ── Begin draws the viewer in (6.73): the view sets off for the red star at once; as it arrives the invitation rises ──
   await T.sleep(1200);
   await T.tap('#go');
   const tBegin = Date.now();
   await T.sleep(3000);
   let s = await T.st(), L = await T.log();
   T.ok('after Begin nothing of the film plays', !s.started && L.told.length === 0 && L.nar.length === 0 && L.clips.length === 0);
-  T.ok('before Play the view is the wide sky', near(s.dist, REST, 0.08), s.dist);
+  T.ok('before Play the view is coming in to the red star (6.73)', s.dist < REST - 0.05 && s.dist > 0.6, s.dist);   /* the star comes to the centre as the view arrives */
   const inv = await T.until(() => window.theApproach.state().inviting && !document.getElementById('play').hidden, 30000);
   const tInv = (Date.now() - tBegin) / 1000;
-  T.ok('the invitation rises by itself after about twenty seconds', !!inv && tInv > 14 && tInv < 26, tInv.toFixed(1) + 's');
+  T.ok('the invitation rises by itself as the view arrives, at about 8.4 seconds (6.73)', !!inv && tInv > 7.6 && tInv < 9.6, tInv.toFixed(1) + 's');
   await T.shot('01-invitation');
+  await T.sleep(Math.max(0, tBegin + 10800 - Date.now())); s = await T.st();
+  T.ok('the view rests near the red star (0.52) with its moons whole', near(s.dist, 0.52, 0.02) && s.hs.a >= 0.99, 'dist ' + s.dist + ' a ' + s.hs.a);
+  await T.shot('01b-rest-near');
 
   // ── Play: the dive ──
   await T.tap('#play');
@@ -51,10 +54,14 @@ const near = (a, b, e) => Math.abs(a - b) <= e;
   let S = await samples();
   const rel = x => (x.t - tPlay) / 1000, op = S.filter(x => x.t >= tPlay && x.t <= tDone - 150);
   const at = sec => op.reduce((b, x) => Math.abs(rel(x) - sec) < Math.abs(rel(b) - sec) ? x : b, op[0]);
-  T.ok('Play: the view rushes in (0.7 by 1.4 seconds, gathering speed)', at(0.7).dist > at(1.4).dist && near(at(1.5).dist, 0.7, 0.06) && (at(0) .dist - at(0.7).dist) < (at(0.7).dist - at(1.4).dist), [at(0).dist, at(0.7).dist, at(1.5).dist].join(' > '));
-  T.ok('the moons are just appearing as the title cuts in', at(1.6).title && at(1.5).hs.a > 0.3 && at(1.5).hs.a < 0.95, 'a=' + at(1.5).hs.a + ' title=' + at(1.6).title);
-  T.ok('under the black it holds', near(at(3).dist, 0.7, 0.03) && near(at(4.6).dist, 0.7, 0.03), at(3).dist + ' ' + at(4.6).dist);
-  T.ok('the black lifts on the arrival (still coming in as it lifts)', at(5.6).dist < 0.69 && at(5.6).dist > 0.4 && at(7).title && at(7).titleOp < 1 && at(7).dist > 0.36, 'dist ' + at(5.6).dist + ' then ' + at(7).dist + ', title opacity ' + at(7).titleOp);
+  /* Play from near (6.73 TWO): it moves in at once, from 0.52 to about 0.42, gathering speed; from far it would rush to 0.7 (begin.js checks that) */
+  const d0 = at(0).dist, hold = Math.min(d0, Math.max(0.396, Math.min(d0 * 0.8, 0.7)));
+  T.ok('Play from near: the view moves in at once (to about 0.42 by 1.4 seconds, gathering speed) (6.73)', at(0.5).dist < d0 - 0.004 && near(at(1.5).dist, hold, 0.02) && (at(0).dist - at(0.7).dist) < (at(0.7).dist - at(1.4).dist), [at(0).dist, at(0.7).dist, at(1.5).dist].join(' > ') + ' (hold ' + hold.toFixed(3) + ')');
+  const jump = Math.max(...op.filter(x => rel(x) <= 1.4).map(x => x.home ? Math.hypot(x.home[0] - at(0).home[0], x.home[1] - at(0).home[1]) : 999));
+  T.ok('through those 1.4 seconds the star keeps its place on screen, so nothing jumps (6.73)', jump < 12, Math.round(jump) + 'px at most');
+  T.ok('the moons are in view as the title cuts in', at(1.6).title && at(1.5).hs.a > 0.3, 'a=' + at(1.5).hs.a + ' title=' + at(1.6).title);
+  T.ok('under the black it holds', near(at(3).dist, hold, 0.02) && near(at(4.6).dist, hold, 0.02), at(3).dist + ' ' + at(4.6).dist);
+  T.ok('the black lifts on the arrival (still coming in as it lifts)', at(5.6).dist <= hold + 0.003 && at(5.6).dist > 0.36 && at(7).title && at(7).titleOp < 1 && at(7).dist > 0.36, 'dist ' + at(5.6).dist + ' then ' + at(7).dist + ', title opacity ' + at(7).titleOp);
   const rest = op.filter(x => rel(x) > 8.9);
   T.ok('it rests close on the red star (distance 0.36) for the whole opening', rest.length > 500 && rest.every(x => near(x.dist, 0.36, 0.006)), 'min ' + Math.min(...rest.map(x => x.dist)) + ' max ' + Math.max(...rest.map(x => x.dist)) + ' over ' + rest.length + ' samples');
   T.ok('its moons are whole throughout', rest.every(x => x.hs.a >= 0.99 && x.hs.kind === 'clear'));
