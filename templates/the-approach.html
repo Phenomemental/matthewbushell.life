@@ -439,7 +439,7 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
     fw = [fw[0] / n, fw[1] / n, fw[2] / n];
     var r = [-fw[2], 0, fw[0]]; n = Math.sqrt(r[0] * r[0] + r[2] * r[2]) || 1; r = [r[0] / n, 0, r[2] / n];
     var u = [r[1] * fw[2] - r[2] * fw[1], r[2] * fw[0] - r[0] * fw[2], r[0] * fw[1] - r[1] * fw[0]];
-    BAS = { eye: eye, f: fw, r: r, u: u, S: Math.min(W, H) * (wide ? 0.9 : 1.12), cx: W / 2, cy: H * (wide ? 0.42 : 0.38) };
+    BAS = { eye: eye, f: fw, r: r, u: u, S: Math.min(W, H) * (wide ? 0.9 : 1.12), cx: W / 2, cy: seatNow() };
     return BAS;
   }
   function oproj(p) {
@@ -575,10 +575,10 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
   /* ---------------- what is showing ---------------- */
   const fr=$('frame'),vid=$('v'),im=$('im'),sn=$('snow'),sg=sn.getContext('2d');
   vid.addEventListener('loadedmetadata',()=>{if(vid.videoWidth){fr.style.setProperty('--ar',(vid.videoWidth/vid.videoHeight).toFixed(4));setTimeout(layout,450);}});
-  function layout(){const r=fr.getBoundingClientRect();$('words').style.top=(fr.classList.contains('on')?r.bottom+14:Math.max(70,H*.22))+'px';}
+  function layout(){const r=fr.getBoundingClientRect();$('words').style.top=(fr.classList.contains('on')?r.bottom+14:wordsTop())+'px';}
   function showPic(p){if(!p){fr.classList.remove('on');vid.style.display='none';im.style.display='none';layout();return;}
     fr.classList.add('on');if(p.clip){im.style.display='none';vid.style.display='block';}else{vid.style.display='none';if(!im.src.endsWith('img/'+p.still+'.jpg')){im.src=PARTS+'img/'+p.still+'.jpg';im.classList.remove('drift');void im.offsetWidth;im.classList.add('drift');}im.style.display='block';}layout();}
-  let typing=0;function sayText(t,big){const el=$('say'),my=++typing;el.classList.toggle('big',!!big);el.textContent='';let i=0;(function st(){if(my!==typing)return;i=Math.min(t.length,i+2);el.textContent=t.slice(0,i);if(i<t.length)setTimeout(st,24);})();}
+  let typing=0,WORDSH=0;function sayText(t,big){const el=$('say'),my=++typing;el.classList.toggle('big',!!big);el.textContent=t;WORDSH=$('words').offsetHeight;el.textContent='';let i=0;(function st(){if(my!==typing)return;i=Math.min(t.length,i+2);el.textContent=t.slice(0,i);if(i<t.length)setTimeout(st,24);})();}
   function clearWords(){typing++;$('say').textContent='';$('who').textContent='';$('diary').style.display='none';$('over').textContent='';}
   /* ---------------- kept lives ---------------- */
   let cur=null,curT=0;
@@ -627,7 +627,7 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
     if(run!==mRun)return;
     /* the piece is over: she drifts off */
     heard=Math.min(MARA.length+1,heard+1);dots();vid.pause();showPic(null);
-    if(showTom){done=true;layoutButtons();mLocked=false;clearWords();const E=$('end');E.querySelector('p').style.opacity=0;E.style.display='flex';LOG.end=Date.now();await sleep(3500);E.style.display='none';await narrate(OUTRO);await sleep(800);clearWords();E.querySelector('p').style.opacity=1;E.style.display='flex';LOG.end2=Date.now();
+    if(showTom){done=true;endOut();layoutButtons();mLocked=false;clearWords();const E=$('end');E.querySelector('p').style.opacity=0;E.style.display='flex';LOG.end=Date.now();await sleep(3500);E.style.display='none';await narrate(OUTRO);await sleep(800);clearWords();E.querySelector('p').style.opacity=1;E.style.display='flex';LOG.end2=Date.now();
       /* then the end credits (6.45) */
       setTimeout(()=>{E.style.display='none';if(!held)openCredits(true);},8000);return;}
     pi++;beat=0;mLocked=false;
@@ -694,7 +694,7 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
     else T.style.display='none';
     for(;introAt<INTRO.length;introAt++){const x=INTRO[introAt];const got=await waitBuf(x.id,ok);if(!ok())return;if(!got)continue;sayText(x.t);play(x.id,'clear');LOG.told.push({id:x.id,t0:Date.now(),t1:Date.now()+BUF[x.id].duration*1000});await sleep((BUF[x.id].duration+.55)*1000);if(!ok())return;}
     await sleep(600);if(!ok())return;endIntro();}
-  function endIntro(){clearWords();document.body.classList.remove('intro');intro=false;introDone=true;placeMark();layoutButtons();}
+  function endIntro(){clearWords();document.body.classList.remove('intro');intro=false;introDone=true;placeMark();layoutButtons();leaveHome();}
   /* ════════════ end of the prototype's radio ════════════ */
 
   /* the words box is wholly invisible whenever it holds nothing (6.7 ZERO): it was the dark block over the sky */
@@ -735,8 +735,8 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
     stopAt = { f: f, locked: mLocked, intro: !introDone };
     LOG.ctl.push({ k: 'stop', t: Date.now(), intro: stopAt.intro, locked: mLocked, pi: pi, introAt: introAt });
     stopped = true; quietR = true;
-    if (intro) { introRun++; intro = false; introStopped = true; var T = $('title'); T.style.display = 'none'; T.style.opacity = 0; document.body.classList.remove('intro'); }
-    fictionOff(); R = null;
+    if (intro || !introDone) { introRun++; intro = false; introStopped = true; var T = $('title'); T.style.display = 'none'; T.style.opacity = 0; document.body.classList.remove('intro'); }
+    fictionOff(); R = null; HS.back = null; HS.diving = false; diveRun++;
     mLocked = false; mRun++; beat = 0; clipOn = false; dragging = false;
     try { vid.pause(); } catch (e) { /* not playing */ }
     if (vg) vg.gain.value = 0;
@@ -754,7 +754,7 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
     resumeAudio(); stopped = false; quietR = false;
     var at = stopAt || { f: f };
     LOG.ctl.push({ k: 'back', t: Date.now(), intro: !!at.intro, locked: !!at.locked, pi: pi, introAt: introAt });
-    if (at.intro && !introDone) runIntro(true);
+    if (at.intro && !introDone) { runIntro(true); var hp = homePose(); glideTo({ tgt: hp.tgt, dist: hp.dist, pitch: hp.pitch }, CALM ? 0.01 : 1.8, ease); }   /* back into the red star */
     else glideNeedle(at.locked && !done ? curM().f : at.f, 900);
     layoutButtons();
   }
@@ -804,27 +804,90 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
   function callMara() { pulseT = now(); nextCall = now() + 25; LOG.calls.push(Date.now()); if (AC && soundOn) [784, 988, 1175].forEach(function (q, k) { pip(q, 0.12, 0.3, k * 0.16); }); }
   function invite() { if (inviting || started) return; inviting = true; LOG.invite = Date.now(); var p = $('play'); layoutButtons(); requestAnimationFrame(function () { p.classList.add('rise'); }); callMara(); }
   function preludeFrame(t) { if (!begun || started) return; if (!inviting && (t > inviteAt || touches >= 3)) invite(); else if (inviting && t > nextCall && !inside && !filmOn) callMara(); }
-  /* Play: the view glides into the red star, and the opening begins exactly as before */
+  /* ── the film begins in the red star (6.82). While the film itself plays (the opening, each tuning of Mara, Tom's radio) the view is
+        close on the red star, and the star wears its moons: the places of the film's own block, drawn with the walk's own moons (6.8)
+        but only to be looked at: no digits, no card, the band unchanged. Away from her (the dial the viewer's, the signal lost, the end)
+        the view is the wide sky as before. The moons belong to the star: wherever it stands on screen, however far, they are drawn round
+        it at the size that distance gives, and they fold into its light as the view draws away. ── */
+  var HOME_D = 0.36, DIVE_MID = 0.7, diveRun = 0;
+  var HS = { rot: 0.9, swirl: 0, a: 0, k: 0, x: 0, y: 0, R: 0, bottom: 0, seatY: -1, kind: 'clear', back: null, diving: false };
+  function homeR() { return Math.min(W * (wide ? 0.2 : 0.385), H * (wide ? 0.28 : 0.2)); }   /* the orbit's radius on screen at home */
+  /* the two seats the star takes when the view is close: clear above the words (the opening, and Tom's last telling), or behind the picture */
+  function clearSeat() { var Rh = homeR(), top = 76 + 0.7 * Rh, slack = (H - tunerH - 8) - (top + 0.6 * Rh + 14 + 200); return top + Math.max(0, slack) * 0.3; }
+  function picSeat() { var r = fr.getBoundingClientRect(), st = stage.getBoundingClientRect(); return r.top - st.top + r.height / 2; }
+  function seatNow() { var w = H * (wide ? 0.42 : 0.38); return HS.k > 0 && HS.seatY > 0 ? lerp(w, HS.seatY, HS.k) : w; }
+  /* how far the view has come in from the wide sky to its close view of the red star: 0 wide, 1 home */
+  function closeK() {
+    if (!started || inside) return 0;
+    var p = filmPos(), d = Math.hypot(orb.tgt[0] - p[0], orb.tgt[1] - p[1], orb.tgt[2] - p[2]);
+    return clamp(Math.log(restDist() / orb.dist) / Math.log(restDist() / HOME_D), 0, 1) * clamp(1 - d / 0.12, 0, 1);
+  }
+  function homeTick(dt) {
+    if (!stopped && !HS.back && !done) HS.kind = (intro || !introDone || (mLocked && !fr.classList.contains('on'))) ? 'clear' : 'pic';
+    var want = HS.kind === 'clear' ? clearSeat() : picSeat();
+    HS.seatY = HS.seatY < 0 ? want : HS.seatY + (want - HS.seatY) * (1 - Math.exp(-dt * 5));
+    HS.k += (closeK() - HS.k) * (1 - Math.exp(-dt * 8)); if (HS.k < 0.002) HS.k = 0; BAS = null;
+    HS.rot += dt * (0.045 + HS.swirl); HS.swirl *= Math.exp(-dt * 1.5);   /* the orbit turns slowly; it wheels as the view arrives */
+  }
+  /* the words sit beneath the star's moons whenever those are in clear view, and never run under the radio */
+  function wordsTop() {
+    var usual = Math.max(70, H * 0.22);
+    if (HS.a < 0.02) return usual;
+    var under = Math.max(usual, HS.bottom + 14), lim = H - tunerH - 8 - (WORDSH || 0);
+    return Math.round(lerp(usual, Math.max(70, Math.min(under, Math.max(usual, lim))), smooth01(HS.a)));
+  }
+  function homeMoons(dt) {
+    HS.a = 0;
+    var q = !inside ? oproj(filmPos()) : null;
+    if (q) {
+      var a = clamp((0.95 - q[2]) / 0.35, 0, 1);
+      var Rr = homeR() * HOME_D / q[2];
+      if (a > 0.01 && q[0] + 1.3 * Rr > 0 && q[0] - 1.3 * Rr < W && q[1] + 0.75 * Rr > 0 && q[1] - 0.75 * Rr < H) {
+        var keep = { wb: wb, path: path, rot: M.rot };
+        wb = { name: FILM, root: film || {}, film: true }; path = []; M.rot = HS.rot;
+        msystem([], q[0], q[1], Rr, 0, -1, a);
+        var ks = kids([]);
+        if (ks.length) for (var k9 = 1; k9 <= 9; k9++) if (ks.indexOf(k9) < 0) { var an = HS.rot + (k9 - 1) * MSTEP, ex = Rr * Math.cos(an), ey = Rr * MQ * Math.sin(an); ctx.strokeStyle = 'rgba(217,179,108,' + (0.45 * a).toFixed(3) + ')'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(q[0] + ex * MCT - ey * MST, q[1] + ex * MST + ey * MCT, 3, 0, TAU); ctx.stroke(); }
+        wb = keep.wb; path = keep.path; M.rot = keep.rot;
+        HS.a = a; HS.x = q[0]; HS.y = q[1]; HS.R = Rr; HS.bottom = q[1] + 0.6 * Rr;
+      }
+    }
+    if (!fr.classList.contains('on')) { var wt = wordsTop() + 'px', we = $('words'); if (we.style.top !== wt) we.style.top = wt; }
+  }
+  /* leaving home: from here the wide sky is where the view rests, and it draws back to it over two and a half seconds */
+  function leaveHome() {
+    handWins = false; glide = null;
+    R = { tgt: filmPos().slice(), dist: restDist(), yaw: orb.yaw, pitch: 0.55, w0: {} };
+    HS.back = { t0: now(), dur: CALM ? 0.01 : 2.6, from: { tgt: orb.tgt.slice(), dist: orb.dist, yaw: orb.yaw, pitch: orb.pitch } };
+  }
+  /* the end: as 'She's home' shows, the view draws back from the red star to the whole sky, and the last two lines are told there */
+  function endOut() { HS.back = null; var wp = widePose(); glideTo({ tgt: wp.tgt, dist: wp.dist, pitch: wp.pitch }, CALM ? 0.01 : 7, ease); }
+  /* Play: the view dives into the red star, and the opening is told from there */
   function startFilm() {
     if (started || !begun) return;
     resumeAudio(); started = true; inviting = false; LOG.play = Date.now();
-    document.body.classList.remove('prelude'); $('play').classList.remove('rise');
-    if (filmOn) stopHand(); if (inside) leaveBlock(true); closeStar(); handWins = false; R = null; layoutButtons();
-    glideTo({ tgt: filmPos().slice(), dist: 0.45, pitch: 0.5 }, CALM ? 0.01 : 1.4, easeIn);
-    setTimeout(function () { if (started && !stopped && !intro && !introDone) { runIntro(false); glideTo({ tgt: filmPos().slice(), dist: restDist(), pitch: 0.55 }, CALM ? 0.01 : 3.4, easeOut); } }, CALM ? 20 : 1400);
+    document.body.classList.remove('prelude'); document.body.classList.add('intro'); $('play').classList.remove('rise');   /* the dial stays hidden from Play to the end of the opening */
+    if (filmOn) stopHand(); if (inside) leaveBlock(true); closeStar(); handWins = false; R = null; HS.back = null; layoutButtons();
+    /* the dive (6.82): the view rushes at the red star and the title cuts in over black; under the black it holds; as the black lifts
+       it is still arriving, the star swelling and its moons wheeling into place; it rests there, close, and the opening is told from there */
+    var mine = ++diveRun; HS.diving = true;
+    glideTo({ tgt: filmPos().slice(), dist: Math.min(orb.dist, DIVE_MID), pitch: 0.5 }, CALM ? 0.01 : 1.4, function (u) { u = clamp(u, 0, 1); return u * u; });
+    setTimeout(function () { if (started && !stopped && !intro && !introDone) runIntro(false); }, CALM ? 20 : 1400);
+    setTimeout(function () { if (mine !== diveRun) return; HS.diving = false; if (started && !stopped && intro) { HS.swirl = 1.5; var hp = homePose(); glideTo({ tgt: hp.tgt, dist: hp.dist, pitch: hp.pitch }, CALM ? 0.01 : 3.6, easeOut); } }, CALM ? 30 : 4900);
   }
   $('play').addEventListener('click', startFilm);
   $('sfilm').addEventListener('click', startFilm);
   /* the red star is home: while the film itself plays the view rests on it */
-  function homePose(base) { return { tgt: filmPos().slice(), dist: restDist(), yaw: base ? base.yaw : orb.yaw, pitch: 0.55 }; }
+  function homePose(base) { return { tgt: filmPos().slice(), dist: done ? restDist() : HOME_D, yaw: base ? base.yaw : orb.yaw, pitch: done ? 0.55 : 0.5 }; }
+  function widePose() { return { tgt: filmPos().slice(), dist: restDist(), yaw: orb.yaw, pitch: 0.55 }; }
   function camHome() { return started && !stopped && !inside && !filmOn && (intro || mLocked || (done && elCredits.hidden)); }
   function restHome(t) {
-    if (!camHome() || glide || Object.keys(pts).length || t - touchT < 3) return;
+    if (!camHome() || glide || HS.diving || Object.keys(pts).length || t - touchT < 3) return;
     var hp = homePose(), d = Math.hypot(orb.tgt[0] - hp.tgt[0], orb.tgt[1] - hp.tgt[1], orb.tgt[2] - hp.tgt[2]);
     if (d > 0.02 || Math.abs(Math.log(orb.dist / hp.dist)) > 0.05 || Math.abs(orb.pitch - hp.pitch) > 0.05) glideTo({ tgt: hp.tgt, dist: hp.dist, pitch: hp.pitch }, 2.2, ease);
   }
-  function onLock() { lost = false; fictionOff(); R = null; handWins = false; LOG.lock = (LOG.lock || 0) + 1; var hp = homePose(); glideTo({ tgt: hp.tgt, dist: hp.dist, pitch: hp.pitch }, 1.1, ease); }
-  function onDrift() { lost = true; R = null; handWins = false; var G = gapNow(); if (G) firstLine(G.block); }
+  function onLock() { lost = false; fictionOff(); R = null; HS.back = null; handWins = false; LOG.lock = (LOG.lock || 0) + 1; var hp = homePose(); glideTo({ tgt: hp.tgt, dist: hp.dist, pitch: hp.pitch }, 1.1, ease); }
+  function onDrift() { lost = true; leaveHome(); var G = gapNow(); if (G) firstLine(G.block); }   /* her station drifts: the view draws back out to the wide sky */
   /* the dial turns the universe: the gap's fiction star and the red star are anchors, pulled toward in step with the needle */
   function smooth01(x) { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); }
   function anchorsNow() {
@@ -834,7 +897,7 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
     return A;
   }
   function poseLerp(a, b, w) { return { tgt: [lerp(a.tgt[0], b.tgt[0], w), lerp(a.tgt[1], b.tgt[1], w), lerp(a.tgt[2], b.tgt[2], w)], dist: a.dist * Math.pow(b.dist / a.dist, w), yaw: lerp(a.yaw, b.yaw, w), pitch: lerp(a.pitch, b.pitch, w) }; }
-  function captureRest() { R = { tgt: orb.tgt.slice(), dist: orb.dist, yaw: orb.yaw, pitch: orb.pitch, w0: {} }; anchorsNow().forEach(function (a) { R.w0[a.kind] = a.w; }); }
+  function captureRest() { HS.back = null; R = { tgt: orb.tgt.slice(), dist: orb.dist, yaw: orb.yaw, pitch: orb.pitch, w0: {} }; anchorsNow().forEach(function (a) { R.w0[a.kind] = a.w; }); }
   function dialTouched() { if (handWins || !R) { handWins = false; captureRest(); } }
   function pullOn() { return started && !stopped && !mLocked && !done && !intro && introDone && !inside && !filmOn && !flying && !handWins && !glide; }
   function pullFrame(dt) {
@@ -847,6 +910,7 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
       var to = a.kind === 'fic' ? { tgt: a.p.slice(), dist: Math.max(0.45, R.dist * 0.55), yaw: R.yaw + 0.55, pitch: Math.max(0.22, R.pitch - 0.12) } : homePose(R);
       pose = poseLerp(pose, to, w);
     });
+    if (HS.back) { var kb = ease((now() - HS.back.t0) / HS.back.dur); if (kb >= 1) HS.back = null; else pose = poseLerp(HS.back.from, pose, kb); }   /* drawing back from the red star, wherever the needle then stands */
     orb.tgt = pose.tgt; orb.dist = pose.dist; orb.yaw = pose.yaw; orb.pitch = pose.pitch;
     if (!CALM) R.yaw += dt * 0.015;   /* the slow turn goes on underneath */
     return true;
@@ -1016,14 +1080,16 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
   function isFocus(p) { return p.length === path.length && onFocusPath(p); }
   function ringRot(p) { var n = mnode(p); return isFocus(p) ? M.rot : onFocusPath(p) ? n.rot : n.ph + M.t * 0.001 * n.om; }
   function mframe(p) { if (!p.length) return { x: 0, y: 0, R: 1 }; var up = p.slice(0, -1), P = mframe(up), a = ringRot(up) + (p[p.length - 1] - 1) * MSTEP, sn = Math.sin(a), pp = 1 - 0.28 * (1 - sn) / 2, ex = P.R * Math.cos(a), ey = P.R * MQ * sn; return { x: P.x + ex * MCT - ey * MST, y: P.y + ex * MST + ey * MCT, R: P.R / MS * pp }; }
-  function mcam(c) { if (c === 'sky') return { x: 0, y: 0, k: KSKY }; var q = mframe(c); return { x: q.x, y: q.y, k: M.R0 / q.R }; }
+  function mcam(c) { if (c === 'sky') return { x: 0, y: 0, k: M.sky0 ? M.sky0.k : KSKY }; var q = mframe(c); return { x: q.x, y: q.y, k: M.R0 / q.R }; }
   function mease(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
   function mwrap(a) { a = (a + Math.PI) % TAU; if (a < 0) a += TAU; return a - Math.PI; }
   function mview() {
     if (!M.tr) { var c = mcam(inside ? path : 'sky'); return { ox: M.cx - c.x * c.k, oy: M.cy - c.y * c.k, k: c.k }; }
     var A = mcam(M.tr.A), B = mcam(M.tr.B), e = mease(clamp((M.t - M.tr.t0) / M.tr.dur, 0, 1)); if (M.tr.dir < 0) e = 1 - e;
     var k = A.k * Math.pow(B.k / A.k, e), m0x = M.cx + (B.x - A.x) * A.k, m0y = M.cy + (B.y - A.y) * A.k, mx = m0x + (M.cx - m0x) * e, my = m0y + (M.cy - m0y) * e;
-    return { ox: mx - B.x * k, oy: my - B.y * k, k: k };
+    var o = { ox: mx - B.x * k, oy: my - B.y * k, k: k };
+    if (M.sky0 && M.tr.A === 'sky') { o.ox += (M.sky0.x - M.cx) * (1 - e); o.oy += (M.sky0.y - M.cy) * (1 - e); }
+    return o;
   }
   /* the star itself, swelling as you arrive: crimson for the film's own star, sea-green for a block film's, warm white for any other */
   function mstar(x, y, r, a) {
@@ -1145,8 +1211,10 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
     flying = true; hold(true);
     glideTo({ tgt: at.slice(), dist: Math.min(orb.dist, 0.55), pitch: 0.5 }, CALM ? 0.01 : 2.3, ease);
     M.cx = W / 2; M.cy = H * (wide ? 0.42 : 0.38); M.R0 = Math.min(W * 0.39, H * 0.25);
-    var ks = kids([]); sel = M.selLive = ks.indexOf(1) >= 0 ? 1 : (ks[0] || 1); M.v = M.vT = sel; M.rotT = Math.PI / 2 - (M.v - 1) * MSTEP; M.rot = M.rotT + 2.6;
-    M.tr = { A: 'sky', B: [], t0: performance.now(), dur: CALM ? 10 : 2300, dir: 1, swirl: true, done: function () { flying = false; M.cardKey = ''; mcard(); update(); } };
+    var ks = kids([]); sel = M.selLive = ks.indexOf(1) >= 0 ? 1 : (ks[0] || 1); M.v = M.vT = sel; M.rotT = Math.PI / 2 - (M.v - 1) * MSTEP; 
+    var hand = name === FILM && HS.a > 0.5;   /* the film's moons already in sight: no second arrival, they carry on from where they stand */
+    M.sky0 = hand ? { k: HS.R, x: HS.x, y: HS.y } : null; M.rot = hand ? M.rotT + mwrap(HS.rot - M.rotT) : M.rotT + 2.6;
+    M.tr = { A: 'sky', B: [], t0: performance.now(), dur: CALM ? 10 : hand ? 900 : 2300, dir: 1, swirl: !hand, done: function () { flying = false; M.cardKey = ''; mcard(); update(); } };
     M.cardFocus = true; quiet(tween(SK, 'dim', DIMIN, 900));
     moonBand(); $('mcard').hidden = false; mcard();
     pip(392, 0.05, 0.5); pip(587, 0.05, 0.6, 0.25); pip(784, 0.04, 0.8, 0.5);
@@ -1164,7 +1232,7 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
     if (instant || CALM) { finish(); return; }
     if (M.tr) return;
     M.cardFocus = true; pip(392, 0.05, 0.3); pip(587, 0.05, 0.4, 0.14);
-    M.tr = { A: 'sky', B: [], t0: performance.now(), dur: 1700, dir: -1, done: finish };
+    M.sky0 = null; M.tr = { A: 'sky', B: [], t0: performance.now(), dur: 1700, dir: -1, done: finish };
     quiet(tween(SK, 'dim', 1, 1500)); update();
   }
   /* Go in: the view falls toward the moon until it is the body in the centre, its own moons standing round it */
@@ -1250,6 +1318,7 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
   function tapSky(x, y) {
     basis();
     var best = null, bd = 28, q = oproj(filmPos()), i;
+    if (q && HS.a > 0.5 && Math.hypot(q[0] - x, q[1] - y) >= 44 && Math.abs(x - q[0]) < HS.R * 1.25 && Math.abs(y - q[1]) < HS.R * 0.62) { if (filmPlaying()) stopFilm(); closeStar(); walkBlock(FILM); return; }
     if (q && Math.hypot(q[0] - x, q[1] - y) < 44) best = starOf(FILM) || { name: FILM, p: FILM_AT.slice(), size: 0 };
     else for (i = 0; i < B3.length; i++) { if (B3[i].name === FILM) continue; q = oproj(B3[i].p); if (!q) continue; var d = Math.hypot(q[0] - x, q[1] - y) - (B3[i].fic ? 10 : 0); if (d < bd) { bd = d; best = B3[i]; } }
     if (best) { if (filmPlaying()) stopFilm(); if (picked && picked.name === best.name && !elStar.hidden) { walkBlock(best.name); return; } openStar(best); } else closeStar();   /* a star tapped while the film itself plays stops it first (6.6); in a gap it simply opens */
@@ -1324,7 +1393,7 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
   }
   function drawPicked(t) {
     if (inside) return;
-    if (begun && (!started || stopped || lost)) {   /* the film's own star, ringed crimson; it pulses when it calls */
+    if (begun && (!started || stopped || lost) && HS.a < 0.3) {   /* the film's own star, ringed crimson; it pulses when it calls (its moons wear their own ring) */
       var hq = oproj(filmPos()); if (hq) { var kk = Math.max(0, 1 - (t - pulseT) / 4), hr = 19 + 3 * Math.sin(t * 1.6) + 16 * kk * (0.5 + 0.5 * Math.sin(t * 7)); ctx.strokeStyle = 'rgba(214,52,46,' + (0.55 + 0.4 * kk).toFixed(2) + ')'; ctx.lineWidth = 2 + 1.5 * kk; ctx.beginPath(); ctx.arc(hq[0], hq[1], hr, 0, TAU); ctx.stroke(); }
     }
     if (picked && !flying) { var pq = oproj(picked.p); if (pq) { ctx.strokeStyle = picked.name === FILM ? 'rgba(255,120,140,.95)' : picked.fic ? 'rgba(120,235,225,.95)' : 'rgba(232,201,138,.95)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(pq[0], pq[1], 17 + 2 * Math.sin(t * 2), 0, TAU); ctx.stroke(); } }
@@ -1443,10 +1512,10 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
     stepGlide(t); rollOn(t);
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     radioFrame(nowMs);
-    if (!elCredits.hidden) drawCreditSky(t);
+    if (!elCredits.hidden) { HS.a = 0; drawCreditSky(t); }
     else {
-      tendSky(t); drawSky(t, 1, sMnow); drawPicked(t);
-      if (inside) drawMoons();
+      tendSky(t); homeTick(dtF); drawSky(t, 1 - 0.28 * HS.a, sMnow); drawPicked(t);
+      if (inside) drawMoons(); else homeMoons(dtF);
       if (tuned) drawTuned(tuned, nowMs);
     }
     raf = requestAnimationFrame(frameLoop);
@@ -1460,7 +1529,7 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
   /* ── what the checks read ── */
   window.__t = { get s() { return { f: f, pi: pi, beat: beat, mLocked: mLocked, heard: heard, showTom: showTom, done: done, cur: cur && cur.who }; }, setF: function (x) { f = x; } };
   window.theApproach = {
-    state: function () { var hq = oproj(filmPos()), G = gapNow(), gs = G && starOf(G.block), gq = gs && oproj(gs.p); return { started: started, inviting: inviting, touches: touches, lost: lost, gap: G ? G.title : '', gapF: G ? G.f : null, gapStar: gq ? [Math.round(gq[0]), Math.round(gq[1])] : null, home: hq ? [Math.round(hq[0]), Math.round(hq[1])] : null, centre: BAS ? [Math.round(BAS.cx), Math.round(BAS.cy)] : null, ficOn: fic.on, ficS: +sFnow.toFixed(3), ficBs: fic.bs, ficT: fic.on ? +vid.currentTime.toFixed(1) : 0, ficFilter: vid.style.filter, pxShown: pxc.style.display === 'block', handWins: handWins, pulled: pulled, dist: +orb.dist.toFixed(3), who: $('who').textContent, diary: $('diary').textContent, vb: +V.b.toFixed(3), stopped: stopped, quietR: quietR, begun: begun, introAt: introAt, introDone: introDone, btn: $('stop').hidden ? '' : $('stop').textContent, skip: !$('skipop').hidden, find: !$('find').hidden, needle: $('needle').style.left, vidPaused: vid.paused, frameOn: fr.classList.contains('on'), stG: stG ? +stG.gain.value.toFixed(3) : -1, ghostG: bus.ghost ? +bus.ghost.g.gain.value.toFixed(3) : -1, live: live.size, intro: intro, recentK: +recentK.toFixed(2), recent: RECENT.length, f: f, pi: pi, mLocked: mLocked, heard: heard, showTom: showTom, done: done, cur: cur && cur.who, clipOn: clipOn, held: held, inside: inside, block: wb ? wb.name : '', path: path.join(''), sel: sel, filmOn: filmOn, tuned: !!tuned, rev: tuned ? tuned.rev : 0, card: inside ? $('maddr').textContent + ' ' + $('mline').textContent : elCard.hidden ? '' : elLine.textContent, read: $('read').textContent, say: $('say').textContent, who: $('who').textContent, ac: AC ? AC.state : 'none', loaded: Object.keys(BUF).length, sM: sMnow, marka: curM() ? curM().f : null }; },
+    state: function () { var _hs = { a: +HS.a.toFixed(2), k: +HS.k.toFixed(2), R: Math.round(HS.R), x: Math.round(HS.x), y: Math.round(HS.y), bottom: Math.round(HS.bottom), seat: Math.round(HS.seatY), kind: HS.kind, wordsTop: parseFloat($('words').style.top) || 0, wordsH: $('words').offsetHeight, back: !!HS.back }, hq = oproj(filmPos()), G = gapNow(), gs = G && starOf(G.block), gq = gs && oproj(gs.p); return { hs: _hs, started: started, inviting: inviting, touches: touches, lost: lost, gap: G ? G.title : '', gapF: G ? G.f : null, gapStar: gq ? [Math.round(gq[0]), Math.round(gq[1])] : null, home: hq ? [Math.round(hq[0]), Math.round(hq[1])] : null, centre: BAS ? [Math.round(BAS.cx), Math.round(BAS.cy)] : null, ficOn: fic.on, ficS: +sFnow.toFixed(3), ficBs: fic.bs, ficT: fic.on ? +vid.currentTime.toFixed(1) : 0, ficFilter: vid.style.filter, pxShown: pxc.style.display === 'block', handWins: handWins, pulled: pulled, dist: +orb.dist.toFixed(3), who: $('who').textContent, diary: $('diary').textContent, vb: +V.b.toFixed(3), stopped: stopped, quietR: quietR, begun: begun, introAt: introAt, introDone: introDone, btn: $('stop').hidden ? '' : $('stop').textContent, skip: !$('skipop').hidden, find: !$('find').hidden, needle: $('needle').style.left, vidPaused: vid.paused, frameOn: fr.classList.contains('on'), stG: stG ? +stG.gain.value.toFixed(3) : -1, ghostG: bus.ghost ? +bus.ghost.g.gain.value.toFixed(3) : -1, live: live.size, intro: intro, recentK: +recentK.toFixed(2), recent: RECENT.length, f: f, pi: pi, mLocked: mLocked, heard: heard, showTom: showTom, done: done, cur: cur && cur.who, clipOn: clipOn, held: held, inside: inside, block: wb ? wb.name : '', path: path.join(''), sel: sel, filmOn: filmOn, tuned: !!tuned, rev: tuned ? tuned.rev : 0, card: inside ? $('maddr').textContent + ' ' + $('mline').textContent : elCard.hidden ? '' : elLine.textContent, read: $('read').textContent, say: $('say').textContent, who: $('who').textContent, ac: AC ? AC.state : 'none', loaded: Object.keys(BUF).length, sM: sMnow, marka: curM() ? curM().f : null }; },
     log: function () { return JSON.parse(JSON.stringify(LOG)); },
     lives: function () { return LIVES.map(function (L) { return { f: L.f, who: L.who }; }); },
     mara: function () { return MARA.map(function (P) { return P.f; }).concat([TOM.f]); },

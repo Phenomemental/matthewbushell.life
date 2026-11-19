@@ -68,3 +68,16 @@ node tests/layout.js
 ```
 
 The second needs Playwright with Chromium. Neither writes to the beach.
+
+The film page has its own checks, in `tests/the-approach/`. They play the made page in a headless browser at phone (390 by 844, touch) and desktop (1440 by 900) sizes, read the live beach as the page does, and write nothing to it:
+
+```bash
+python3 tools/generate.py --out /tmp/made --root "" --site http://127.0.0.1:8770 --record /tmp/record.json
+node tests/the-approach/serve.js /tmp/made 8770 &
+node tests/the-approach/film.js  --size phone --shots /tmp/shots   # the whole film, Begin to the credits (about seven minutes)
+node tests/the-approach/hands.js --size phone   # the viewer's controls (film:the-approach 6.6)
+node tests/the-approach/dial.js  --size phone   # the way in, Signal lost, the dial that turns the universe (6.7)
+node tests/the-approach/moons.js --size phone   # the nine moons (6.8)
+```
+
+Each takes `--size desktop` and `--url` (the live page, for instance). They need `playwright-core` and an installed Chrome.
