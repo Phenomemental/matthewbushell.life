@@ -1,0 +1,724 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>The Pscale universe, Matthew Bushell</title>
+<meta name="description" content="Every block on Pscale as a star. Turn the sky, come close, and walk into any star as far down as it goes.">
+
+<link rel="canonical" href="https://www.matthewbushell.life/universe/">
+<meta property="og:title" content="The Pscale universe">
+<meta property="og:description" content="Every block on Pscale as a star. Turn the sky, come close, and walk into any star as far down as it goes.">
+<meta property="og:url" content="https://www.matthewbushell.life/universe/">
+<meta name="theme-color" content="#04060b">
+<link rel="icon" href="/assets/favicon.svg?v=94ae1879" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&amp;display=swap" rel="stylesheet">
+<!-- visit counting: GoatCounter, no cookies; this exact copy of its script, or none -->
+<script data-goatcounter="https://matthewbushell.goatcounter.com/count" async src="https://gc.zgo.at/count.v4.js" crossorigin="anonymous" integrity="sha384-nRw6qfbWyJha9LhsOtSb2YJDyZdKvvCFh0fJYlkquSFjUxp9FVNugbfy8q1jdxI+"></script>
+<style>
+/* The universe alone: the live Pscale sky of The Approach (film:the-approach 6.42, 6.8, 6.82) with the film and the dial taken away.
+   Every block is a star; a star opens into its places as moons; a moon opens into its own, as far down as the block goes. */
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;background:#04060b}
+.uni{--ink:#efe6d6;--dim:#b9ab90;--gold:#d9b36c;
+  position:relative;height:100vh;height:100svh;overflow:hidden;background:#04060b;color:var(--ink);
+  font-family:'Cormorant Garamond',Georgia,serif;font-weight:500;-webkit-font-smoothing:antialiased;user-select:none;-webkit-user-select:none}
+.uni #sky{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+.uni.dragging #sky{cursor:grabbing}
+.uni button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.uni button:focus-visible{outline:2px solid #ff5d86;outline-offset:3px}
+.uni [hidden]{display:none!important}
+.ubtn{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;min-height:48px;margin:0;padding:0 18px;border:1.5px solid #eadfc4;border-radius:999px;
+  background:rgba(12,14,26,.94);color:#fff8ea;font-family:'Cormorant Garamond',Garamond,serif;font-size:19px;font-weight:600;letter-spacing:.03em;line-height:1.1;white-space:nowrap;
+  box-shadow:0 2px 14px rgba(0,0,0,.55)}
+.ubtn:hover{background:rgba(44,50,76,.96)}
+.ubtn:disabled{opacity:.36;cursor:default}
+.ubtn.go{background:#c21d4e;border-color:#ff8aa6;color:#fff;box-shadow:0 0 26px rgba(194,29,78,.5)}
+.ucorner{position:absolute;z-index:8;top:calc(8px + env(safe-area-inset-top));right:calc(8px + env(safe-area-inset-right));display:flex;gap:6px;padding:5px;border-radius:32px;background:rgba(3,5,12,.66);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.ucorner .ubtn{padding:0 14px;font-size:18px}
+.umark{position:absolute;z-index:3;top:calc(14px + env(safe-area-inset-top));left:calc(16px + env(safe-area-inset-left));margin:0;max-width:calc(100% - 170px);font-size:13px;letter-spacing:.3em;line-height:1.5;color:#cdbf9f;text-shadow:0 0 8px #000;pointer-events:none;white-space:nowrap}
+.umark b{display:block;font-size:15px;letter-spacing:.08em;font-weight:500;font-style:italic;color:var(--dim);overflow:hidden;text-overflow:ellipsis}
+
+/* a star's card, opened by a tap on the sky */
+.ustar{position:absolute;z-index:6;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom));width:min(480px,calc(100% - 24px));box-sizing:border-box;padding:14px 60px 16px 18px;border-radius:18px;
+  background:rgba(6,9,22,.95);border:1px solid rgba(238,242,255,.3);box-shadow:0 10px 40px rgba(0,0,0,.6);color:#f1ebdd;text-align:left;user-select:text;-webkit-user-select:text}
+.ustar p{margin:0}
+.ustar .uname{font-size:18px;font-weight:600;letter-spacing:.05em;color:#e8c98a;overflow-wrap:anywhere}
+.ustar .umeta{margin-top:3px;font:500 12px ui-monospace,Menlo,Consolas,monospace;letter-spacing:.08em;color:var(--dim)}
+.ustar .uline{margin-top:8px;font-size:19px;line-height:1.32;overflow-wrap:break-word;max-height:7.9em;overflow-y:auto}
+.ustar .uclose{position:absolute;top:6px;right:6px;width:48px;padding:0;font-size:26px}
+.ustar .ubtn.go{margin-top:12px}
+
+/* inside a block: the place's address, its words whole, and the two ways to move */
+.uplace{position:absolute;z-index:6;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom));width:min(600px,calc(100% - 24px));box-sizing:border-box;margin:0;pointer-events:none}
+.uplace p{margin:0}
+#paddr{font-family:ui-monospace,Menlo,Consolas,monospace;color:var(--gold);letter-spacing:.1em;font-size:14px;min-height:18px;text-shadow:0 0 8px #000;overflow-wrap:anywhere}
+#pline{margin-top:6px;font-size:20px;line-height:1.3;height:5.2em;max-height:30vh;max-height:30svh;overflow-y:auto;overscroll-behavior:contain;color:var(--ink);text-shadow:0 0 10px #000,0 0 3px #000;
+  pointer-events:auto;user-select:text;-webkit-user-select:text;white-space:pre-wrap;overflow-wrap:break-word;scrollbar-width:thin;scrollbar-color:#8a6a3a transparent}
+.uways{display:flex;gap:8px;margin-top:10px;pointer-events:auto}
+.uways .ubtn{flex:1;border-radius:8px}
+.uways .ubtn.go{flex:1.7}
+.uhint{position:absolute;z-index:5;left:16px;right:16px;bottom:calc(28px + env(safe-area-inset-bottom));margin:0;text-align:center;font-style:italic;font-size:20px;line-height:1.3;color:var(--ink);text-shadow:0 0 10px #000,0 0 4px #000;pointer-events:none;opacity:0;transition:opacity 1.2s}
+.uhint.on{opacity:1}
+.uni.walking .uhint{bottom:calc(250px + env(safe-area-inset-bottom))}
+.unotice{position:absolute;z-index:8;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom));margin:0;width:max-content;max-width:calc(100% - 28px);padding:4px 8px 4px 18px;box-sizing:border-box;display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center;
+  border:1px solid rgba(238,242,255,.25);border-radius:26px;background:rgba(3,5,12,.86);font-size:19px;font-style:italic}
+.unojs{position:absolute;left:16px;right:16px;top:45%;margin:0;text-align:center;font-style:italic;font-size:21px;color:rgba(238,242,255,.8)}
+@media (min-width:900px) and (min-height:560px){
+  .ucorner{top:16px;right:20px}
+  .umark{top:20px;left:24px}
+  #pline{font-size:21px}
+}
+</style>
+</head>
+<body>
+<main class="uni" id="uni">
+<canvas id="sky" aria-hidden="true"></canvas>
+
+<p class="umark">THE PSCALE UNIVERSE<b id="ucount"></b></p>
+<div class="ucorner">
+  <button type="button" class="ubtn" id="sound" aria-pressed="false">Sound: off</button>
+</div>
+
+<aside class="ustar" id="starcard" hidden aria-live="polite">
+  <button type="button" class="ubtn uclose" id="sclose" aria-label="Close the card">×</button>
+  <p class="uname" id="sname"></p>
+  <p class="umeta" id="smeta"></p>
+  <p class="uline" id="sline"></p>
+  <button type="button" class="ubtn go" id="swalk" hidden>Go in</button>
+</aside>
+
+<div class="uplace" id="place" hidden>
+  <p id="paddr" aria-live="polite"></p>
+  <p id="pline" aria-live="polite" tabindex="0"></p>
+  <div class="uways"><button type="button" class="ubtn" id="tup">Up</button><button type="button" class="ubtn go" id="tin">Go in</button></div>
+</div>
+<p class="uhint" id="hint" aria-live="polite"></p>
+
+<p class="unotice" id="notice" role="status" hidden><span>Pscale could not be reached.</span> <button type="button" class="ubtn" id="again">Try again</button></p>
+<noscript><p class="unojs">This page draws the live Pscale sky, and needs JavaScript to do it.</p></noscript>
+</main>
+
+<script>
+/* The Pscale universe: the sky, the moons and the dive of The Approach, standing alone. No film and no dial: the hand is on the sky
+   itself. Where the film's page stopped at what the film needed, this one goes as far as a block goes: every block is read whole
+   whatever its size, and a place kept inside another's own line (the nested underscore, a block's deeper floors) opens as its heart.
+   Plain JavaScript, no libraries. It reads Pscale and writes nothing to it. */
+(function () {
+  'use strict';
+  var WIRE = 'https://beach.happyseaurchin.com/.well-known/pscale-beach';
+  var ARMS = ['archive', 'pool', 'spine', 'function', 'liquid', 'grain', 'passport', 'now', 'shell'];
+  var TAU = Math.PI * 2;
+  var $ = function (id) { return document.getElementById(id); };
+  var stage = $('uni'), canvas = $('sky'), ctx = canvas.getContext('2d');
+  if (!ctx) return;
+  var elNotice = $('notice'), elSound = $('sound');
+  var CALM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ── small helpers ── */
+  function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function ease(t) { t = clamp(t, 0, 1); return t * t * (3 - 2 * t); }
+  function easeOut(t) { t = clamp(t, 0, 1); return 1 - Math.pow(1 - t, 3); }
+  function hash(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+  function rnd(seed) { var a = seed >>> 0; return function () { a = (a + 0x6D2B79F5) >>> 0; var t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+  function hh(s, k) { var x = 2166136261 ^ k; for (var i = 0; i < s.length; i++) { x ^= s.charCodeAt(i); x = Math.imul(x, 16777619); } x ^= x >>> 13; x = Math.imul(x, 0x5bd1e995); x ^= x >>> 15; return (x >>> 0) / 4294967295; }
+  function now() { return performance.now() / 1000; }
+
+  /* ── reading Pscale ── */
+  var index = null, reading = 0;
+  function get(url, wait) {
+    var ctl = window.AbortController ? new AbortController() : null;
+    var timer = setTimeout(function () { if (ctl) ctl.abort(); }, wait || 20000);
+    return fetch(url, { headers: { Accept: 'application/json' }, signal: ctl ? ctl.signal : undefined })
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function (j) { clearTimeout(timer); return j; }, function (e) { clearTimeout(timer); throw e; });
+  }
+  function readIndex() {
+    var mine = ++reading;
+    elNotice.hidden = true;
+    return get(WIRE).then(function (j) {
+      if (!j || typeof j !== 'object' || !Array.isArray(j.blocks)) throw new Error('not an index');
+      index = j; beachStars();
+      showHint(coarse ? 'Drag to turn the sky. Pinch to come closer. Tap a star to read it.' : 'Drag to turn the sky. Scroll to come closer. Click a star to read it.');
+    }).catch(function () { if (mine === reading) elNotice.hidden = false; });
+  }
+  $('again').addEventListener('click', function () { readIndex(); });
+  function sealed(n) { return !!n && typeof n === 'object' && n['9'] && typeof n['9'] === 'object' && n['9']._ === 'gray'; }
+  function lineOf(n) {
+    if (sealed(n)) return 'This line is sealed.';
+    var guard = 0;
+    while (n && typeof n === 'object' && guard++ < 24) n = n._;
+    return typeof n === 'string' ? n : '';
+  }
+  function tidy(s) { return String(s).replace(/\s*\((?:AHEAD|BEHIND)\b[^)]*\)/g, ''); }
+  function story(n) { return tidy(lineOf(n)).trim(); }
+
+  /* ── the live sky: every block a star from the live index, in three dimensions ── */
+  var dust = [], B3 = [];
+  (function () { var r = rnd(81); function gg() { var u = 0; for (var k = 0; k < 4; k++) u += r(); return (u - 2) * 0.9; } for (var i = 0; i < 1400; i++) dust.push([gg() * 1.6, gg() * 0.45, gg() * 1.6, 0.12 + r() * 0.3]); })();
+  function sprite(inner, outer) {
+    var c = document.createElement('canvas'); c.width = c.height = 128;
+    var g2 = c.getContext('2d'), gr = g2.createRadialGradient(64, 64, 0, 64, 64, 64);
+    gr.addColorStop(0, inner); gr.addColorStop(0.1, inner); gr.addColorStop(0.32, outer); gr.addColorStop(1, 'rgba(0,0,0,0)');
+    g2.fillStyle = gr; g2.fillRect(0, 0, 128, 128);
+    return c;
+  }
+  var SPR = [sprite('rgba(255,255,255,1)', 'rgba(170,196,255,.2)'), sprite('rgba(255,250,240,1)', 'rgba(255,214,170,.2)'), sprite('rgba(232,240,255,1)', 'rgba(140,170,255,.22)')];
+  var SPR_NEW = sprite('rgba(255,246,226,1)', 'rgba(255,196,120,.4)'), RECENT = [], RECENT_K = 0.55, RECENT_H = 72;
+  function beachStars() {
+    var bytes = (index && index.bytes) || {}, names = ((index && index.blocks) || []).map(function (b) { return typeof b === 'string' ? b : (b && b.name) || ''; }).filter(Boolean);
+    B3 = names.map(function (name) {
+      var kind = name.split(':')[0], arm = ARMS.indexOf(kind), r, ang, y, size = Number(bytes[name]) || 300;
+      if (arm >= 0) { r = 0.15 + 0.85 * Math.pow(hh(name, 1), 0.7); ang = arm * TAU / 9 + r * 3.2 + (hh(name, 2) - 0.5) * 0.35; y = (hh(name, 3) - 0.5) * 0.05; }
+      else { ang = hh(name, 2) * TAU; r = 0.1 + 0.95 * Math.pow(hh(name, 1), 0.5); y = (hh(name, 3) - 0.5) * 0.25; }
+      var u = hh(name, 4);
+      return { name: name, size: size, p: [r * Math.cos(ang), y, r * Math.sin(ang)], br: 0.25 + 1.6 * Math.min(1, Math.max(0, Math.log(Math.max(size, 50)) / Math.LN10 - 1.6)) / 3.2,
+        tint: u < 0.2 ? 2 : u < 0.62 ? 0 : 1, ph: hh(name, 5) * TAU, sp: 0.25 + u * 0.5 };
+    });
+    /* how recently each block was written, from the index's own record; the newest glow amber */
+    var tch = (index && index.touched) || {}, nowT = Date.parse((index && index.now && index.now.iso) || '') || Date.now();
+    B3.forEach(function (s) { var w = Date.parse(tch[s.name] || ''), age = (nowT - w) / 3600000; s.recent = w && age >= 0 && age < RECENT_H ? Math.pow(1 - age / RECENT_H, 1.5) : 0; });
+    RECENT = B3.filter(function (s) { return s.recent > 0; });
+    $('ucount').textContent = B3.length.toLocaleString('en-GB') + ' stars, read live';
+  }
+  var W = 0, H = 0, DPR = 1, wide = false, coarse = !!(window.matchMedia && matchMedia('(pointer: coarse)').matches);
+  var orb = { yaw: 0.6, pitch: 0.72, dist: 2.4, tgt: [0, 0, 0] }, glide = null, DMIN = 0.22, DMAX = 4.6, BAS = null;
+  function seat() { return H * (wide ? 0.44 : 0.4); }
+  function resize() {
+    var r = stage.getBoundingClientRect();
+    W = Math.max(1, Math.round(r.width)); H = Math.max(1, Math.round(r.height));
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(W * DPR); canvas.height = Math.round(H * DPR);
+    wide = W >= 900 && H >= 560;
+    BAS = null; M.cx = W / 2; M.cy = seat(); M.R0 = Math.min(W * 0.39, H * 0.25);
+  }
+  function basis() {
+    var cp = Math.cos(orb.pitch), sp = Math.sin(orb.pitch), cy = Math.cos(orb.yaw), sy = Math.sin(orb.yaw), t = orb.tgt;
+    var eye = [t[0] + orb.dist * cp * cy, t[1] + orb.dist * sp, t[2] + orb.dist * cp * sy];
+    var fw = [t[0] - eye[0], t[1] - eye[1], t[2] - eye[2]], n = Math.sqrt(fw[0] * fw[0] + fw[1] * fw[1] + fw[2] * fw[2]) || 1;
+    fw = [fw[0] / n, fw[1] / n, fw[2] / n];
+    var r = [-fw[2], 0, fw[0]]; n = Math.sqrt(r[0] * r[0] + r[2] * r[2]) || 1; r = [r[0] / n, 0, r[2] / n];
+    var u = [r[1] * fw[2] - r[2] * fw[1], r[2] * fw[0] - r[0] * fw[2], r[0] * fw[1] - r[1] * fw[0]];
+    BAS = { eye: eye, f: fw, r: r, u: u, S: Math.min(W, H) * (wide ? 0.9 : 1.12), cx: W / 2, cy: seat() };
+    return BAS;
+  }
+  function oproj(p) {
+    var b = BAS || basis(), d0 = p[0] - b.eye[0], d1 = p[1] - b.eye[1], d2 = p[2] - b.eye[2], z = d0 * b.f[0] + d1 * b.f[1] + d2 * b.f[2];
+    if (z <= 0.01) return null;
+    return [b.cx + (d0 * b.r[0] + d1 * b.r[1] + d2 * b.r[2]) * b.S / z, b.cy - (d0 * b.u[0] + d1 * b.u[1] + d2 * b.u[2]) * b.S / z, z];
+  }
+  function starOf(name) { for (var i = 0; i < B3.length; i++) if (B3[i].name === name) return B3[i]; return null; }
+  function glideTo(to, dur, fn, done) { glide = { from: { yaw: orb.yaw, pitch: orb.pitch, dist: orb.dist, tgt: orb.tgt.slice() }, to: to, t0: now(), dur: CALM ? 0.01 : dur, fn: fn || ease, done: done }; }
+  function stepGlide(t) {
+    if (!glide) return;
+    var k = glide.fn((t - glide.t0) / glide.dur), a = glide.from, b = glide.to, i;
+    if (b.tgt) for (i = 0; i < 3; i++) orb.tgt[i] = lerp(a.tgt[i], b.tgt[i], k);
+    if (b.dist != null) orb.dist = a.dist * Math.pow(b.dist / a.dist, k);
+    if (b.pitch != null) orb.pitch = lerp(a.pitch, b.pitch, k);
+    if (t - glide.t0 >= glide.dur) { var d = glide.done; glide = null; if (d) d(); }
+  }
+  var SK = { dim: 1, to: 1 }, DIMIN = 0.3, NAMED = [];
+  function drawSky(t, alpha) {
+    var gd = ctx.createLinearGradient(0, 0, 0, H);
+    gd.addColorStop(0, '#02040b'); gd.addColorStop(0.55, '#070d24'); gd.addColorStop(1, '#03050c');
+    ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.fillStyle = gd; ctx.fillRect(0, 0, W, H);
+    var b = basis();
+    alpha *= SK.dim;
+    if (alpha <= 0.002) return;
+    var i, s, q;
+    q = oproj([0, 0, 0]);
+    if (q) {
+      var hr = b.S / q[2] * 1.05, hz = ctx.createRadialGradient(q[0], q[1], 0, q[0], q[1], hr);
+      hz.addColorStop(0, 'rgba(70,92,170,.22)'); hz.addColorStop(0.5, 'rgba(40,54,120,.08)'); hz.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.globalAlpha = alpha; ctx.fillStyle = hz; ctx.fillRect(0, 0, W, H);
+    }
+    ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = '#b8c8ff';
+    for (i = 0; i < dust.length; i++) { q = oproj(dust[i]); if (!q || q[0] < 0 || q[0] > W || q[1] < 0 || q[1] > H) continue; ctx.globalAlpha = Math.min(1, alpha * dust[i][3]); ctx.fillRect(q[0], q[1], 1.2, 1.2); }
+    NAMED.length = 0;
+    for (i = 0; i < B3.length; i++) {
+      s = B3[i];
+      q = oproj(s.p); if (!q || q[0] < -30 || q[0] > W + 30 || q[1] < -30 || q[1] > H + 30) continue;
+      var near = Math.min(6, 1.1 / Math.max(q[2], 0.05)), tw = 0.86 + 0.14 * Math.sin(t * s.sp + s.ph);
+      var rad = (1.4 + s.br * 3.2) * (0.55 + near * 0.45) * (wide ? 1 : 1.3);
+      ctx.globalAlpha = Math.min(1, alpha * Math.min(1, 0.38 + s.br * 0.55) * tw);
+      ctx.drawImage(SPR[s.tint], q[0] - rad, q[1] - rad, rad * 2, rad * 2);
+      if (q[2] < 0.62) NAMED.push([q[2], q[0], q[1] + rad * 0.5 + 15, s.name]);
+    }
+    for (i = 0; i < RECENT.length; i++) {   /* blocks written in the last three days glow */
+      s = RECENT[i]; q = oproj(s.p); if (!q || q[0] < -40 || q[0] > W + 40 || q[1] < -40 || q[1] > H + 40) continue;
+      var nr = Math.min(6, 1.1 / Math.max(q[2], 0.05)), gr = (5 + 13 * s.recent) * (0.6 + nr * 0.4) * (wide ? 1 : 1.2);
+      ctx.globalAlpha = Math.min(1, alpha * RECENT_K * (0.3 + 0.7 * s.recent) * (0.72 + 0.28 * Math.sin(t * 1.3 + s.ph)));
+      ctx.drawImage(SPR_NEW, q[0] - gr, q[1] - gr, gr * 2, gr * 2);
+    }
+    ctx.globalCompositeOperation = 'source-over';
+    /* close to, the nearest stars wear their names */
+    if (NAMED.length && !inside) {
+      NAMED.sort(function (u, w) { return u[0] - w[0]; });
+      ctx.font = '500 12px ui-monospace,Menlo,Consolas,monospace'; ctx.textAlign = 'center'; ctx.shadowColor = '#000'; ctx.shadowBlur = 5;
+      for (i = 0; i < NAMED.length && i < 14; i++) { var nm = NAMED[i]; ctx.globalAlpha = alpha * clamp((0.62 - nm[0]) / 0.25, 0, 1) * 0.8; ctx.fillStyle = '#cdbf9f'; ctx.fillText(nm[3].length > 34 ? nm[3].slice(0, 33) + '…' : nm[3], nm[1], nm[2]); }
+      ctx.shadowBlur = 0;
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  /* ── sound: off until asked for. The sound of the universe from the film's page (6.73), made in code, nothing loaded: a low held
+        chord that beats slowly against itself, glass tones in a long echo, a breath of air, and now and then three far pips. ── */
+  var AC = null, master = null, soundOn = false, MUSIC = null, musicAt = -1, farT = 0;
+  function pip(f, vol, dur, when) {
+    if (!AC || !soundOn) return;
+    var o = AC.createOscillator(), q = AC.createGain(), t = AC.currentTime + (when || 0); o.frequency.value = f;
+    q.gain.setValueAtTime(0, t); q.gain.linearRampToValueAtTime(vol, t + 0.01); q.gain.exponentialRampToValueAtTime(0.0005, t + dur);
+    o.connect(q); q.connect(master); o.start(t); o.stop(t + dur + 0.05);
+  }
+  function buildMusic(ac, out) {
+    var t0 = ac.currentTime, g = ac.createGain(); g.gain.value = 0; g.connect(out);
+    /* the space: two delays feeding each other, one to each ear */
+    var send = ac.createGain(), dA = ac.createDelay(2), dB = ac.createDelay(2), fA = ac.createGain(), fB = ac.createGain(), soft = ac.createBiquadFilter(), wet = ac.createGain();
+    dA.delayTime.value = 0.47; dB.delayTime.value = 0.71; fA.gain.value = 0.56; fB.gain.value = 0.56; soft.type = 'lowpass'; soft.frequency.value = 2400; wet.gain.value = 0.7;
+    send.connect(soft); soft.connect(dA); dA.connect(fA); fA.connect(dB); dB.connect(fB); fB.connect(dA);
+    var pan = function (v) { if (!ac.createStereoPanner) return null; var p = ac.createStereoPanner(); p.pan.value = v; return p; };
+    var pA = pan(-0.75), pB = pan(0.75);
+    if (pA) { dA.connect(pA); pA.connect(wet); dB.connect(pB); pB.connect(wet); } else { dA.connect(wet); dB.connect(wet); }
+    wet.connect(g);
+    /* one voice: an oscillator whose loudness breathes between (1 - depth) and 1 of vol, at its own slow rate */
+    function voice(type, hz, vol, rate, depth, turn, where, dry, echo, into) {
+      var o = ac.createOscillator(), a = ac.createGain(), l = ac.createOscillator(), ld = ac.createGain();
+      o.type = type; o.frequency.value = hz; a.gain.value = vol * (1 - depth / 2); l.frequency.value = rate; ld.gain.value = vol * depth / 2;
+      l.connect(ld); ld.connect(a.gain); o.connect(a);
+      var p = where ? pan(where) : null, end = a; if (p) { a.connect(p); end = p; }
+      if (dry) { var d = ac.createGain(); d.gain.value = dry; end.connect(d); d.connect(into || g); }
+      if (echo) { var e = ac.createGain(); e.gain.value = echo; end.connect(e); e.connect(send); }
+      o.start(t0); l.start(t0 + turn / rate);
+    }
+    var warm = ac.createBiquadFilter(); warm.type = 'lowpass'; warm.frequency.value = 760; warm.Q.value = 0.4; warm.connect(g);
+    voice('sine', 98.00, 0.060, 0.031, 0.5, 0.10, 0, 1, 0, warm);
+    voice('triangle', 196.00, 0.060, 0.047, 0.6, 0.55, -0.3, 1, 0.15, warm);
+    voice('triangle', 196.62, 0.060, 0.041, 0.6, 0.20, 0.3, 1, 0.15, warm);
+    voice('triangle', 293.66, 0.034, 0.053, 0.8, 0.70, -0.15, 1, 0.2, warm);
+    voice('triangle', 294.37, 0.034, 0.037, 0.8, 0.35, 0.15, 1, 0.2, warm);
+    voice('sine', 392.00, 0.034, 0.033, 0.9, 0.45, -0.4, 1, 0.3, null);
+    voice('sine', 392.83, 0.034, 0.039, 0.9, 0.90, 0.4, 1, 0.3, null);
+    voice('sine', 587.33, 0.024, 0.045, 1, 0.15, 0.1, 1, 0.4, null);
+    voice('sine', 783.99, 0.050, 0.043, 1, 0.75, -0.5, 0.5, 1, null);
+    voice('sine', 1174.66, 0.036, 0.061, 1, 0.30, 0.55, 0.5, 1, null);
+    voice('sine', 880.00, 0.030, 0.052, 1, 0.05, 0.2, 0.5, 1, null);
+    voice('sine', 1567.98, 0.016, 0.071, 1, 0.50, -0.2, 0.4, 1, null);
+    voice('sine', 1108.73, 0.030, 0.029, 1, 0.80, 0.4, 0.5, 1, null);   /* the strange note */
+    var nb = ac.createBuffer(1, Math.floor(ac.sampleRate * 3), ac.sampleRate), nd = nb.getChannelData(0), seed = 7;
+    for (var i = 0; i < nd.length; i++) { seed = (seed * 16807) % 2147483647; nd[i] = seed / 1073741823.5 - 1; }
+    var ns = ac.createBufferSource(), bp = ac.createBiquadFilter(), ng = ac.createGain(), bl = ac.createOscillator(), bd = ac.createGain();
+    ns.buffer = nb; ns.loop = true; bp.type = 'bandpass'; bp.frequency.value = 720; bp.Q.value = 1.6; ng.gain.value = 0.02;
+    bl.frequency.value = 0.027; bd.gain.value = 330; bl.connect(bd); bd.connect(bp.frequency);
+    ns.connect(bp); bp.connect(ng); ng.connect(g); var ne = ac.createGain(); ne.gain.value = 0.5; ng.connect(ne); ne.connect(send); ns.start(t0); bl.start(t0);
+    function pips(at) {
+      for (var k = 0; k < 3; k++) {
+        var o = ac.createOscillator(), a = ac.createGain(), t = at + k * 0.21; o.frequency.value = 1567.98;
+        a.gain.setValueAtTime(0, t); a.gain.linearRampToValueAtTime(0.03, t + 0.012); a.gain.exponentialRampToValueAtTime(0.0004, t + 0.26);
+        o.connect(a); a.connect(send); o.start(t); o.stop(t + 0.3);
+      }
+    }
+    return { pips: pips, level: function (v, tc) { g.gain.setTargetAtTime(v, ac.currentTime, tc); } };
+  }
+  function musicTick() {
+    if (!MUSIC) return;
+    var want = soundOn ? (inside ? 0.4 : 1) * 1.2 : 0;
+    if (want !== musicAt) { MUSIC.level(want, musicAt < 0 ? 1.3 : 0.5); musicAt = want; }
+    if (want > 0 && !inside && now() > farT) { MUSIC.pips(AC.currentTime + 0.05); farT = now() + 10 + Math.random() * 6; }
+  }
+  elSound.addEventListener('click', function () {
+    soundOn = !soundOn;
+    if (soundOn) {
+      try {
+        if (!AC) { AC = new (window.AudioContext || window.webkitAudioContext)(); master = AC.createGain(); master.gain.value = 0.95; master.connect(AC.destination); }
+        if (AC.state !== 'running') quiet(AC.resume());
+        if (!MUSIC) { MUSIC = buildMusic(AC, master); musicAt = -1; farT = now() + 4; }
+      } catch (e) { soundOn = false; }
+    }
+    elSound.textContent = soundOn ? 'Sound: on' : 'Sound: off'; elSound.setAttribute('aria-pressed', String(soundOn));
+  });
+  function quiet(p) { if (p && p.catch) p.catch(function () {}); return p; }
+
+  /* ── inside a block. A place is a path of digits from the block's top; a 0 in the path is a step into the place's own line where
+        that line is itself a place with places of its own (the nested underscore: the deeper floors of a block). ── */
+  var inside = false, wb = null, path = [], sel = null, flying = false;
+  function keyOf(d) { return d === 0 ? '_' : String(d); }
+  function nodeOf(p) { var n = wb && wb.root; for (var i = 0; i < p.length; i++) { if (!n || typeof n !== 'object' || sealed(n) || n[keyOf(p[i])] == null) return undefined; n = n[keyOf(p[i])]; } return n; }
+  function kidsOfNode(n) { var out = []; if (!n || typeof n !== 'object' || sealed(n)) return out; for (var d = 1; d <= 9; d++) if (n[String(d)] != null) out.push(d); return out; }
+  function heartOfNode(n) { var guard = 0; if (!n || typeof n !== 'object' || sealed(n)) return false; n = n._; while (n && typeof n === 'object' && guard++ < 24) { if (sealed(n)) return false; if (kidsOfNode(n).length) return true; n = n._; } return false; }
+  var KC = {};   /* what stands at each place, kept while the block is walked: the tree is drawn many times a second */
+  function at2(p) { var k = p.join('.'), c = KC[k]; if (!c) { var n = nodeOf(p); c = KC[k] = { kids: kidsOfNode(n), heart: heartOfNode(n) }; } return c; }
+  function kids(p) { return at2(p).kids; }
+  function heart(p) { return at2(p).heart; }
+  function opens(p) { var c = at2(p); return c.kids.length > 0 || c.heart; }
+  function floorOf(root) { var f = 0, n = root, guard = 0; while (n && typeof n === 'object' && guard++ < 24) { f++; n = n._; } return Math.max(1, f); }
+  /* the place's address as Pscale writes it: the block's floor sets where the point falls; a step into a heart is a 0 */
+  function address(p) {
+    if (!p.length) return '';
+    var F = wb ? wb.floor : 1, d = p.map(String);
+    if (d.length <= F) { while (d.length < F) d.push('0'); return d.join(''); }
+    return d.slice(0, F).join('') + '.' + d.slice(F).join('');
+  }
+  function within(p) { var c = at2(p), n = c.kids.length; return (n ? n + (n === 1 ? ' place' : ' places') : '') + (c.heart ? (n ? ', and a heart' : 'a heart') : ''); }
+
+  /* ── the nine moons (6.8): a block's places drawn round its star as moons on one tilted orbit; a moon's own places round it; and
+        at the centre of any place that holds one, its heart, a smaller system of its own. ── */
+  var MSTEP = TAU / 9, MS = 4.6, MBETA = 0.25, MQ = 0.40, MTILT = -0.22, MCT = Math.cos(MTILT), MST = Math.sin(MTILT), KSKY = 4;
+  var MNOTE = [392, 440, 494, 587, 659, 784, 880, 988, 1175];
+  var M = { rot: 0, rotT: 0, v: 1, vT: 1, tr: null, labelA: 0, seenDive: false, nodes: {}, hits: [], lastD: null, cardKey: '', cardFocus: true, drag: null, pts: {}, pinch: null, lastZoom: 0, cx: 0, cy: 0, R0: 100, t: 0 };
+  var MSTARS = []; (function () { var r = rnd(11); for (var i = 0; i < 280; i++) MSTARS.push({ a: r() * TAU, u: r(), z: 0.25 + r() * 0.75, s: 0.5 + r() * 1.2, tw: r() * TAU, c: r() < 0.16 ? '255,226,190' : '208,218,255' }); })();
+  function mkey(p) { return p.join('.'); }
+  function mnode(p) { var k = mkey(p); if (!M.nodes[k]) { var h = hash((wb ? wb.name : '') + '/' + k); M.nodes[k] = { ph: (h % 6283) / 1000, om: (0.07 + ((h >>> 8) % 1000) / 1000 * 0.13) * (((h >>> 20) & 1) ? -1 : 1), rot: 0 }; } return M.nodes[k]; }
+  function mw(p) { return 0.8 + 0.045 * kids(p).length; }
+  function onFocusPath(p) { if (p.length > path.length) return false; for (var i = 0; i < p.length; i++) if (path[i] !== p[i]) return false; return true; }
+  function isFocus(p) { return p.length === path.length && onFocusPath(p); }
+  function ringRot(p) { var n = mnode(p); return isFocus(p) ? M.rot : onFocusPath(p) ? n.rot : n.ph + M.t * 0.001 * n.om; }
+  function mframe(p) {
+    if (!p.length) return { x: 0, y: 0, R: 1 };
+    var up = p.slice(0, -1), P = mframe(up), d = p[p.length - 1];
+    if (d === 0) return { x: P.x, y: P.y, R: P.R / MS };   /* the heart stands where its place stands, one scale down */
+    var a = ringRot(up) + (d - 1) * MSTEP, sn = Math.sin(a), pp = 1 - 0.28 * (1 - sn) / 2, ex = P.R * Math.cos(a), ey = P.R * MQ * sn;
+    return { x: P.x + ex * MCT - ey * MST, y: P.y + ex * MST + ey * MCT, R: P.R / MS * pp };
+  }
+  function mcam(c) { if (c === 'sky') return { x: 0, y: 0, k: KSKY }; var q = mframe(c); return { x: q.x, y: q.y, k: M.R0 / q.R }; }
+  function mease(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+  function mwrap(a) { a = (a + Math.PI) % TAU; if (a < 0) a += TAU; return a - Math.PI; }
+  function mview() {
+    if (!M.tr) { var c = mcam(inside ? path : 'sky'); return { ox: M.cx - c.x * c.k, oy: M.cy - c.y * c.k, k: c.k }; }
+    var A = mcam(M.tr.A), B = mcam(M.tr.B), e = mease(clamp((M.t - M.tr.t0) / M.tr.dur, 0, 1)); if (M.tr.dir < 0) e = 1 - e;
+    var k = A.k * Math.pow(B.k / A.k, e), m0x = M.cx + (B.x - A.x) * A.k, m0y = M.cy + (B.y - A.y) * A.k, mx = m0x + (M.cx - m0x) * e, my = m0y + (M.cy - m0y) * e;
+    return { ox: mx - B.x * k, oy: my - B.y * k, k: k };
+  }
+  /* the star itself, swelling as you arrive */
+  function mstar(x, y, r, a) {
+    var rr = Math.max(r, 3.2), pu = 0.5 + 0.5 * Math.sin(M.t * 0.003), A = a * (rr > 60 ? Math.max(0.74, 60 / rr) : 1);
+    if (A < 0.01 || x + rr * 2.4 < 0 || x - rr * 2.4 > W || y + rr * 2.4 < 0 || y - rr * 2.4 > H) return;
+    var P = ['255,252,246', '255,246,232', '240,208,156', '190,142,74', '242,210,160'];
+    var gr = ctx.createRadialGradient(x, y, 0, x, y, rr * 2.4);
+    gr.addColorStop(0, 'rgba(' + P[0] + ',' + A + ')'); gr.addColorStop(0.28, 'rgba(' + P[1] + ',' + A * 0.96 + ')'); gr.addColorStop(0.42, 'rgba(' + P[2] + ',' + A * 0.5 + ')'); gr.addColorStop(0.7, 'rgba(' + P[3] + ',' + A * 0.15 + ')'); gr.addColorStop(1, 'rgba(' + P[3] + ',0)');
+    ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(x, y, rr * 2.4, 0, TAU); ctx.fill();
+    ctx.strokeStyle = 'rgba(' + P[4] + ',' + A * (0.5 + 0.4 * pu) + ')'; ctx.lineWidth = Math.max(1.5, rr * 0.06); ctx.beginPath(); ctx.arc(x, y, rr * (1.2 + 0.06 * pu), 0, TAU); ctx.stroke();
+  }
+  /* a moon, lit from the body it circles */
+  function mmoon(x, y, r, lx, ly, a) {
+    if (r < 0.35 || a < 0.02) return; if (x + r * 2 < 0 || x - r * 2 > W || y + r * 2 < 0 || y - r * 2 > H) return;
+    if (r < 2.2) { ctx.fillStyle = 'rgba(233,222,196,' + a + ')'; ctx.beginPath(); ctx.arc(x, y, Math.max(r, 0.7), 0, TAU); ctx.fill(); return; }
+    var A = a * (r > 80 ? Math.max(0.9, 80 / r) : 1);
+    var h = ctx.createRadialGradient(x, y, r * 0.6, x, y, r * 1.9); h.addColorStop(0, 'rgba(240,226,190,' + 0.17 * A + ')'); h.addColorStop(1, 'rgba(240,226,190,0)'); ctx.fillStyle = h; ctx.beginPath(); ctx.arc(x, y, r * 1.9, 0, TAU); ctx.fill();
+    var gr = ctx.createRadialGradient(x + lx * r * 0.45, y + ly * r * 0.45, r * 0.06, x, y, r * 1.02);
+    gr.addColorStop(0, 'rgba(255,250,236,' + A + ')'); gr.addColorStop(0.4, 'rgba(226,210,174,' + A + ')'); gr.addColorStop(0.8, 'rgba(118,106,104,' + A + ')'); gr.addColorStop(1, 'rgba(34,30,52,' + A + ')');
+    ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.fill();
+  }
+  function starry(p) { for (var i = 0; i < p.length; i++) if (p[i] !== 0) return false; return true; }   /* the block's own line, however deep its floors go */
+  function msystem(p, x, y, R, lx, ly, a) {
+    var ext = R * 1.35 + 60; if (a < 0.01 || x + ext < 0 || x - ext > W || y + ext < 0 || y - ext > H) return;
+    var ks = kids(p), nk = ks.length, sub = a * clamp((R - 9) / 14, 0, 1), br = R * MBETA * (0.8 + 0.045 * nk);
+    var lit = isFocus(p) || (M.tr && M.tr.B !== 'sky' && M.tr.B.length === p.length && mkey(M.tr.B) === mkey(p));
+    if (sub > 0.01 && nk && R < 60000) { ctx.strokeStyle = 'rgba(217,179,108,' + sub * (lit ? 0.36 : 0.2) + ')'; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(x, y, R, R * MQ, MTILT, 0, TAU); ctx.stroke(); }
+    var it = [], r0 = ringRot(p);
+    if (sub > 0.01 && nk) for (var k = 1; k <= 9; k++) { var an = r0 + (k - 1) * MSTEP, sn = Math.sin(an), ex = R * Math.cos(an), ey = R * MQ * sn; it.push({ k: k, sn: sn, p: 1 - 0.28 * (1 - sn) / 2, x: x + ex * MCT - ey * MST, y: y + ex * MST + ey * MCT, has: ks.indexOf(k) >= 0 }); }
+    it.sort(function (u, w) { return u.sn - w.sn; });
+    var here = inside && isFocus(p);
+    function kid(q) {
+      var Rc = R / MS * q.p, cp = p.concat([q.k]);
+      if (here) M.hits.push({ k: q.k, x: q.x, y: q.y, sn: q.sn, has: q.has, r: q.has ? Rc * MBETA * mw(cp) : 3 });
+      if (!q.has) return;
+      var dx = x - q.x, dy = y - q.y, dl = Math.hypot(dx, dy) || 1, ca = sub * (0.5 + 0.5 * (q.sn + 1) / 2);
+      if (Rc >= 9 && opens(cp)) msystem(cp, q.x, q.y, Rc, dx / dl, dy / dl, ca); else mmoon(q.x, q.y, Rc * MBETA * mw(cp), dx / dl, dy / dl, ca);
+    }
+    it.forEach(function (q) { if (q.sn <= 0) kid(q); });
+    /* the centre: the place's own body; where it holds a heart, the body gives way to the heart's system as it comes into sight */
+    var hz = heart(p), Ri = R / MS, hs = hz ? clamp((Ri - 9) / 14, 0, 1) : 0, st = starry(p);
+    if (hs < 1) { if (st) mstar(x, y, br, a * (1 - hs)); else mmoon(x, y, br, lx, ly, a * (1 - hs)); }
+    if (hz && hs < 1 && a > 0.05) { ctx.strokeStyle = 'rgba(217,179,108,' + a * (1 - hs) * 0.55 + ')'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(x, y, Math.max(br, 3.2) * (st ? 1.75 : 1.35), 0, TAU); ctx.stroke(); }   /* a second ring: there is more within */
+    if (hs > 0) msystem(p.concat([0]), x, y, Ri, lx, ly, a * hs);
+    if (here && hz) M.hits.push({ k: 0, x: x, y: y, sn: 0.999, has: true, r: Math.max(br * (1 - hs), Ri * 0.5 * hs, 10) });
+    it.forEach(function (q) { if (q.sn > 0) kid(q); });
+  }
+  /* the stars stream past as you dive */
+  function mstars(D) {
+    var rmax = Math.hypot(W, H) * 0.62, spin = inside ? M.rot : 0, RR = function (q) { return rmax * (0.015 + Math.pow(q, 1.5)); };
+    if (M.lastD === null) M.lastD = D;
+    for (var i = 0; i < MSTARS.length; i++) {
+      var s = MSTARS[i], f1 = ((s.u + D * s.z * 0.24) % 1 + 1) % 1, f0 = ((s.u + M.lastD * s.z * 0.24) % 1 + 1) % 1, an = s.a + spin * 0.1 * s.z;
+      var r1 = RR(f1), x1 = M.cx + r1 * Math.cos(an), y1 = M.cy + r1 * Math.sin(an) * 0.92, al = Math.pow(Math.sin(Math.PI * f1), 0.55) * (0.3 + 0.7 * s.z) * (0.75 + 0.25 * Math.sin(M.t * 0.0015 + s.tw));
+      if (Math.abs(f1 - f0) < 0.4) { var r00 = RR(f0), x0 = M.cx + r00 * Math.cos(an), y0 = M.cy + r00 * Math.sin(an) * 0.92; if (Math.hypot(x1 - x0, y1 - y0) > 1.6) { ctx.strokeStyle = 'rgba(' + s.c + ',' + al * 0.8 + ')'; ctx.lineWidth = s.s; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke(); continue; } }
+      ctx.fillStyle = 'rgba(' + s.c + ',' + al + ')'; ctx.beginPath(); ctx.arc(x1, y1, s.s, 0, TAU); ctx.fill();
+    }
+    M.lastD = D;
+  }
+  function mshort(p) { if (p[p.length - 1] === 0) return 'the heart'; var t = story(nodeOf(p)); if (!t) return address(p); var s = t.split(' — ')[0].split(': ')[0].split(', ')[0].split(' (')[0].split(' for the ')[0].split('\n')[0]; return s.length > 26 ? s.slice(0, 25) + '…' : s; }
+  function mlabels() {
+    if (M.labelA < 0.02 || !inside) return;
+    ctx.textAlign = 'center'; ctx.shadowColor = '#000'; ctx.shadowBlur = 6;
+    M.hits.forEach(function (h) {
+      var sl = h.k === sel, below = h.sn > -0.25;
+      if (!h.has) { ctx.strokeStyle = 'rgba(217,179,108,' + M.labelA * 0.4 + ')'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(h.x, h.y, 3, 0, TAU); ctx.stroke(); }
+      ctx.font = '600 12px ui-monospace,Menlo,Consolas,monospace'; ctx.fillStyle = 'rgba(217,179,108,' + M.labelA * (!h.has ? 0.3 : sl ? 1 : 0.62) + ')';
+      if (h.k !== 0 || sl) ctx.fillText(String(h.k), h.x, below ? h.y + h.r + 16 : h.y - h.r - 8);
+      if (sl && h.has) {
+        ctx.shadowBlur = 0; ctx.strokeStyle = 'rgba(255,110,130,' + M.labelA * 0.95 + ')'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(h.x, h.y, h.r + 6, 0, TAU); ctx.stroke(); ctx.shadowBlur = 6;
+        ctx.font = 'italic 18px "Cormorant Garamond","EB Garamond",Georgia,serif'; ctx.fillStyle = 'rgba(239,230,210,' + M.labelA + ')'; ctx.fillText(mshort(path.concat([h.k])), h.x, h.y + h.r + 37);
+      }
+    });
+    ctx.shadowBlur = 0;
+  }
+  function drawMoons() {
+    if (!inside) return;
+    var Vw = mview(); mstars(Math.log(Vw.k / M.R0) / Math.log(MS));
+    M.hits.length = 0; msystem([], Vw.ox, Vw.oy, Vw.k, 0, -1, 1); mlabels();
+  }
+  function moonsTick(dt) {
+    M.t = performance.now();
+    if (M.tr && M.t - M.tr.t0 >= M.tr.dur) { var d = M.tr.done; M.tr = null; if (d) d(); }
+    SK.dim += (SK.to - SK.dim) * (1 - Math.exp(-dt * 3));
+    if (!inside) return;
+    if (!M.drag) M.v += (M.vT - M.v) * (1 - Math.exp(-dt * 10));
+    M.rotT = Math.PI / 2 - (M.v - 1) * MSTEP;
+    var sw = M.tr && M.tr.swirl ? (1 - mease(clamp((M.t - M.tr.t0) / M.tr.dur, 0, 1))) * 2.6 : 0;
+    M.rot += (M.rotT + sw - M.rot) * (1 - Math.exp(-dt * 12));
+    M.labelA += ((M.tr ? 0 : 1) - M.labelA) * (1 - Math.exp(-dt * (M.tr ? 14 : 5)));
+  }
+  var typeT = null;
+  function typeOut(s) { clearInterval(typeT); var el = $('pline'), i = 0, step = Math.max(3, Math.ceil(s.length / 70)); el.textContent = ''; el.scrollTop = 0; typeT = setInterval(function () { i += step; el.textContent = s.slice(0, i); if (i >= s.length) clearInterval(typeT); }, 16); }
+  /* the card: the address growing a digit at each dive, and that place's words, whole */
+  function mcard() {
+    if (!inside) return;
+    var p = M.cardFocus || sel == null ? path : path.concat([sel]), key = wb.name + '/' + mkey(p) + '/' + (M.cardFocus ? 'f' : 's');
+    $('tup').disabled = !!M.tr; $('tup').textContent = path.length ? 'Up' : 'Back to the sky';
+    $('tin').disabled = !!M.tr || sel == null || !opens(path.concat([sel]));
+    if (key === M.cardKey) return; M.cardKey = key;
+    var w = within(p);
+    $('paddr').textContent = wb.name + (p.length ? ' · ' + address(p) : '') + (w ? '  ·  ' + w + ' within' : '');
+    typeOut(story(nodeOf(p)) || (p.length ? 'Nothing is written here.' : wb.name));
+  }
+  function mnearest(val) { var best = null, bd = 99; kids(path).forEach(function (k) { var d = Math.abs(k - val); if (d < bd) { bd = d; best = k; } }); return best; }
+  function msetV(val) { M.v = M.vT = val; var k = mnearest(val); if (k != null && k !== sel) { sel = k; M.cardFocus = false; pip(MNOTE[k - 1] || 440, 0.05, 0.16); mcard(); } }
+  function mrelease() { if (sel) M.vT = sel; M.cardFocus = false; mcard(); }
+  function mpick(k) { sel = k; if (k) M.vT = k; M.cardFocus = false; pip(k ? MNOTE[k - 1] : 294, 0.05, 0.16); mcard(); }
+  function msetLevel(r0) {
+    var best = null, bs = -9; kids(path).forEach(function (k) { var s = Math.sin(r0 + (k - 1) * MSTEP); if (s > bs) { bs = s; best = k; } });
+    sel = best != null ? best : heart(path) ? 0 : null; M.v = M.vT = sel || 1; M.rotT = Math.PI / 2 - (M.v - 1) * MSTEP; M.rot = M.rotT + mwrap(r0 - M.rotT); M.cardKey = ''; M.cardFocus = true; mcard();
+  }
+  /* coming close to a star: its places open round it as moons */
+  function enterBlock(name, json) {
+    if (inside) return;
+    closeStar(); hideHint();
+    var s = starOf(name), at = s ? s.p : orb.tgt.slice();
+    inside = true; wb = { name: name, root: json, floor: floorOf(json) }; path = []; KC = {}; M.nodes = {}; M.cardKey = ''; M.lastD = null; M.hits.length = 0;
+    flying = true; stage.classList.add('walking');
+    glideTo({ tgt: at.slice(), dist: Math.min(orb.dist, 0.55), pitch: 0.5 }, 2.3, ease);
+    var ks = kids([]); sel = ks.length ? (ks.indexOf(1) >= 0 ? 1 : ks[0]) : heart([]) ? 0 : null; M.v = M.vT = sel || 1; M.rotT = Math.PI / 2 - (M.v - 1) * MSTEP; M.rot = M.rotT + 2.6;
+    M.tr = { A: 'sky', B: [], t0: performance.now(), dur: CALM ? 10 : 2300, dir: 1, swirl: true, done: function () { flying = false; M.cardKey = ''; mcard(); if (!M.seenDive) showHint(opens([]) ? (coarse ? 'Drag to turn the moons. Tap one to read it, tap it again to go in.' : 'Drag to turn the moons. Click one to read it, click it again to go in.') : 'This block is a single line.'); } };
+    M.cardFocus = true; SK.to = DIMIN;
+    $('place').hidden = false; mcard();
+    pip(392, 0.05, 0.5); pip(587, 0.05, 0.6, 0.25); pip(784, 0.04, 0.8, 0.5);
+  }
+  /* from a star's top, Up folds the moons back into the star and returns to the sky */
+  function leaveBlock() {
+    if (!inside) return;
+    var name = wb.name;
+    function finish() {
+      inside = false; wb = null; path = []; sel = null; flying = false; M.tr = null; M.hits.length = 0; SK.to = 1; KC = {};
+      $('place').hidden = true; stage.classList.remove('walking'); hideHint(); touchT = now();
+      var s = starOf(name); glideTo({ tgt: (s ? s.p : orb.tgt).slice(), dist: 1.2, pitch: 0.6 }, 1.6, easeOut);
+    }
+    if (CALM) { finish(); return; }
+    if (M.tr) return;
+    M.cardFocus = true; pip(392, 0.05, 0.3); pip(587, 0.05, 0.4, 0.14);
+    M.tr = { A: 'sky', B: [], t0: performance.now(), dur: 1700, dir: -1, done: finish };
+    SK.to = 1; mcard();
+  }
+  /* Go in: the view falls toward the moon (or into the heart) until it is the body in the centre, its own moons standing round it */
+  function goIn() {
+    if (!inside || M.tr || sel == null) return;
+    var X = path.concat([sel]); if (!opens(X)) { mpick(sel); return; }
+    M.seenDive = true; hideHint(); pip(784, 0.05, 0.3); pip(587, 0.05, 0.4, 0.14); pip(392, 0.05, 0.6, 0.28);
+    var F = path.slice();
+    M.tr = { A: F, B: X, t0: performance.now(), dur: CALM ? 10 : 1500, dir: 1, done: function () { mnode(F).rot = M.rot; var nx = mnode(X), r = nx.ph + performance.now() * 0.001 * nx.om; path = X; msetLevel(r); } };
+    mcard();
+  }
+  function goUp() {
+    if (!inside || M.tr) return;
+    if (!path.length) { leaveBlock(); return; }
+    pip(392, 0.05, 0.3); pip(587, 0.05, 0.4, 0.14);
+    var X = path.slice(), Fp = X.slice(0, -1), nx = mnode(X), d = X[X.length - 1];
+    nx.ph = M.rot - performance.now() * 0.001 * nx.om;
+    path = Fp; M.rot = mnode(Fp).rot; sel = d;
+    if (d) M.v = M.vT = d;
+    else { var best = null, bs = -9; kids(Fp).forEach(function (k) { var sn = Math.sin(M.rot + (k - 1) * MSTEP); if (sn > bs) { bs = sn; best = k; } }); M.v = M.vT = best || 1; }   /* out of a heart: the ring stays as it was left */
+    M.rotT = Math.PI / 2 - (M.v - 1) * MSTEP; M.rot = M.rotT + mwrap(M.rot - M.rotT); M.cardKey = ''; M.cardFocus = false;
+    mcard();
+    M.tr = { A: Fp, B: X, t0: performance.now(), dur: CALM ? 10 : 1250, dir: -1, done: function () { M.cardKey = ''; mcard(); } };
+    mcard();
+  }
+  function moonTap(x, y) {
+    if (!inside || M.tr) return;
+    var b = null, bd = 1e9; M.hits.forEach(function (h) { if (!h.has) return; var d = Math.hypot(x - h.x, y - h.y); if (d < Math.max(26, h.r + 16) && d < bd) { bd = d; b = h; } });
+    if (b) { if (b.k === sel && !M.cardFocus) goIn(); else mpick(b.k); }
+  }
+  function mzoom(dir) { var t = performance.now(); if (M.tr || t - M.lastZoom < 550) return; M.lastZoom = t; if (dir > 0) goIn(); else goUp(); }
+  /* the hand among the moons: a drag spins the orbit, a tap chooses, a pinch dives or climbs */
+  function mdown(e) { var p = at(e); M.pts[e.pointerId] = p; try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* no matter */ } var k = Object.keys(M.pts); if (k.length === 1) M.drag = { x: p[0], t: performance.now(), moved: false, v0: M.v }; else if (k.length === 2) { M.drag = null; var a = M.pts[k[0]], b = M.pts[k[1]]; M.pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]) }; } }
+  function mmove(e) {
+    if (!M.pts[e.pointerId]) return; var p = at(e); M.pts[e.pointerId] = p; var k = Object.keys(M.pts);
+    if (M.pinch && k.length === 2) { var a = M.pts[k[0]], b = M.pts[k[1]], d = Math.hypot(a[0] - b[0], a[1] - b[1]), q = d / M.pinch.d; if (q > 1.28) { mzoom(1); M.pinch.d = d; } else if (q < 0.78) { mzoom(-1); M.pinch.d = d; } }
+    else if (M.drag && !M.tr) { var dx = p[0] - M.drag.x; if (Math.abs(dx) > 8) M.drag.moved = true; if (M.drag.moved && kids(path).length) msetV(clamp(M.drag.v0 + dx / (M.R0 * MSTEP), 1, 9)); }
+  }
+  function mup(e) {
+    if (!M.pts[e.pointerId]) return; var p = M.pts[e.pointerId]; delete M.pts[e.pointerId]; if (Object.keys(M.pts).length < 2) M.pinch = null;
+    if (M.drag) { if (!M.drag.moved && performance.now() - M.drag.t < 450 && e.type === 'pointerup') moonTap(p[0], p[1]); else if (M.drag.moved) mrelease(); M.drag = null; }
+  }
+  $('tup').addEventListener('click', goUp);
+  $('tin').addEventListener('click', goIn);
+
+  /* ── exploring the sky (6.42): a finger turns it, a pinch or the wheel zooms, a tap opens a star's card ── */
+  var elStar = $('starcard'), elSName = $('sname'), elSMeta = $('smeta'), elSLine = $('sline'), elSWalk = $('swalk'), cardWake = 0;
+  var touchT = -99, pts = {}, gest = null, picked = null, LINES_READ = {}, BLOCKS = {}, READING = {}, HEAVY = 600000, lastSky = 0;
+  function at(e) { var r = stage.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
+  function two() { var k = Object.keys(pts); return k.length >= 2 ? [pts[k[0]], pts[k[1]]] : null; }
+  canvas.addEventListener('pointerdown', function (e) {
+    if (inside) { mdown(e); return; }
+    if (flying) return;
+    var p = at(e); pts[e.pointerId] = p;
+    gest = { moved: 0, t: now(), dist: 0, d0: orb.dist, many: Object.keys(pts).length > 1 };
+    try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* no capture, no matter */ }
+    touchT = now(); if (glide) glide = null; stage.classList.add('dragging');
+  });
+  canvas.addEventListener('pointermove', function (e) {
+    if (inside) { mmove(e); return; }
+    if (flying || !pts[e.pointerId] || !gest) return;
+    var p = at(e), was = pts[e.pointerId]; pts[e.pointerId] = p; touchT = now();
+    var pair = two();
+    if (pair) { var dist = Math.max(8, Math.hypot(pair[0][0] - pair[1][0], pair[0][1] - pair[1][1])); if (!gest.dist) { gest.dist = dist; gest.d0 = orb.dist; } else { orb.dist = clamp(gest.d0 * gest.dist / dist, DMIN, DMAX); maybeMoons(); } gest.moved = 99; gest.many = true; return; }
+    var dx = p[0] - was[0], dy = p[1] - was[1]; gest.moved += Math.abs(dx) + Math.abs(dy);
+    if (gest.moved > 8) { orb.yaw += dx * 0.006; orb.pitch = clamp(orb.pitch + dy * 0.005, -1.2, 1.45); hideHint(); }
+  });
+  function lift(e) {
+    if (inside) { mup(e); return; }
+    if (!pts[e.pointerId]) return;
+    var p = pts[e.pointerId]; delete pts[e.pointerId];
+    var left = Object.keys(pts).length; touchT = now();
+    if (gest && !left && !gest.many && gest.moved <= 8 && now() - gest.t < 0.7 && e.type === 'pointerup') tapSky(p[0], p[1]);
+    if (!left) { gest = null; stage.classList.remove('dragging'); } else if (gest) gest.dist = 0;
+  }
+  canvas.addEventListener('pointerup', lift);
+  canvas.addEventListener('pointercancel', lift);
+  canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+  canvas.addEventListener('wheel', function (e) { e.preventDefault(); if (inside) { mzoom(e.deltaY < 0 ? 1 : -1); return; } if (flying) return; if (glide) glide = null; orb.dist = clamp(orb.dist * Math.exp(e.deltaY * 0.0012), DMIN, DMAX); touchT = now(); hideHint(); maybeMoons(); }, { passive: false });
+  function tapSky(x, y) {
+    basis();
+    var best = null, bd = 28, q, i;
+    for (i = 0; i < B3.length; i++) { q = oproj(B3[i].p); if (!q) continue; var d = Math.hypot(q[0] - x, q[1] - y); if (d < bd) { bd = d; best = B3[i]; } }
+    if (best) { if (picked && picked.name === best.name && !elStar.hidden) { walkBlock(best.name); return; } openStar(best); } else closeStar();
+  }
+  function bytesOf(name) { return Number(((index && index.bytes) || {})[name]) || 0; }
+  function kb(n) { if (n >= 1e6) return (n / 1e6).toFixed(1) + ' MB'; var k = n / 1000; return (k < 10 ? k.toFixed(1) : String(Math.round(k))) + ' KB'; }
+  function writtenAt(name) { var w = Date.parse(((index && index.touched) || {})[name] || ''); if (!w) return ''; try { return new Date(w).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }); } catch (e) { return ''; } }
+  function openStar(s) {
+    picked = s; hideHint();
+    glideTo({ tgt: s.p.slice(), dist: Math.min(orb.dist, wide ? 1.4 : 1.2) }, 1.4, ease);
+    var name = s.name, size = bytesOf(name), when = writtenAt(name);
+    elSName.textContent = name; elSMeta.textContent = (size ? kb(size) : '') + (size && when ? '  ·  ' : '') + (when ? 'last written ' + when : ''); elStar.hidden = false;
+    /* on a touch screen the click that follows the tap lands where the card has just appeared: for a third of a second the card
+       takes no presses, so the tap that opened it cannot also press its buttons */
+    elStar.style.pointerEvents = 'none'; clearTimeout(cardWake); cardWake = setTimeout(function () { elStar.style.pointerEvents = ''; }, 350);
+    elSWalk.textContent = size > HEAVY ? 'Go in (' + kb(size) + ' to read)' : 'Go in'; elSWalk.hidden = true;
+    function show(text, walkable) { if (picked && picked.name === name) { elSLine.textContent = text; elSWalk.hidden = !walkable; } }
+    if (LINES_READ[name] != null) { show(LINES_READ[name][0], LINES_READ[name][1]); return; }
+    show('Reading…', false);
+    get(WIRE + '?block=' + encodeURIComponent(name) + '&spindle=0').then(function (j) {
+      var line = tidy(sealed(j) ? '' : lineOf(j)).replace(/\s+/g, ' ').trim(), ok = !sealed(j);
+      if (sealed(j)) line = 'This block is sealed.'; else if (!line) line = 'Nothing is written at the top of this block.'; else if (line.length > 320) line = line.slice(0, 320).replace(/\s+\S*$/, '') + '…';
+      LINES_READ[name] = [line, ok]; show(line, ok);
+    }).catch(function () { show('Pscale could not be reached.', false); });
+  }
+  function closeStar() { picked = null; elStar.hidden = true; }
+  /* coming very close to a star by your own zoom opens it, unless it is a heavy one, which waits to be asked */
+  var MOON_NEAR = 0.3;
+  function nearestToCentre() { basis(); var best = null, bd = 70; B3.forEach(function (s) { var q = oproj(s.p); if (!q) return; var d = Math.hypot(q[0] - BAS.cx, q[1] - BAS.cy); if (d < bd) { bd = d; best = s; } }); return best; }
+  function maybeMoons() { if (inside || flying || orb.dist > MOON_NEAR) return; var s = picked || nearestToCentre(); if (s && bytesOf(s.name) <= HEAVY) walkBlock(s.name); }
+  /* every block is read whole, whatever its size, so that every place in it can be reached */
+  function walkBlock(name) {
+    function go(j) { if (!inside) enterBlock(name, j); }
+    function say(text) { if (picked && picked.name === name) { elSLine.textContent = text; elSWalk.hidden = true; } }
+    if (READING[name]) return;
+    if (BLOCKS[name]) { go(BLOCKS[name]); return; }
+    READING[name] = true; say(bytesOf(name) > HEAVY ? 'Reading the whole block, ' + kb(bytesOf(name)) + '…' : 'Reading the block…');
+    get(WIRE + '?block=' + encodeURIComponent(name), 90000).then(function (j) {
+      delete READING[name];
+      if (sealed(j)) { say('This block is sealed.'); return; }
+      if (j == null || typeof j !== 'object') j = { _: j == null ? '' : String(j) };
+      BLOCKS[name] = j; go(j);
+    }).catch(function () { delete READING[name]; if (picked && picked.name === name) { elSLine.textContent = 'Pscale could not be reached.'; elSWalk.hidden = false; } });
+  }
+  $('sclose').addEventListener('click', closeStar);
+  elSWalk.addEventListener('click', function () { if (picked) walkBlock(picked.name); });
+  function tendSky(t) {
+    var dt = Math.min(0.1, Math.max(0, t - lastSky)); lastSky = t;
+    if (CALM || flying) return;
+    if (inside) { orb.yaw += dt * 0.02; return; }
+    if (!glide && !Object.keys(pts).length && t - touchT > 3) orb.yaw += dt * 0.015;   /* left alone, the sky turns slowly */
+  }
+  function drawPicked(t) {
+    if (inside || !picked || flying) return;
+    var pq = oproj(picked.p); if (pq) { ctx.strokeStyle = 'rgba(232,201,138,.95)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(pq[0], pq[1], 17 + 2 * Math.sin(t * 2), 0, TAU); ctx.stroke(); }
+  }
+  var hintT = 0;
+  function showHint(text) { var e = $('hint'); e.textContent = text; e.classList.add('on'); clearTimeout(hintT); hintT = setTimeout(hideHint, 14000); }
+  function hideHint() { clearTimeout(hintT); $('hint').classList.remove('on'); }
+
+  /* ── keys: among the stars, arrows turn and + and - zoom; in a block, digits choose (0 the heart), Enter goes in, Backspace climbs, Escape leaves ── */
+  document.addEventListener('keydown', function (e) {
+    var el = e.target;
+    if (e.metaKey || e.ctrlKey || e.altKey || (el && (/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || el.isContentEditable))) return;
+    if (!inside) {
+      if (flying) return;
+      if (e.key === 'Escape') { closeStar(); return; }
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); orb.yaw += e.key === 'ArrowLeft' ? 0.08 : -0.08; touchT = now(); }
+      else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') { e.preventDefault(); orb.pitch = clamp(orb.pitch + (e.key === 'ArrowUp' ? 0.06 : -0.06), -1.2, 1.45); touchT = now(); }
+      else if (e.key === '+' || e.key === '=' || e.key === '-') { e.preventDefault(); glide = null; orb.dist = clamp(orb.dist * (e.key === '-' ? 1.15 : 0.87), DMIN, DMAX); touchT = now(); maybeMoons(); }
+      else if (e.key === 'Enter' && picked && el === document.body) { e.preventDefault(); walkBlock(picked.name); }
+      return;
+    }
+    var ks = kids(path);
+    if (/^[0-9]$/.test(e.key)) { var d = Number(e.key); if (d ? ks.indexOf(d) >= 0 : heart(path)) { e.preventDefault(); if (sel === d && !M.cardFocus) goIn(); else mpick(d); } }
+    else if ((e.key === 'ArrowRight' || e.key === 'ArrowLeft') && ks.length) { e.preventDefault(); var i = ks.indexOf(sel); i = clamp((i < 0 ? 0 : i) + (e.key === 'ArrowRight' ? 1 : -1), 0, ks.length - 1); mpick(ks[i]); }
+    else if ((e.key === 'Enter' && el === document.body) || e.key === 'ArrowDown') { e.preventDefault(); goIn(); }
+    else if (e.key === 'Backspace' || e.key === 'ArrowUp') { e.preventDefault(); goUp(); }
+    else if (e.key === 'Escape') { e.preventDefault(); if (!M.tr) { path = []; M.cardKey = ''; } leaveBlock(); }
+  });
+
+  /* ── the frame ── */
+  var visible = true, raf = 0, lastF = 0;
+  function frameLoop() {
+    raf = 0;
+    if (!visible || document.hidden) return;
+    var t = now(), dt = Math.min(0.1, Math.max(0, t - (lastF || t))); lastF = t;
+    moonsTick(Math.min(0.05, dt)); stepGlide(t); musicTick();
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    tendSky(t); drawSky(t, 1); drawPicked(t);
+    if (inside) drawMoons();
+    raf = requestAnimationFrame(frameLoop);
+  }
+  function wake() { lastF = 0; if (!raf) raf = requestAnimationFrame(frameLoop); }
+  document.addEventListener('visibilitychange', function () { if (!document.hidden && AC && soundOn && AC.state !== 'running') quiet(AC.resume()); wake(); });
+  if (window.IntersectionObserver) new IntersectionObserver(function (es) { visible = es[0].isIntersecting; wake(); }).observe(stage);
+  window.addEventListener('resize', resize);
+  if (window.ResizeObserver) new ResizeObserver(resize).observe(stage);
+
+  /* ── what the checks read ── */
+  window.theUniverse = {
+    state: function () { return { stars: B3.length, recent: RECENT.length, inside: inside, block: wb ? wb.name : '', floor: wb ? wb.floor : 0, path: path.slice(), sel: sel, tr: !!M.tr, flying: flying, dist: +orb.dist.toFixed(3), addr: $('paddr').textContent, line: $('pline').textContent, card: elStar.hidden ? '' : elSName.textContent + ' | ' + elSMeta.textContent + ' | ' + elSLine.textContent, walk: !elSWalk.hidden, hint: $('hint').classList.contains('on') ? $('hint').textContent : '', sound: soundOn, notice: !elNotice.hidden }; },
+    star: function (name) { basis(); var s = starOf(name), q = s && oproj(s.p); return q ? { x: q[0], y: q[1], z: q[2] } : null; },
+    look: function (name) { var s = starOf(name); if (s) { orb.tgt = s.p.slice(); orb.dist = 1.2; BAS = null; } return !!s; },
+    moons: function () { return { kids: inside ? kids(path) : [], heart: inside ? heart(path) : false, hits: M.hits.map(function (h) { return { k: h.k, has: h.has, x: Math.round(h.x), y: Math.round(h.y), r: Math.round(h.r) }; }) }; },
+    deepest: function () { if (!wb) return null; var best = []; (function walk(n, p) { if (p.length > best.length) best = p.slice(); if (!n || typeof n !== 'object' || sealed(n) || p.length > 60) return; for (var d = 0; d <= 9; d++) { var c = n[keyOf(d)]; if (c != null && (d || (typeof c === 'object' && heartOfNode(n)))) walk(c, p.concat([d])); } })(wb.root, []); return best; }
+  };
+
+  resize(); readIndex(); wake();
+})();
+</script>
+<noscript><img class="counted" src="https://matthewbushell.goatcounter.com/count?p=/universe/" alt=""></noscript>
+</body>
+</html>

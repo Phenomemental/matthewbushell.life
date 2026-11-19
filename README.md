@@ -10,9 +10,11 @@ the beach too, at `spine:life-work` 8. It is not copied here.
 ## What's here
 
 - `templates/` — the pages, as slots that name addresses in `spine:life-work`. No site words.
-  `the-approach.html` is the one page outside the page map: the film's page, carried whole to
+  `the-approach.html` is a page outside the page map: the film's page, carried whole to
   `/the-approach/` while the site is up, in no menu and no sitemap. It reads `film:the-approach` live in
   the reader's browser; its plan is on the beach at `film:the-approach` 6.5.
+  `universe.html` is carried the same way to `/universe/`: the film page's live sky and moons alone, with no film and
+  no dial, every block read whole and walked as deep as it goes (a nested underscore opens as a place's heart).
 - `the-approach/` — what the film's page plays, copied beside the page by the generator, in the folders of the working
   piece it was ported from (the Claude artifact 'The Approach: the radio'): `clips/` (Mara's and Tom's own moving
   pictures), `poster/` (each clip's first frame), `nar/` (the narrator: the opening o1 to o9, the story r1 to r8,
