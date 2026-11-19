@@ -179,6 +179,18 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
 .csheet .sec{margin-top:26px}
 .cways{display:inline-flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:40px auto 0;padding:10px;border-radius:36px;background:rgba(20,22,34,.9)}
 .credits .cclose{position:absolute;z-index:2;top:calc(14px + env(safe-area-inset-top));right:calc(14px + env(safe-area-inset-right))}
+/* the way out (6.72): 'Explore the pscale universe' stays at the foot of the credits from their first frame; the roll fades beneath it */
+.credits .cexplore{position:absolute;z-index:2;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom));max-width:calc(100% - 28px);padding:0 22px}
+.credits .cexplore.call{animation:invite 2.4s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.credits .cexplore.call{animation:none}}
+.credits::after{content:'';position:absolute;z-index:1;left:0;right:0;bottom:0;height:calc(104px + env(safe-area-inset-bottom));background:linear-gradient(to top,rgba(2,3,8,.92) 50%,rgba(2,3,8,0));pointer-events:none}
+.credits .rollin{padding-bottom:calc(132px + env(safe-area-inset-bottom))}
+/* where the roll comes to rest the last line stands alone over the sky, a small mark saying there is more beneath */
+.credits .clast{position:relative;min-height:100vh;min-height:100svh}
+.credits .clast::after{content:'';position:absolute;left:50%;bottom:calc(114px + env(safe-area-inset-bottom));width:13px;height:13px;margin-left:-7px;border-right:1.5px solid rgba(244,241,234,.5);border-bottom:1.5px solid rgba(244,241,234,.5);transform:rotate(45deg)}
+.xhint{position:absolute;z-index:5;left:16px;right:16px;bottom:calc(var(--tuner) + 16px);margin:0;text-align:center;font-style:italic;font-size:20px;line-height:1.3;color:var(--ink);text-shadow:0 0 10px #000,0 0 4px #000;pointer-events:none;opacity:0;transition:opacity 1.2s}
+.xhint.on{opacity:1}
+.film.credited .xhint,.film.held .xhint{visibility:hidden}
 .film.credited .corner,.film.credited .tuner,.film.credited .wcard,.film.credited .say,.film.credited .fmark,.film.credited .front,.film.credited .starcard,.film.credited .notice,
 .film.credited .station,.film.credited .fwho,.film.credited .diary,.film.credited .centre,.film.credited .thought,.film.credited .over{visibility:hidden}
 
@@ -210,11 +222,12 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
 <article class="wcard" id="wcard" aria-live="polite" hidden><p id="wline"></p></article>
 <div class="mcard" id="mcard" hidden aria-live="polite"><p id="maddr"></p><p id="mline"></p></div>
 <p class="mhint" id="mhint"></p>
+<p class="xhint" id="xhint" aria-live="polite"></p>
 
 <div id="radio">
   <p id="read">· · ·</p>
   <div id="band" role="slider" aria-label="The dial" aria-valuemin="0" aria-valuemax="100" tabindex="0"><div id="needle"></div></div>
-  <div id="btns"><button type="button" id="tup" hidden>Up</button><button type="button" id="stop" aria-pressed="false" hidden>Stop</button><button type="button" id="play" hidden>Play the film</button><button type="button" id="find">Find Mara</button><button type="button" id="skipop" hidden>Skip the opening</button><button type="button" id="tin" hidden>Go in</button></div>
+  <div id="btns"><button type="button" id="tup" hidden>Up</button><button type="button" id="stop" aria-pressed="false" hidden>Stop</button><button type="button" id="play" hidden>Play the film</button><button type="button" id="find">Find Mara</button><button type="button" id="replay" hidden>Play the film again</button><button type="button" id="skipop" hidden>Skip the opening</button><button type="button" id="tin" hidden>Go in</button></div>
 </div>
 
 <p class="notice" id="notice" role="status" hidden><span>Pscale could not be reached.</span> <button type="button" id="again">Try again</button></p>
@@ -286,12 +299,12 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
     </section>
   </div>
   <div class="cways">
-    <button type="button" class="btn red" id="csky">Back to the sky</button>
     <a class="btn" href="{{root}}/">Matthew Bushell’s site</a>
   </div>
 </div>
 </div>
 <button type="button" class="cclose" id="cclose">Close credits</button>
+<button type="button" class="btn red cexplore" id="csky">Explore the pscale universe</button>
 </section>
 
 </main>
@@ -725,7 +738,8 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
     st.textContent = filmOn ? 'Stop this film' : stopped ? 'Back to the film' : 'Stop';
     st.setAttribute('aria-pressed', String(stopped && !filmOn));
     $('skipop').hidden = inside || filmOn || !opening || !introStopped;
-    $('find').hidden = inside || opening || !started;
+    $('find').hidden = inside || opening || !started || done;   /* after the end there is no one to find */
+    $('replay').hidden = !done || inside || filmOn;
     $('tup').hidden = !inside; $('tin').hidden = !inside;
   }
   /* Stop: everything playing stops at once (the narrator, the clip, the static, the whispers, any pips); the radio goes quiet
@@ -751,7 +765,7 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
      and the tuning that was stopped starts again from its beginning and plays on */
   function backToFilm() {
     if (!stopped || filmOn || inside) return;
-    resumeAudio(); stopped = false; quietR = false;
+    resumeAudio(); stopped = false; quietR = false; hideHint();
     var at = stopAt || { f: f };
     LOG.ctl.push({ k: 'back', t: Date.now(), intro: !!at.intro, locked: !!at.locked, pi: pi, introAt: introAt });
     if (at.intro && !introDone) { runIntro(true); var hp = homePose(); glideTo({ tgt: hp.tgt, dist: hp.dist, pitch: hp.pitch }, CALM ? 0.01 : 1.8, ease); }   /* back into the red star */
@@ -865,7 +879,7 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
   /* Play: the view dives into the red star, and the opening is told from there */
   function startFilm() {
     if (started || !begun) return;
-    resumeAudio(); started = true; inviting = false; LOG.play = Date.now();
+    resumeAudio(); started = true; inviting = false; LOG.play = Date.now(); hideHint();
     document.body.classList.remove('prelude'); document.body.classList.add('intro'); $('play').classList.remove('rise');   /* the dial stays hidden from Play to the end of the opening */
     if (filmOn) stopHand(); if (inside) leaveBlock(true); closeStar(); handWins = false; R = null; HS.back = null; layoutButtons();
     /* the dive (6.82): the view rushes at the red star and the title cuts in over black; under the black it holds; as the black lifts
@@ -880,7 +894,7 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
   /* the red star is home: while the film itself plays the view rests on it */
   function homePose(base) { return { tgt: filmPos().slice(), dist: done ? restDist() : HOME_D, yaw: base ? base.yaw : orb.yaw, pitch: done ? 0.55 : 0.5 }; }
   function widePose() { return { tgt: filmPos().slice(), dist: restDist(), yaw: orb.yaw, pitch: 0.55 }; }
-  function camHome() { return started && !stopped && !inside && !filmOn && (intro || mLocked || (done && elCredits.hidden)); }
+  function camHome() { return started && !stopped && !inside && !filmOn && (intro || mLocked); }   /* after the end nothing pulls the view home (6.72) */
   function restHome(t) {
     if (!camHome() || glide || HS.diving || Object.keys(pts).length || t - touchT < 3) return;
     var hp = homePose(), d = Math.hypot(orb.tgt[0] - hp.tgt[0], orb.tgt[1] - hp.tgt[1], orb.tgt[2] - hp.tgt[2]);
@@ -1205,7 +1219,7 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
   /* coming close to a star: its places open round it as moons */
   function enterBlock(name, json) {
     if (inside) return;
-    closeStar(); card(''); radioF = f; stopHand();
+    closeStar(); card(''); radioF = f; stopHand(); hideHint();
     var s = starOf(name), at = name === FILM ? filmPos() : s ? s.p : orb.tgt.slice();
     inside = true; wb = { name: name, root: json, film: name === FILM }; path = []; M.nodes = {}; M.cardKey = ''; M.lastD = null;
     flying = true; hold(true);
@@ -1325,7 +1339,7 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
   }
   function bytesOf(name) { return Number(((index && index.bytes) || {})[name]) || 0; }
   function openStar(s) {
-    picked = s;
+    picked = s; hideHint();
     glideTo({ tgt: s.p.slice(), dist: Math.min(orb.dist, wide ? 1.4 : 1.2) }, 1.4, ease);
     var name = s.name, size = bytesOf(name), isFilm = name === FILM;
     elSName.textContent = s.fic ? name + '  ·  ' + s.fic.title : name; elStar.hidden = false;
@@ -1458,7 +1472,7 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
     elCredits.hidden = false; stage.classList.add('credited'); $('end').style.display = 'none';
     [].forEach.call(elRoll.querySelectorAll('[data-face]'), function (pn) { pn.removeAttribute('data-started'); var c = pn.querySelector('canvas'); c.getContext('2d').clearRect(0, 0, c.width, c.height); });
     faces = []; holds = [].slice.call(elRoll.querySelectorAll('[data-hold]')); holdAt = 0; holdTill = 0; rollStop = false; rollLast = now(); ghostNext = now() + 3;
-    elRoll.scrollTop = 0; rollY = 0; rolling = !CALM; fillCredits(); ['mara', 'tom'].forEach(faceImg);
+    elRoll.scrollTop = 0; rollY = 0; rolling = !CALM; $('csky').classList.remove('call'); fillCredits(); ['mara', 'tom'].forEach(faceImg);
   }
   function closeCredits() { elCredits.hidden = true; rolling = false; stage.classList.remove('credited'); if (cvoice) { cvoice.pause(); cvoice = null; } credHeld = false; hold(false); }
   function rollOn(t) {
@@ -1469,7 +1483,7 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
     for (var i = 0; i < faces.length; i++) drawFace(faces[i], t);
     if (AC && soundOn && t > ghostNext) { play(GHOSTS[Math.floor(Math.random() * GHOSTS.length)], 'credits', 1); ghostNext = t + 4 + Math.random() * 6; }
     if (!rolling || t < holdTill) return;
-    if (rollStop) { rolling = false; return; }
+    if (rollStop) { rolling = false; $('csky').classList.add('call'); return; }
     if (holdAt < holds.length) { var h = holds[holdAt]; if (h.offsetTop + h.offsetHeight / 2 <= mid + 1) { holdTill = t + Number(h.getAttribute('data-hold')); holdAt++; if (h.hasAttribute('data-stop')) rollStop = true; return; } }
     rollY = Math.max(rollY, top) + (wide ? 62 : 50) * dt; elRoll.scrollTop = rollY;   /* kept as a running total: a frame's step is less than a pixel */
     if (rollY + hgt >= elRoll.scrollHeight - 2) rolling = false;
@@ -1483,7 +1497,22 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
   ['pointerdown', 'wheel', 'touchstart', 'keydown', 'focusin'].forEach(function (ev) { elRoll.addEventListener(ev, function () { rolling = false; }, { passive: true }); });
   $('credit').addEventListener('click', function () { openCredits(false); });
   $('cclose').addEventListener('click', closeCredits);
-  $('csky').addEventListener('click', function () { closeCredits(); if (inside) leaveBlock(true); });
+  /* ── the way out (6.72): 'Explore the pscale universe' closes the credits and gives the viewer the whole sky, from the very view the
+        credits were turning over, with one line saying what a tap does. It works whenever the credits are open: after the end, in the
+        middle of the film (which stays stopped, 'Back to the film' in reach), or before Play. ── */
+  var explored = false, hintT = 0;
+  function showHint(text) { var e = $('xhint'); e.textContent = text; e.classList.add('on'); clearTimeout(hintT); hintT = setTimeout(hideHint, 14000); }
+  function hideHint() { clearTimeout(hintT); $('xhint').classList.remove('on'); }
+  function explore() {
+    var t = now(), was = !elCredits.hidden;
+    resumeAudio(); closeCredits(); if (inside) leaveBlock(true); closeStar();
+    if (was) { orb.yaw = 0.6 + t * 0.05; orb.pitch = 0.95; orb.dist = wide ? 2.3 : 2.7; orb.tgt = [0, 0, 0]; BAS = null; }   /* the sky the credits were turning over, so nothing jumps */
+    R = null; HS.back = null; handWins = true; touchT = t; explored = true; LOG.ctl.push({ k: 'explore', t: Date.now() });
+    glideTo({ tgt: [0, 0, 0], dist: wide ? 2.2 : 2.5, pitch: 0.72 }, CALM ? 0.01 : 2.6, ease);
+    showHint('Tap any star to read its block. The sea-green stars play a film.');
+  }
+  $('csky').addEventListener('click', explore);
+  $('replay').addEventListener('click', function () { try { location.reload(); } catch (e) { /* this frame will not reload */ } });
 
   /* ── keys for walking a block: digits go down, Enter goes in, Backspace climbs, Escape leaves ── */
   document.addEventListener('keydown', function (e) {
@@ -1545,7 +1574,7 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
     ring: function () { if (!inside || M.tr) return null; return { pts: M.hits.filter(function (h) { return h.has; }).sort(function (a, b) { return a.k - b.k; }).map(function (h) { return { k: h.k, x: h.x, y: h.y }; }) }; },
     oldring: function () { if (!inside) return null; var ks = kids(path); return { pts: ks.map(function (d, i) { var q = [0, 0]; return { k: d, x: q[0], y: q[1] }; }) }; },
     film: function () { return { src: (elFilm.currentSrc || '').split('/').pop(), t: elFilm.currentTime, paused: elFilm.paused, muted: elFilm.muted }; },
-    credits: function () { return { open: !elCredits.hidden, faces: faces.length, voice: cvoice ? cvoice.src.split('/').pop() : '' }; }
+    credits: function () { return { open: !elCredits.hidden, faces: faces.length, voice: cvoice ? cvoice.src.split('/').pop() : '', explored: explored, hint: $('xhint').classList.contains('on') ? $('xhint').textContent : '', call: $('csky').classList.contains('call'), again: !$('replay').hidden, find: !$('find').hidden }; }
   };
 
   /* ── begin: the veil, the dial waiting behind it ── */
