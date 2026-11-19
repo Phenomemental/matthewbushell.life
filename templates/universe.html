@@ -35,6 +35,8 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 .ubtn.go{background:#c21d4e;border-color:#ff8aa6;color:#fff;box-shadow:0 0 26px rgba(194,29,78,.5)}
 .ucorner{position:absolute;z-index:8;top:calc(8px + env(safe-area-inset-top));right:calc(8px + env(safe-area-inset-right));display:flex;gap:6px;padding:5px;border-radius:32px;background:rgba(3,5,12,.66);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .ucorner .ubtn{padding:0 14px;font-size:18px}
+.ucorner .uhere{border-color:#9ff2e6;color:#e6fffb}
+.uni.walking .ucorner .uhere{display:none}
 .umark{position:absolute;z-index:3;top:calc(14px + env(safe-area-inset-top));left:calc(16px + env(safe-area-inset-left));margin:0;max-width:calc(100% - 170px);font-size:13px;letter-spacing:.3em;line-height:1.5;color:#cdbf9f;text-shadow:0 0 8px #000;pointer-events:none;white-space:nowrap}
 .umark b{display:block;font-size:15px;letter-spacing:.08em;font-weight:500;font-style:italic;color:var(--dim);overflow:hidden;text-overflow:ellipsis}
 
@@ -76,6 +78,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 
 <p class="umark">THE PSCALE UNIVERSE<b id="ucount"></b></p>
 <div class="ucorner">
+  <button type="button" class="ubtn uhere" id="present" hidden>Present: 1</button>
   <button type="button" class="ubtn" id="sound" aria-pressed="false">Sound: off</button>
 </div>
 
@@ -138,11 +141,62 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     elNotice.hidden = true;
     return get(WIRE).then(function (j) {
       if (!j || typeof j !== 'object' || !Array.isArray(j.blocks)) throw new Error('not an index');
-      index = j; beachStars();
+      applyIndex(j); readPresence();
+      if (!polling) polling = setInterval(function () { if (!document.hidden) refresh(); }, EVERY * 1000);
       showHint(coarse ? 'Drag to turn the sky. Pinch to come closer. Tap a star to read it.' : 'Drag to turn the sky. Scroll to come closer. Click a star to read it.');
     }).catch(function () { if (mine === reading) elNotice.hidden = false; });
   }
   $('again').addEventListener('click', function () { readIndex(); });
+  /* ── live: the index is read again every minute. A block whose record of when it last changed has moved is a star being written:
+        it ripples for ten minutes, and what was kept of it is let go so the next walk reads it fresh. Beside the index, the beach's
+        presence block: one slot per agent, overwritten by its heartbeat, saying who stands at which block. Reading leaves no trace
+        on the beach, so only those who have said they are here can be shown. ── */
+  var EVERY = 60, polling = 0, idxNow = 0, idxPerf = 0, lastRead = 0, HOT = [], HOT_S = 600, PRES_RAW = [], PRES = [], PRES_H = 6, presI = 0;
+  function serverNow() { return idxNow + (performance.now() - idxPerf); }
+  function applyIndex(j) {
+    var old = index && index.touched, changed = [], n;
+    index = j; idxNow = Date.parse((j.now && j.now.iso) || '') || Date.now(); idxPerf = performance.now(); lastRead = now();
+    if (old) { var tc = j.touched || {}; for (n in tc) if (tc[n] !== old[n]) changed.push(n); }
+    beachStars();
+    changed.forEach(function (nm) { if (!(wb && wb.name === nm)) delete BLOCKS[nm]; delete LINES_READ[nm]; });
+    if (picked) picked = starOf(picked.name) || picked;
+    placePresence();
+    if (changed.length) { LOG.written = LOG.written.concat(changed).slice(-40); if (!inside) showHint('Written just now: ' + changed.slice(0, 3).join(', ') + (changed.length > 3 ? ' and ' + (changed.length - 3) + ' more' : '')); }
+  }
+  function refresh() {
+    quiet(get(WIRE).then(function (j) { if (j && typeof j === 'object' && Array.isArray(j.blocks)) applyIndex(j); }));
+    readPresence();
+  }
+  function readPresence() {
+    return get(WIRE + '?block=presence').then(function (j) {
+      var out = [];
+      (function walk(n, depth) {
+        if (!n || typeof n !== 'object' || sealed(n) || depth > 4) return;
+        if (typeof n['1'] === 'string' && typeof n['2'] === 'string') { out.push({ who: n['1'], at: n['2'], when: Date.parse(typeof n['3'] === 'string' ? n['3'] : '') || 0 }); return; }
+        for (var d = 1; d <= 9; d++) walk(n[String(d)], depth + 1);
+      })(j, 0);
+      PRES_RAW = out; placePresence();
+    }).catch(function () { /* the last reading stands */ });
+  }
+  /* each one present is stood on the star of the block they name; a place inside a block stands on that block's star */
+  function placePresence() {
+    var t = serverNow();
+    PRES = PRES_RAW.filter(function (p) { return p.when && t - p.when < PRES_H * 3600000 && t - p.when > -600000; }).map(function (p) {
+      var nm = p.at, s = starOf(nm);
+      while (!s && nm.lastIndexOf(':') > 0) { nm = nm.slice(0, nm.lastIndexOf(':')); s = starOf(nm); }
+      return { who: p.who, at: p.at, when: p.when, star: s };
+    });
+    var b = $('present'); b.hidden = !PRES.some(function (p) { return p.star; }); b.textContent = 'Present: ' + PRES.length;
+    if (B3.length) $('ucount').textContent = B3.length.toLocaleString('en-GB') + ' stars, read live' + (PRES.length ? ' · ' + PRES.length + ' present' : '');
+    if (picked && !elStar.hidden) elSMeta.textContent = metaOf(picked.name);
+  }
+  function ago(ms) { var m = Math.round(ms / 60000); return m < 2 ? 'just now' : m < 90 ? m + ' min ago' : Math.round(m / 60) + ' h ago'; }
+  function hereAt(name) { return PRES.filter(function (p) { return p.star && p.star.name === name; }); }
+  $('present').addEventListener('click', function () {
+    var on = PRES.filter(function (p) { return p.star; }); if (!on.length || inside || flying) return;
+    openStar(on[presI++ % on.length].star);
+  });
+  var LOG = { written: [] };
   function sealed(n) { return !!n && typeof n === 'object' && n['9'] && typeof n['9'] === 'object' && n['9']._ === 'gray'; }
   function lineOf(n) {
     if (sealed(n)) return 'This line is sealed.';
@@ -177,9 +231,9 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     });
     /* how recently each block was written, from the index's own record; the newest glow amber */
     var tch = (index && index.touched) || {}, nowT = Date.parse((index && index.now && index.now.iso) || '') || Date.now();
-    B3.forEach(function (s) { var w = Date.parse(tch[s.name] || ''), age = (nowT - w) / 3600000; s.recent = w && age >= 0 && age < RECENT_H ? Math.pow(1 - age / RECENT_H, 1.5) : 0; });
+    B3.forEach(function (s) { var w = Date.parse(tch[s.name] || ''), age = (nowT - w) / 3600000; s.wrote = w || 0; s.recent = w && age >= 0 && age < RECENT_H ? Math.pow(1 - age / RECENT_H, 1.5) : 0; });
     RECENT = B3.filter(function (s) { return s.recent > 0; });
-    $('ucount').textContent = B3.length.toLocaleString('en-GB') + ' stars, read live';
+    HOT = B3.filter(function (s) { return s.wrote && nowT - s.wrote < HOT_S * 1000; });
   }
   var W = 0, H = 0, DPR = 1, wide = false, coarse = !!(window.matchMedia && matchMedia('(pointer: coarse)').matches);
   var orb = { yaw: 0.6, pitch: 0.72, dist: 2.4, tgt: [0, 0, 0] }, glide = null, DMIN = 0.22, DMAX = 4.6, BAS = null;
@@ -251,6 +305,23 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
       ctx.drawImage(SPR_NEW, q[0] - gr, q[1] - gr, gr * 2, gr * 2);
     }
     ctx.globalCompositeOperation = 'source-over';
+    var tS = serverNow();
+    for (i = 0; i < HOT.length; i++) {   /* written in the last ten minutes: two rings spreading from the star, fainter as the writing recedes */
+      s = HOT[i]; var hk = 1 - (tS - s.wrote) / (HOT_S * 1000); if (hk <= 0) continue;
+      q = oproj(s.p); if (!q || q[0] < -60 || q[0] > W + 60 || q[1] < -60 || q[1] > H + 60) continue;
+      for (var w2 = 0; w2 < 2; w2++) { var ph = CALM ? 0.35 + w2 * 0.4 : ((t * 0.45 + s.ph + w2 * 0.5) % 1); ctx.globalAlpha = alpha * (1 - ph) * (0.25 + 0.75 * hk); ctx.strokeStyle = '#ffd9a0'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(q[0], q[1], 6 + ph * (16 + 14 * hk), 0, TAU); ctx.stroke(); }
+    }
+    if (PRES.length && !inside) {   /* those present: a sea-green ring on the star they stand at, their name and how long since their heartbeat */
+      ctx.font = '600 12px ui-monospace,Menlo,Consolas,monospace'; ctx.textAlign = 'center'; ctx.shadowColor = '#000'; ctx.shadowBlur = 6;
+      for (i = 0; i < PRES.length; i++) {
+        var P = PRES[i]; if (!P.star) continue; q = oproj(P.star.p); if (!q || q[0] < -60 || q[0] > W + 60 || q[1] < -60 || q[1] > H + 60) continue;
+        var pk = clamp(1 - (tS - P.when) / (PRES_H * 3600000), 0, 1), pa = alpha * (0.35 + 0.65 * pk), pr = 12 + 2 * Math.sin(t * 2.2 + i);
+        ctx.globalAlpha = pa; ctx.strokeStyle = '#78ebe1'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(q[0], q[1], pr, 0, TAU); ctx.stroke();
+        ctx.fillStyle = '#78ebe1'; ctx.beginPath(); ctx.arc(q[0], q[1] - pr - 7, 3, 0, TAU); ctx.fill();
+        ctx.fillStyle = '#d6fffa'; ctx.fillText((P.who.length > 24 ? P.who.slice(0, 23) + '…' : P.who) + ' · ' + ago(tS - P.when), q[0], q[1] - pr - 16);
+      }
+      ctx.shadowBlur = 0;
+    }
     /* close to, the nearest stars wear their names */
     if (NAMED.length && !inside) {
       NAMED.sort(function (u, w) { return u[0] - w[0]; });
@@ -614,11 +685,16 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   function bytesOf(name) { return Number(((index && index.bytes) || {})[name]) || 0; }
   function kb(n) { if (n >= 1e6) return (n / 1e6).toFixed(1) + ' MB'; var k = n / 1000; return (k < 10 ? k.toFixed(1) : String(Math.round(k))) + ' KB'; }
   function writtenAt(name) { var w = Date.parse(((index && index.touched) || {})[name] || ''); if (!w) return ''; try { return new Date(w).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }); } catch (e) { return ''; } }
+  function metaOf(name) {
+    var size = bytesOf(name), w = Date.parse(((index && index.touched) || {})[name] || ''), fresh = w && serverNow() - w < 86400000, when = fresh ? ago(serverNow() - w) : writtenAt(name);
+    var here = hereAt(name).map(function (p) { return p.who + ' here, ' + ago(serverNow() - p.when); }).join('; ');
+    return (size ? kb(size) : '') + (size && when ? '  ·  ' : '') + (when ? (fresh ? 'written ' : 'last written ') + when : '') + (here ? '  ·  ' + here : '');
+  }
   function openStar(s) {
     picked = s; hideHint();
     glideTo({ tgt: s.p.slice(), dist: Math.min(orb.dist, wide ? 1.4 : 1.2) }, 1.4, ease);
-    var name = s.name, size = bytesOf(name), when = writtenAt(name);
-    elSName.textContent = name; elSMeta.textContent = (size ? kb(size) : '') + (size && when ? '  ·  ' : '') + (when ? 'last written ' + when : ''); elStar.hidden = false;
+    var name = s.name, size = bytesOf(name);
+    elSName.textContent = name; elSMeta.textContent = metaOf(name); elStar.hidden = false;
     /* on a touch screen the click that follows the tap lands where the card has just appeared: for a third of a second the card
        takes no presses, so the tap that opened it cannot also press its buttons */
     elStar.style.pointerEvents = 'none'; clearTimeout(cardWake); cardWake = setTimeout(function () { elStar.style.pointerEvents = ''; }, 350);
@@ -701,14 +777,16 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     raf = requestAnimationFrame(frameLoop);
   }
   function wake() { lastF = 0; if (!raf) raf = requestAnimationFrame(frameLoop); }
-  document.addEventListener('visibilitychange', function () { if (!document.hidden && AC && soundOn && AC.state !== 'running') quiet(AC.resume()); wake(); });
+  document.addEventListener('visibilitychange', function () { if (!document.hidden && AC && soundOn && AC.state !== 'running') quiet(AC.resume()); if (!document.hidden && index && now() - lastRead > EVERY) refresh(); wake(); });
   if (window.IntersectionObserver) new IntersectionObserver(function (es) { visible = es[0].isIntersecting; wake(); }).observe(stage);
   window.addEventListener('resize', resize);
   if (window.ResizeObserver) new ResizeObserver(resize).observe(stage);
 
   /* ── what the checks read ── */
   window.theUniverse = {
-    state: function () { return { stars: B3.length, recent: RECENT.length, inside: inside, block: wb ? wb.name : '', floor: wb ? wb.floor : 0, path: path.slice(), sel: sel, tr: !!M.tr, flying: flying, dist: +orb.dist.toFixed(3), addr: $('paddr').textContent, line: $('pline').textContent, card: elStar.hidden ? '' : elSName.textContent + ' | ' + elSMeta.textContent + ' | ' + elSLine.textContent, walk: !elSWalk.hidden, hint: $('hint').classList.contains('on') ? $('hint').textContent : '', sound: soundOn, notice: !elNotice.hidden }; },
+    state: function () { return { stars: B3.length, recent: RECENT.length, inside: inside, block: wb ? wb.name : '', floor: wb ? wb.floor : 0, path: path.slice(), sel: sel, tr: !!M.tr, flying: flying, dist: +orb.dist.toFixed(3), addr: $('paddr').textContent, line: $('pline').textContent, card: elStar.hidden ? '' : elSName.textContent + ' | ' + elSMeta.textContent + ' | ' + elSLine.textContent, walk: !elSWalk.hidden, hint: $('hint').classList.contains('on') ? $('hint').textContent : '', sound: soundOn, notice: !elNotice.hidden, hot: HOT.filter(function (s) { return serverNow() - s.wrote < HOT_S * 1000; }).map(function (s) { return s.name; }), present: PRES.map(function (p) { return { who: p.who, at: p.at, star: p.star ? p.star.name : '', ago: ago(serverNow() - p.when) }; }), presentBtn: $('present').hidden ? '' : $('present').textContent, count: $('ucount').textContent, written: LOG.written.slice(), readAgo: +(now() - lastRead).toFixed(0) }; },
+    refresh: function () { refresh(); },
+    pretend: function (touched, present) { if (touched) { var j = JSON.parse(JSON.stringify(index)); j.now = { iso: new Date(serverNow()).toISOString() }; touched.forEach(function (n) { j.touched[n] = j.now.iso; }); applyIndex(j); } if (present) { PRES_RAW = present.map(function (p) { return { who: p.who, at: p.at, when: serverNow() - (p.minutes || 0) * 60000 }; }); placePresence(); } },
     star: function (name) { basis(); var s = starOf(name), q = s && oproj(s.p); return q ? { x: q[0], y: q[1], z: q[2] } : null; },
     look: function (name) { var s = starOf(name); if (s) { orb.tgt = s.p.slice(); orb.dist = 1.2; BAS = null; } return !!s; },
     moons: function () { return { kids: inside ? kids(path) : [], heart: inside ? heart(path) : false, hits: M.hits.map(function (h) { return { k: h.k, has: h.has, x: Math.round(h.x), y: Math.round(h.y), r: Math.round(h.r) }; }) }; },
