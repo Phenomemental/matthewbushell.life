@@ -78,6 +78,8 @@ node tests/the-approach/film.js  --size phone --shots /tmp/shots   # the whole f
 node tests/the-approach/hands.js --size phone   # the viewer's controls (film:the-approach 6.6)
 node tests/the-approach/dial.js  --size phone   # the way in, Signal lost, the dial that turns the universe (6.7)
 node tests/the-approach/moons.js --size phone   # the nine moons (6.8)
+node tests/the-approach/out.js   --size phone   # the way out: Explore the pscale universe, and after the end (6.72)
+node tests/the-approach/timing.js --size phone  # the film's own timings, to set one build beside another
 ```
 
 Each takes `--size desktop` and `--url` (the live page, for instance). They need `playwright-core` and an installed Chrome.

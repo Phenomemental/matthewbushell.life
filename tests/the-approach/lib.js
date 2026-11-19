@@ -1,4 +1,4 @@
-// Shared by the check suites of The Approach page (film:the-approach 6.6, 6.7, 6.8, 6.82 on pscale).
+// Shared by the check suites of The Approach page (film:the-approach 6.6, 6.7, 6.72, 6.8, 6.82 on pscale).
 // Headless Chrome through playwright-core (or playwright). APPROACH_CHANNEL=none uses Playwright's own Chromium.
 'use strict';
 let chromium; try { chromium = require('playwright-core').chromium; } catch (e) { chromium = require('playwright').chromium; }
@@ -25,7 +25,7 @@ async function open(o) {
   page.on('requestfailed', r => { if (!/gc\.zgo\.at|goatcounter|ERR_ABORTED/.test(r.url() + (r.failure() ? r.failure().errorText : ''))) failed.push(r.url() + ' ' + (r.failure() ? r.failure().errorText : '')); const u = r.url(); if (!/goatcounter|gc\.zgo/.test(u) && !/ERR_ABORTED/.test(r.failure() ? r.failure().errorText : '')) missing.push('failed ' + u + ' ' + (r.failure() ? r.failure().errorText : '')); });
   // the visit counter is never reached from a check, so a check is never counted as a visit
   await ctx.route(/gc\.zgo\.at|goatcounter\.com/, r => r.abort());
-  await page.goto(o.url, { waitUntil: 'load' });
+  for (let i = 0; ; i++) { try { await page.goto(o.url, { waitUntil: 'load' }); break; } catch (e) { if (i >= 4) throw e; missing.length = 0; failed.length = 0; errors.length = 0; await new Promise(r => setTimeout(r, 3000)); } }   // a dropped connection is tried again
   const T = {
     browser, page, errors, missing, size: sz, o, results: [],
     st: () => page.evaluate(() => window.theApproach.state()),

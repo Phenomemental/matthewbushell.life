@@ -567,6 +567,18 @@ class TheFilmPage(Base):
         for gone in ('the-approach/moments/', 'data-moments', 'id="skip"', 'Walk the film', 'beachsky.js', 'screens_dark', 'tom_one_page'):
             self.assertNotIn(gone, h)
 
+    def test_the_way_out_stands_in_the_credits(self):
+        """6.72: 'Explore the pscale universe' at the foot of the credits in place of 'Back to the sky', 'Play the film again'
+        after the end, and no id used twice (the page finds its buttons by id: 'Try again' and 'Play the film again' are two)."""
+        self.run_with(blocks())
+        h = self.read(self.FILE)
+        self.assertIn('<button type="button" class="btn red cexplore" id="csky">Explore the pscale universe</button>', h)
+        self.assertNotIn('Back to the sky', h)
+        self.assertIn('<button type="button" id="replay" hidden>Play the film again</button>', h)
+        self.assertIn('<button type="button" id="again">Try again</button>', h)
+        ids = re.findall(r'\sid="([^"]+)"', h.split('<script>')[0])
+        self.assertEqual(sorted(set(i for i in ids if ids.count(i) > 1)), [])
+
     def test_the_viewer_can_always_stop_it_and_step_out(self):
         """6.6: a Stop button from Begin to the end card (Back to the film once stopped), a way to skip the rest of the
         opening, and a sky canvas drawn by the graphics chip, not in software."""
