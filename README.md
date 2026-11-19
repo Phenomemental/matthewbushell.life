@@ -79,6 +79,7 @@ node tests/the-approach/hands.js --size phone   # the viewer's controls (film:th
 node tests/the-approach/dial.js  --size phone   # the way in, Signal lost, the dial that turns the universe (6.7)
 node tests/the-approach/moons.js --size phone   # the nine moons (6.8)
 node tests/the-approach/out.js   --size phone   # the way out: Explore the pscale universe, and after the end (6.72)
+node tests/the-approach/begin.js --size phone   # Begin draws you in: the approach, the invitation as it arrives, the sound before the film (6.73)
 node tests/the-approach/timing.js --size phone  # the film's own timings, to set one build beside another
 ```
 

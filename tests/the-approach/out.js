@@ -12,7 +12,7 @@ const near = (a, b, e) => Math.abs(a - b) <= e;
   const REST = W >= 900 ? 2.5 : 2.35, OUT0 = W >= 900 ? 2.3 : 2.7, OUT1 = W >= 900 ? 2.2 : 2.5;
   const A = () => T.ev(() => window.theApproach.state());
   const C = () => T.ev(() => window.theApproach.credits());
-  const pose = () => T.ev(() => { const k = window.theApproach.sky(), s = window.theApproach.state(); return { yaw: k.yaw, dist: k.dist, home: s.home, film: k.film.map(Math.round) }; });
+  const pose = () => T.ev(() => { const k = window.theApproach.sky(), s = window.theApproach.state(); return { yaw: k.yaw, dist: k.dist, home: s.home, film: k.film.map(Math.round), centre: s.centre || [innerWidth / 2, innerHeight * 0.4] }; });
   const btn = () => T.ev(() => { const b = document.getElementById('csky'), r = b.getBoundingClientRect(), c = getComputedStyle(b), top = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
     const g = getComputedStyle(document.getElementById('credits'), '::after');
     const texts = [].slice.call(document.querySelectorAll('#roll p, #roll h2, #roll a, #roll span')).filter(e => e.offsetParent && e.textContent.trim()).map(e => e.getBoundingClientRect()).filter(q => q.bottom > r.top + 4 && q.top < r.bottom - 4 && q.right > r.left && q.left < r.right).length;
@@ -21,7 +21,7 @@ const near = (a, b, e) => Math.abs(a - b) <= e;
   const zoomTo = async (lo, hi) => { for (let i = 0; i < 80; i++) { const s = await A(); if (s.dist >= lo && s.dist <= hi) return; await P.mouse.move(W / 2, H * 0.36); await P.mouse.wheel(0, s.dist < lo ? 200 : -110); await T.sleep(80); } };
   const clearStar = fic => T.ev(fic => { const k = window.theApproach.sky(); return (fic ? k.fictions : k.clear).filter(a => document.elementFromPoint(a.x, a.y) === document.getElementById('sky'))[0] || null; }, !!fic);
   const findStar = async fic => { for (let i = 0; i < 16; i++) { const s = await clearStar(fic); if (s) return s; if (!fic && i === 1) await zoomTo(0.9, 1.2); if (!fic && i === 6) await zoomTo(0.45, 0.6); await dragSky(70); } return null; };   // nearer, until single stars stand clear
-  const still = async (ms) => { const a = await pose(); await T.sleep(ms); const b = await pose(); return { a, b, same: Math.abs(a.dist - b.dist) < 0.004 && Math.hypot(a.film[0] - b.film[0], a.film[1] - b.film[1]) < 0.12 * W }; };
+  const still = async (ms) => { const a = await pose(); await T.sleep(ms); const b = await pose(); const c = b.centre, dA = Math.hypot(a.film[0] - c[0], a.film[1] - c[1]), dB = Math.hypot(b.film[0] - c[0], b.film[1] - c[1]); return { a, b, same: Math.abs(a.dist - b.dist) < 0.004 && !(dB < 24 && dA > 60) }; };   /* nothing pulls the view home: the distance holds and the red star is not brought to the centre (the sky's slow turn may carry it) */
   const begin = async () => { await T.sleep(1300); await T.tap('#go'); await T.sleep(2200); };
 
   // ── before Play: Explore from the credits leaves the invitation working (check 7) ──
