@@ -567,6 +567,12 @@ class TheFilmPage(Base):
         for gone in ('the-approach/moments/', 'data-moments', 'id="skip"', 'Walk the film', 'beachsky.js', 'screens_dark', 'tom_one_page'):
             self.assertNotIn(gone, h)
 
+    def test_a_star_card_does_not_take_the_tap_that_opened_it(self):
+        """On a touch screen the click after a tap lands on the card as it appears; for a moment the card takes no presses."""
+        self.run_with(blocks())
+        h = self.read(self.FILE)
+        self.assertIn("elStar.style.pointerEvents = 'none'; clearTimeout(cardWake); cardWake = setTimeout(function () { elStar.style.pointerEvents = ''; }, 350);", h)
+
     def test_the_way_out_stands_in_the_credits(self):
         """6.72: 'Explore the pscale universe' at the foot of the credits in place of 'Back to the sky', 'Play the film again'
         after the end, and no id used twice (the page finds its buttons by id: 'Try again' and 'Play the film again' are two)."""

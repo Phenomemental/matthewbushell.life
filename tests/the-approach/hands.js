@@ -92,7 +92,22 @@ const near = (a, b, e) => Math.abs(a - b) <= e;
     star = await findStar(false); if (!star) break;
     await T.tapAt(star.x, star.y);
     c = await T.until(() => { const e = document.getElementById('starcard'); return !e.hidden && !/^Reading/.test(document.getElementById('sline').textContent) ? { name: document.getElementById('sname').textContent, walk: !document.getElementById('swalk').hidden } : null; }, 9000);
-    if (tries === 1) { T.ok('a tap on a star opens its card', !!c && c.name.length > 2, c && c.name); await T.shot('h05-star-card-while-stopped'); }
+    if (tries === 1) {
+      T.ok('a tap on a star opens its card', !!c && c.name.length > 2, c && c.name); await T.shot('h05-star-card-while-stopped');
+      // the tap that opens a card cannot also press its buttons: as the card appears it takes no presses, and a moment later it does
+      await T.ev(() => document.getElementById('sclose').click()); await T.sleep(1500);
+      const s2 = await clearStar(false);
+      if (s2) {
+        await T.tapAt(s2.x, s2.y);
+        const under = () => T.ev(() => { const e = document.getElementById('starcard'), b = document.getElementById('sclose').getBoundingClientRect(), t = document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2); return { open: !e.hidden, takes: !!t && e.contains(t) }; });
+        const at0 = await under(); await T.sleep(700); const at1 = await under();
+        T.ok('as a card opens it takes no presses, so the opening tap cannot close it; then it does', at0.open && !at0.takes && at1.open && at1.takes, JSON.stringify([at0, at1]));
+        await T.tap('#sclose'); await T.sleep(300);
+        T.ok('and its close button works', await T.ev(() => document.getElementById('starcard').hidden));
+        await zoomMid(); star = await findStar(false); if (star) await T.tapAt(star.x, star.y);
+        c = await T.until(() => { const e = document.getElementById('starcard'); return !e.hidden && !/^Reading/.test(document.getElementById('sline').textContent) ? { name: document.getElementById('sname').textContent, walk: !document.getElementById('swalk').hidden } : null; }, 9000);
+      }
+    }
     if (c && c.walk) { await T.tap('#swalk'); m = await T.until(() => { const z = window.theApproach.moons(); return z.inside && !z.tr ? z : null; }, 12000); walked = !!m; }
     if (!walked) { console.log('   (not walked: ' + JSON.stringify(c) + ')'); await T.ev(() => document.getElementById('sclose').click()); await zoomMid(); await dragSky(90); }
   }

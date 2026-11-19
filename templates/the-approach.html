@@ -1296,7 +1296,7 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
 
   /* ── exploring the sky (6.42): a finger turns it, a pinch or the wheel zooms, a tap opens a star's card.
         A block the index lists as larger than 40 KB shows its name and size only, never downloaded. ── */
-  var elStar = $('starcard'), elSName = $('sname'), elSLine = $('sline'), elSWalk = $('swalk'), elSFic = $('sfic');
+  var elStar = $('starcard'), elSName = $('sname'), elSLine = $('sline'), elSWalk = $('swalk'), elSFic = $('sfic'), cardWake = 0;
   var touchT = -99, pts = {}, gest = null, picked = null, LINES_READ = {}, BLOCKS = {}, BIG = 40000, lastSky = 0, tapIn = null;
   function at(e) { var r = stage.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
   function two() { var k = Object.keys(pts); return k.length >= 2 ? [pts[k[0]], pts[k[1]]] : null; }
@@ -1343,6 +1343,9 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
     glideTo({ tgt: s.p.slice(), dist: Math.min(orb.dist, wide ? 1.4 : 1.2) }, 1.4, ease);
     var name = s.name, size = bytesOf(name), isFilm = name === FILM;
     elSName.textContent = s.fic ? name + '  ·  ' + s.fic.title : name; elStar.hidden = false;
+    /* on a touch screen the click that follows the tap lands where the card has just appeared: for a third of a second the card takes
+       no presses, so the tap that opened it cannot also press its close button or 'Walk this block' */
+    elStar.style.pointerEvents = 'none'; clearTimeout(cardWake); cardWake = setTimeout(function () { elStar.style.pointerEvents = ''; }, 350);
     elSWalk.textContent = isFilm ? 'Walk into the film' : 'Walk this block'; elSWalk.hidden = !isFilm; elSFic.hidden = !s.fic;
     $('sfilm').hidden = !(isFilm && begun && !started); if (isFilm && begun && !started) invite();
     function show(text, walkable) { if (picked && picked.name === name) { elSLine.textContent = text; if (!isFilm) elSWalk.hidden = !walkable; } }
