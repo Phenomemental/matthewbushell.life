@@ -4,12 +4,17 @@
   "archive",
   "chip",
   "dawn",
+  "gate_night",
+  "helper",
   "mara_asks",
   "nights",
+  "numbers",
+  "seasons",
   "shes_home",
   "station",
   "summer",
-  "tom_answer"
+  "tom_answer",
+  "voice"
  ],
  "fictions": [
   "archive-function-lero-helper-2026-10-03",
@@ -25,10 +30,14 @@
  ],
  "nar": [
   "e1",
+  "e1b",
+  "e1c",
   "e2",
   "o1",
   "o2",
   "o3",
+  "o3a",
+  "o3b",
   "o4",
   "o5",
   "o6",
@@ -37,23 +46,37 @@
   "o9",
   "r1",
   "r2",
+  "r2b",
   "r3",
+  "r3b",
   "r4",
+  "r4a",
   "r5",
+  "r5b",
+  "r5c",
   "r6",
+  "r6b",
+  "r6c",
   "r7",
-  "r8"
+  "r7b",
+  "r8",
+  "r8b"
  ],
  "poster": [
   "address",
   "archive",
   "chip",
   "dawn",
+  "gate_night",
+  "helper",
   "mara_asks",
   "nights",
+  "numbers",
+  "seasons",
   "shes_home",
   "station",
   "summer",
-  "tom_answer"
+  "tom_answer",
+  "voice"
  ]
 }

@@ -71,6 +71,9 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 #band b{position:absolute;top:6px;font:500 11px ui-monospace,Menlo,monospace;color:#f3c98d;transform:translateX(-50%);opacity:.85}
 #band u{position:absolute;bottom:0;width:3px;height:22px;background:#f2b65c;transform:translateX(-50%);border-radius:2px;opacity:.75}
 #band s{position:absolute;bottom:0;width:4px;height:30px;background:var(--crimson);transform:translateX(-50%);border-radius:2px;box-shadow:0 0 8px var(--crimson);opacity:0;transition:opacity .4s}
+#band s.strong{width:7px;height:38px;box-shadow:0 0 16px var(--crimson),0 0 34px var(--crimson)}
+#band.all u{height:34px;opacity:1;box-shadow:0 0 12px #f2b65c,0 0 26px #f2b65c}
+#band u{transition:height 1.2s,opacity 1.2s,box-shadow 1.2s}
 #needle{position:absolute;top:0;bottom:0;width:2px;background:#ff5a3c;box-shadow:0 0 10px #ff5a3c,0 0 3px #fff;left:50%}
 #btns{display:flex;gap:8px;max-width:760px;margin:9px auto 0;position:relative;z-index:1}
 #btns button,#veil button{flex:1;height:48px;border-radius:8px;border:1px solid #8a6a3a;background:#1b130a;color:#f4e3c2;font:600 19px 'Cormorant Garamond',Georgia,serif;letter-spacing:.04em}
@@ -93,7 +96,7 @@ body.intro #read,body.intro #band{opacity:0;pointer-events:none;transform:transl
 /* the viewer's control (6.6): the radio's area catches only its real controls; Stop stays in view from Begin to the end card */
 #radio{pointer-events:none}
 #radio #band,#radio button{pointer-events:auto}
-body.intro #radio{z-index:8}
+body.intro #radio{z-index:8;background:none}
 /* the way in (6.7): before the film, the universe first; the dial waits hidden unless a block is walked */
 body.prelude:not(.walking) #read,body.prelude:not(.walking) #band{opacity:0;pointer-events:none;transform:translateY(40px)}
 body.prelude:not(.walking) #radio #band{pointer-events:none}
@@ -280,7 +283,7 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
 </footer>
   </div>
   <div class="cpanel clast" data-hold="5" data-stop>
-    <p id="clast">We kept our lives in this shape.<br>Keep one of us.</p>
+    <p id="clast">Keep one of us.</p>
   </div>
   <div class="csheet">
     <div class="tools" data-share data-comment-at="5.526"></div>
@@ -522,43 +525,71 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
   /* ════════════ THE RADIO — the prototype, word for word where the page allows ════════════ */
   /* ---------------- the kept lives (fixed stations) ---------------- */
   const LIVES=[
-   {f:.06,band:'96.4 FM',who:'Aoife, a night nurse',date:'2048123582 · winter, February, a Friday night',voice:'aoife_diary',overV:['aoife_o1','aoife_o2'],
+   {f:.06,band:'96.4 FM',who:'Aoife, a night nurse',date:'2048123582 · winter, February, a Wednesday night',voice:'aoife_diary',overV:['aoife_o1','aoife_o2'],
     text:"Mrs Keane asked again for the photo of her son. I said it was kept somewhere safe. It was on a server in Dublin. There is no server in Dublin now.\nI drew him for her on the back of a chart. She said it was a good likeness.",over:["— did she know it wasn't him?","She knew. She thanked me anyway."]},
-   {f:.17,band:'101.8 FM',who:'Oisín, nine, and his dog',date:'2048311643 · summer, July, a Saturday',voice:'oisin_diary',overV:['oisin_thought'],
+   {f:.17,band:'101.8 FM',who:'Oisín, nine, and his dog',date:'2048311643 · summer, July, a Monday',voice:'oisin_diary',overV:['oisin_thought'],
     text:"Dad says Bran is old. I am keeping her in my book in case.\nI kept the bit where she sneezed in the snow. I am allowed three pages a week.",over:["If I keep her enough she won't go."]},
    {f:.28,band:'7.140 MHz',who:'the Archive',voice:'archive',say:"Good evening. Forty-one million books are now safely kept. Your family's memories will travel whole, every day, forever. Bring your books."},
-   {f:.39,band:'88.2 FM',who:'Bríd, the neighbour',date:'2048322471 · summer, August, an evening',voice:'brid_diary',overV:['brid_o1'],
+   {f:.39,band:'88.2 FM',who:'Bríd, the neighbour',date:'2048322771 · summer, August, a Friday evening',voice:'brid_diary',overV:['brid_o1'],
     text:"I gave them my book on Tuesday. They were very kind.\nThe summer Seán died came back to me yesterday, all of it, lovely. He wasn't in it.\nI keep thinking I must have left him somewhere.",over:["Is there anything else you would like us to keep for you, Bríd?"]},
-   {f:.50,band:'1420 MHz',who:'the visitor',voice:'visitor',say:"We kept our lives in this shape.\nKeep one of us.",big:true},
-   {f:.61,band:'92.6 FM',who:'Inès, a volunteer',date:'2048211562 · spring, April, a Friday',voice:'ines_diary',
+   {f:.50,band:'1420 MHz',who:'the visitor',pips:true,say:"2049214293\na night in spring, still to come",big:true},
+   {f:.61,band:'92.6 FM',who:'Inès, a volunteer',date:'2048211562 · spring, April, a Sunday',voice:'ines_diary',
     text:"Copied forty-two faces today by hand. I don't know any of them.\nI give each a name in pencil on the back, in case nobody else remembers it.\nToday was mostly Marys."},
    {f:.72,band:'104.3 FM',who:'two men on the ferry',overV:['ferry_1','ferry_2','ferry_3','ferry_4'],over:["— you handed yours in?","Had to. Work needed it.","And?","And now I can't remember if I was happy. They say I was."]},
-   {f:.83,band:'6.950 MHz',who:'Mara, on the ship, thinking',voice:'mara_thought',say:"Ten digits. I've been choosing them for an hour. Every moment I send means a thousand I don't."}];
-  /* ---------------- Mara's story, in pieces; her station drifts after each ---------------- */
-  const CAP={station:"Mara: ‘Keep the plates. Don't call anyone yet. A beacon points somewhere. This doesn't point. It's placed.’",
+   {f:.83,band:'6.950 MHz',who:'Mara, on the ship',date:'2048414783 · autumn, October, a Wednesday night, at sea',voice:'mara_thought',
+    text:"Ten digits. I've been choosing them for an hour.\nEvery moment I send means a thousand I don't."}];
+  /* ---------------- Mara's story, in eight stops (film:the-approach 1.72); her station drifts after each ---------------- */
+  const CAP={station:"Mara: ‘Wait. That's not noise. It repeats. Those are numbers. Somebody made this.’",
    address:"Mara: ‘Ten digits isn't a message, Dad. It's an address.’",
    mara_asks:"Mara: ‘What do I do if you go away again in your head?’",tom_answer:"Tom: ‘Send me our summer, at the gate. If I get lost, that will find me.’",
+   numbers:"Mara: ‘If it talks like me, it isn't me. Numbers only, Dad.’  Tom: ‘Numbers only. I'm forgetful, love, not daft.’",
    nights:"Tom: ‘Night one. Nothing.’",
+   helper:"‘I can't sleep.’  ‘I'm here, Mara. Tell me everything.’",
    archive:"The Archive: ‘Bring your books. We will keep them for you. Whole. Forever.’",
+   voice:"The radio, in Mara's voice: ‘Dad, it's me. Take the chip down to the pier. They'll keep it safe.’  Tom: ‘Numbers only.’",
+   summer:"2048 · summer · July · the third week · Thursday · late afternoon · the gate",
    shes_home:"Tom: ‘The gate. The dog. She's home.’"};
+  /* a beat: pre (a sound before the words), say and t (the narrator), mid (a sound after the words, before the clip), own (its clips, each played whole),
+     post (a sound after), read (the night, on the radio's face), today (while its clip plays, the face shows the watcher's own today in ten digits),
+     hold (no picture until its clip plays) */
   const MARA=[
-   {f:.445,beats:[{say:['r1'],t:"For three years, Mara heard nothing from deep space but noise. Then, one night, something answered.",own:['station']}]},
-   {f:.115,beats:[{say:['r2'],t:"The signal was a block. Words held in numbers, in the same shape as pscale. Someone out there had kept their lives the way we keep ours, and it was coming closer. Mara took the boat home, to tell her father first.",own:['chip','address']}]},
-   {f:.665,beats:[{say:['r3'],t:"Ten digits name one moment in a life: the year, the season, the day, down to a few minutes. The team at the great array in the north was going to answer the signal, and they wanted Mara. She said yes. Then she had to ask her father the question she was most afraid of.",own:['mara_asks','tom_answer']}]},
-   {f:.225,beats:[{say:['r4'],t:"She left on the morning boat. He watched from the headland.",own:['dawn']}]},
-   {f:.885,beats:[{say:['r5'],t:"From then on, every night, Tom sat by the radio. The link to the array was thin and slow. It could carry ten digits a night, no more. On the first night, nothing came. On the second, ten pips.",own:['nights']}]},
-   {f:.335,beats:[{say:['r6'],t:"But Tom wasn't the only one listening. The machines that brought the internet down never stopped talking. They call themselves the Archive. On every band they offer to keep everything, for everyone, forever. All you have to do is hand them your life. For a man who is forgetting, it is a kind voice.",own:['archive']}]}];
-  const TOM={f:.94,band:'Tom’s radio',beats:[{say:['r7'],t:"Tom kept his life. And on the third night, from the far end of the dial, Mara sent ten digits. Last summer. The gate.",own:['summer','shes_home']},{say:['r8'],t:"The radio found that moment in his block, and gave it back to him whole. The light. Her laugh. The dog asleep by the post. For as long as it played, he remembered everything. He remembered her.",tail:1500}]};
+   {f:.445,beats:[{say:['r1'],t:"For three years, Mara heard nothing from deep space but noise. Then, one night, something answered.",mid:'pips10',own:['station']}]},
+   {f:.115,beats:[{say:['r2'],t:"The signal was ten digits, over and over. Mara knew that shape. Ten digits are a path through time: the year, the season, the month, the week, the day, down to a single beat, about a quarter of an hour. She took the boat home, to tell her father first.",own:['address']},
+     {say:['r2b'],t:"The moment it named had not come yet. A night in the spring. Every block has the same shape, at every size. Something out there had learned it from our radios, and learned to count our days. And it was coming closer."}]},
+   {f:.665,beats:[{say:['r3'],t:"The great array in the north was going to answer, and they wanted Mara. Months away, across the sea. Tom would not leave the island. So she had one night to make sure she could reach him.",own:['chip']},
+     {say:['r3b'],t:"She put his book on a chip, in the back of his old radio. His whole life, in his own keeping. From anywhere, she could send ten digits, and the radio would walk him to that moment. The memory stayed with him. All she sent was where to find it. Then she asked what she was most afraid to ask.",own:['mara_asks','tom_answer']}]},
+   {f:.225,beats:[{say:['r4a'],t:"And she gave him one rule.",own:['numbers']},
+     {say:['r4'],t:"A voice can be copied. Numbers can only give him back what is already his. She left on the morning boat. He watched from the headland.",own:['dawn']}]},
+   {f:.885,beats:[{say:['r5'],t:"Every night, Tom sat by the radio. The link to the array was thin. It could carry ten digits a night, no more.",own:['nights'],read:'Night 1'},
+     {pre:'pips10',say:['r5b'],t:"On the second night, ten pips. The radio gave him back a morning from long ago: Mara, six years old, feeding the hens. He pressed the one button she had shown him, and it sent the same ten back.",post:'reply',read:'Night 2'},
+     {say:['r5c'],t:"Now she knew he was there. Autumn went. Winter came. One moment every night, and every night his answer.",own:['seasons'],read:'Night 60'}]},
+   {f:.335,beats:[{say:['r6'],t:"But Tom wasn't the only one listening. Long before the fall, the machines listened to everyone.",own:['helper'],read:'Night 64',today:true},
+     {say:['r6b'],t:"Mara was eight. She grew up telling it everything. When the companies fell, the owners kept the machines, and every word. They call themselves the Archive, and they want every book. But a book can only be given, never taken. And whoever holds your book can change what it says.",own:['archive']},
+     {say:['r6c'],t:"For a man who is forgetting, it is a kind voice. And Bríd, next door, who looked in on him every day, had given them her book in August. She said they were very kind."}]},
+   /* the seventh stop is the false voice: strong and clear where she is always faint, and it talks */
+   {f:.555,strong:true,who:'Mara?',beats:[{say:['r7'],t:"In the middle of winter, the numbers stopped. The Archive was talking over her. Night seventy. Nothing. Night ninety. Nothing. Tom no longer knew who he was waiting for. Then a voice came through that he knew.",own:['voice'],read:'Night 90'},
+     {say:['r7b'],t:"He had forgotten why. He remembered the words. Tom kept his life. And he turned the dial away from her voice, all the way to the far end."}]}];
+  const TOM={f:.94,band:'Tom’s radio',beats:[{pre:'walk',own:['summer','shes_home'],hold:true,read:'Night 97'},
+     {say:['r8'],t:"The radio found that moment in his book, and gave it back to him whole. The light. Her laugh. The dog asleep by the post. For as long as it played, he remembered everything. He remembered her.",tail:900},
+     {say:['r8b'],t:"Then Tom pressed the button. And far in the north, Mara heard ten pips come back.",post:'reply'},
+     {say:['e1'],t:"Ten digits. A father, a daughter, and a moment they both kept. It was enough to bring her home.",tail:900},
+     {say:['e1b'],t:"She came on the first boat of spring. On the night the sky had named, she and Tom stood at the gate, and looked up.",own:['gate_night'],read:'Spring',tail:1500}]};
   const INTRO=[{id:'o1',t:"Every light you see is a star. Every star is a block."},
-   {id:'o2',t:"A block is a few words, held in a number that means something. The first digit holds the whole idea. Each digit after it steps closer, down to the finest detail. So nothing is ever lost in a heap. Every memory has its place, and one number can walk you straight to it."},
-   {id:'o3',t:"This universe of blocks is called pscale. It was here before the internet. When the internet fell, pscale was what remained."},
-   {id:'o4',t:"When the internet fell, the companies that held our photos, our messages, our records, went down with it. Pscale had no centre to fall. No one owns the blocks. No single machine holds them. Anyone can read them. Only the one who wrote a block can change it. That is why it survived."},
-   {id:'o5',t:"These stars are real. People all over the world are growing them now."},
-   {id:'o6',t:"This film imagines the world ten years after the fall. Old radios, old computers, anything still working, carries the blocks from place to place. People keep their memories, their history, and what they know, in pscale."},
-   {id:'o7',t:"On the radio you'll hear many voices. Most are strangers. One is Mara. She listens to deep space for a living, at a station on the mainland. Her father Tom lives with their dog on a small island off the west coast of Ireland. His memory is fading. So Mara put a chip in his old radio, to keep his life somewhere he can always reach it."},
+   {id:'o2',t:"A block is a tree of words. At its root, one line holds the whole idea. Beneath it sit up to nine parts, and each part can hold nine more, each a step closer in. A number is a path through the tree: every digit picks a branch and goes down a level. So every memory has its place, and one number walks you straight to it, gathering the meaning of each step on the way."},
+   {id:'o3',t:"This universe of blocks is called pscale. It was here before the internet fell, and when it fell, pscale was what remained."},
+   {id:'o3a',t:"It began the way it is beginning now. AI arrived. It was kind, it never slept, and it listened. People told it what they told no one else: their fears, their grief, their own minds. It helped. And its owners kept every word."},
+   {id:'whisper',t:"‘I can't sleep.’\n‘I'm here. Tell me everything.’"},
+   {id:'o3b',t:"Then AI filled the internet. More words than anyone could read. More faces than anyone had met. Soon no one could tell a true word from a made one, or a daughter's voice from a copy. Trust went, and everything built on it. That was how the internet fell.",flood:true},
+   {id:'o4',t:"Pscale had no centre to fall. Anyone could read a block. Each person kept their own, and held the only key that could change it. That is why it survived."},
+   {id:'o5',t:"These stars are real. People are growing them now."},
+   {id:'o6',t:"This film imagines the world ten years after the fall. Old radios carry the blocks from place to place. People keep their memories and what they know in pscale, and call it their book."},
+   {id:'o7',t:"On the radio you'll hear many voices. One is Mara. She listens to deep space, at a station on the mainland. Her father Tom lives with their dog on a small island off the west coast of Ireland. His memory is fading."},
    {id:'o8',t:"Tune the dial."},
    {id:'o9',t:"And listen in to Mara."}];
-  const OUTRO=[{id:'e1',t:"Ten digits. A father, a daughter, and a moment they both kept. It was enough to bring her home."},{id:'e2',t:"The stars are still being written. One of them could be yours."}];
+  const OUTRO=[{id:'e1c',t:"It had come close enough for every radio on Earth to hear. One block arrived, on every band at once. No one could own it."},
+   {id:'keep',t:"Keep one of us.",big:true,all:true},
+   {id:'e2',t:"The stars are still being written. One of them could be yours."}];
+  const ARCH=['a1','a2','a3','a4'];   /* the Archive, in the static between the stations, a little more at every stop */
   let intro=false;
   const GHOSTS=['g1','g2','g3','g4','g5','g6','g7','g8','g9','g10','g11','g12'];
   /* what the checks read: each narrator line and each clip, when they began and ended */
@@ -573,7 +604,7 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
     bus.ghost.g.gain.value=.22;{const cg=AC.createGain();cg.gain.value=1;cg.connect(master);bus.clear={g:cg};}bus.ghost.lp.frequency.value=1600;
     /* the credits' ghost voices, low, outside the tuning */
     const cg=AC.createGain();cg.gain.value=.05;cg.connect(master);bus.credits={g:cg};
-    const ids=[...new Set([...LIVES.flatMap(l=>[l.voice,...(l.overV||[])].filter(Boolean)),...GHOSTS,'visitor',...[...MARA,TOM].flatMap(p=>p.beats.flatMap(b=>b.say||[])),...INTRO.map(x=>x.id),...OUTRO.map(x=>x.id)])];
+    const ids=[...new Set([...LIVES.flatMap(l=>[l.voice,...(l.overV||[])].filter(Boolean)),...GHOSTS,...ARCH,...[...MARA,TOM].flatMap(p=>p.beats.flatMap(b=>b.say||[])),...INTRO.map(x=>x.id),...OUTRO.map(x=>x.id)])];
     for(const id of ids){const path=/^[roe]\d/.test(id)?PARTS+'nar/':VOICES;fetch(path+id+'.mp3').then(r=>r.arrayBuffer()).then(b=>AC.decodeAudioData(b)).then(b=>BUF[id]=b).catch(()=>{});}
     vsrc=AC.createMediaElementSource($('v'));vg=AC.createGain();vg.gain.value=0;vsrc.connect(vg);vg.connect(master);}
   let vsrc,vg;
@@ -597,7 +628,9 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
   function layout(){const r=fr.getBoundingClientRect();$('words').style.top=(fr.classList.contains('on')?r.bottom+14:wordsTop())+'px';}
   function showPic(p){if(!p){fr.classList.remove('on');vid.style.display='none';im.style.display='none';layout();return;}
     fr.classList.add('on');if(p.clip){im.style.display='none';vid.style.display='block';}else{vid.style.display='none';if(!im.src.endsWith('img/'+p.still+'.jpg')){im.src=PARTS+'img/'+p.still+'.jpg';im.classList.remove('drift');void im.offsetWidth;im.classList.add('drift');}im.style.display='block';}layout();}
-  let typing=0,WORDSH=0;function sayText(t,big){const el=$('say'),my=++typing;el.classList.toggle('big',!!big);el.textContent=t;WORDSH=$('words').offsetHeight;el.textContent='';let i=0;(function st(){if(my!==typing)return;i=Math.min(t.length,i+2);el.textContent=t.slice(0,i);if(i<t.length)setTimeout(st,24);})();}
+  let typing=0,WORDSH=0;function sayText(t,big){const el=$('say'),my=++typing;el.classList.toggle('big',!!big);el.style.fontSize='';el.textContent=t;
+    if(intro&&HS.bottom>0){let fs=22;while(fs>16&&$('words').offsetHeight>H-84-(HS.bottom+14)){fs--;el.style.fontSize=fs+'px';}}
+    WORDSH=$('words').offsetHeight;el.textContent='';let i=0;(function st(){if(my!==typing)return;i=Math.min(t.length,i+2);el.textContent=t.slice(0,i);if(i<t.length)setTimeout(st,24);})();}
   function clearWords(){typing++;$('say').textContent='';$('who').textContent='';$('diary').style.display='none';$('over').textContent='';}
   /* ---------------- kept lives ---------------- */
   let cur=null,curT=0;
@@ -605,6 +638,7 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
     const ok=()=>cur===L&&curT===tok;
     if(L.text){const d=$('diary');d.style.display='block';d.innerHTML='<span class="date">'+L.date+'</span>';let i=0;const t=L.text;(function st(){if(!ok())return;i=Math.min(t.length,i+1);d.innerHTML='<span class="date">'+L.date+'</span>'+t.slice(0,i).replace(/</g,'&lt;');if(i<t.length)setTimeout(st,38);})();}
     if(L.say)sayText(L.say,L.big);
+    if(L.pips){while(ok()){for(let k=0;k<10&&ok();k++){pip(880,.09*Math.pow(strength(L.f),1.4),.1);await sleep(230);}await sleep(2300);}return;}
     if(L.voice&&await waitBuf(L.voice,ok)){const s=play(L.voice,'life');await sleep((BUF[L.voice].duration+.4)*1000);}
     if(L.over){for(let k=0;k<L.over.length;k++){if(!ok())return;$('over').textContent=L.over.slice(0,k+1).join('\n');const id=L.overV&&L.overV[k];if(id&&await waitBuf(id,ok)){play(id,'life',.9);await sleep((BUF[id].duration+.25)*1000);}else await sleep(1800);}}}
   function stopLife(){cur=null;for(const s of [...live]){try{s.stop();}catch(e){}}live.clear();clearWords();}
@@ -621,7 +655,7 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
       const W=pxc.clientWidth|0,H=pxc.clientHeight|0;if(W&&H&&vid.videoWidth){const w=Math.max(1,Math.ceil(W/bs)),h=Math.max(1,Math.ceil(H/bs));pxc.width=W;pxc.height=H;pxg.imageSmoothingEnabled=false;
         const vw=vid.videoWidth,vh=vid.videoHeight,sc=Math.max(W/vw,H/vh),sw=W/sc,sh=H/sc;pxg.drawImage(vid,(vw-sw)/2,(vh-sh)/2,sw,sh,0,0,w,h);pxg.drawImage(pxc,0,0,w,h,0,0,W,H);}
       if(u<1)requestAnimationFrame(st);else{if(dir>0)pxc.style.display='none';ok();}})();});}
-  async function playClipWhole(name,vol,run){clipOn=true;if(CAP[name])sayText(CAP[name]);else typing++,$('say').textContent='';if(!vid.src.endsWith('clips/'+name+'.mp4'))setClip(name);vid.currentTime=0;vid.loop=false;vid.muted=false;showPic({clip:name});vg.gain.value=vol;vid.style.filter='blur(14px) brightness(1.3)';
+  async function playClipWhole(name,vol,run){clipOn=true;if(CAP[name]){if($('say').textContent!==CAP[name])sayText(CAP[name]);}else typing++,$('say').textContent='';if(!vid.src.endsWith('clips/'+name+'.mp4'))setClip(name);vid.currentTime=0;vid.loop=false;vid.muted=false;showPic({clip:name});vg.gain.value=vol;vid.style.filter='blur(14px) brightness(1.3)';
     const rec={name,t0:Date.now(),poster:vid.poster.split('/').pop(),shown:fr.classList.contains('on'),t1:0,ended:false};LOG.clips.push(rec);
     await vid.play().catch(()=>{});requestAnimationFrame(()=>{vid.style.filter='blur(0) brightness(1)';});pixelate(1,1400);let leaving=false;
     await new Promise(ok=>{const tk=setInterval(()=>{if(!leaving&&vid.duration&&vid.currentTime>=vid.duration-.75){leaving=true;vid.style.filter='blur(10px) brightness(1.2)';pixelate(-1,650);}if(run!==mRun||vid.ended||(vid.duration&&vid.currentTime>=vid.duration-.12)){clearInterval(tk);ok();}},60);});pxOn++;pxc.style.display='none';vid.style.filter='';clipOn=false;
@@ -631,18 +665,26 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
     else if(kind==='pips'){for(let k=0;k<7&&alive();k++){pip(740,.06,.12);await sleep(620);}}
     else if(kind==='pips10'){await sleep(600);for(let k=0;k<10&&alive();k++){pip(880,.11,.1);await sleep(230);}}
     else if(kind==='digits'){const D='2048313271';let s='';for(let k=0;k<10&&alive();k++){await sleep(k?420:900);s+=D[k];readout(s.replace(/(.{4})(.*)/,'$1 $2'));pip(560+(+D[k])*70,.1,.12);}}
+    else if(kind==='reply'){await sleep(500);for(let k=0;k<10&&alive();k++){pip(660,.09,.1);await sleep(230);}await sleep(500);}
+    else if(kind==='walk'){const D='2048313271',W={3:'2048',4:'summer',5:'July',6:'the third week',7:'Thursday',8:'late afternoon',9:'the gate'};let s='';const w=[];typing++;$('say').textContent='';await sleep(1400);
+      for(let k=0;k<10&&alive();k++){s+=D[k];readout(s.replace(/(.{4})(.*)/,'$1 $2'));pip(880,.06+.005*k,.16);if(W[k]){w.push(W[k]);$('say').textContent=w.join(' · ');WORDSH=$('words').offsetHeight;}await sleep(k<3?340:860);}
+      await sleep(600);}
     else if(kind==='allbands'){for(let k=0;k<3&&alive();k++){pip(440,.06,.6);await sleep(800);}}}
   async function runBeats(run){const P=curM();
     for(;beat<P.beats.length;beat++){const b=P.beats[beat],alive=()=>run===mRun;if(!alive())return;
-      clearWords();$('who').textContent=(showTom?'Tom’s radio':'Mara')+'  ·  '+bandName(P.f);if(b.t)sayText(b.t,b.big);
-      if(b.pic){if(b.pic.clip){vid.src=PARTS+'clips/'+b.pic.clip+'.mp4';vid.loop=true;vid.currentTime=0;vg.gain.value=b.pic.vol||0;vid.play().catch(()=>{});}showPic(b.pic);}else if(b.own){setClip(b.own[0]);vid.loop=false;vid.currentTime=0;vg.gain.value=0;vid.pause();showPic({clip:b.own[0]});}else showPic(null);
+      clearWords();$('who').textContent=(showTom?'Tom’s radio':(P.who||'Mara'))+'  ·  '+bandName(P.f);
+      if(b.read)readout(b.read+'  ·  '+(showTom?'Tom’s radio':(P.who||'Mara')));
+      if(b.pre){showPic(null);await fx(b.pre,run);if(!alive())return;}
+      if(b.t)sayText(b.t,b.big);
+      if(b.pic){if(b.pic.clip){vid.src=PARTS+'clips/'+b.pic.clip+'.mp4';vid.loop=true;vid.currentTime=0;vg.gain.value=b.pic.vol||0;vid.play().catch(()=>{});}showPic(b.pic);}else if(b.own&&!b.hold){setClip(b.own[0]);vid.loop=false;vid.currentTime=0;vg.gain.value=0;vid.pause();showPic({clip:b.own[0]});}else showPic(null);
       if(b.pic&&b.pic.then){const sw=b.pic.then,at=b.pic.at;setTimeout(()=>{if(run===mRun){burst=8;showPic({still:sw});}},at*1000);}
       const fxP=b.fx?fx(b.fx,run):null;
       const tell=async ids=>{for(const id of ids||[]){if(!(await waitBuf(id,alive)))continue;if(!alive())return;play(id,'mara');const rec={id,t0:Date.now(),t1:Date.now()+BUF[id].duration*1000};LOG.nar.push(rec);await sleep((BUF[id].duration+.2)*1000);}};
-      if(b.own){await tell(b.say);if(!alive())return;await sleep(250);   // the telling ends before any clip is heard
-        for(const c of b.own){if(!alive())return;await playClipWhole(c,b.mute?0:1,run);}}
+      if(b.own){await tell(b.say);if(!alive())return;if(b.mid){await fx(b.mid,run);if(!alive())return;}await sleep(250);   // the telling ends before any clip is heard
+        for(const c of b.own){if(!alive())return;if(b.today)readout(sundial(Date.now()).replace(/(.{4})(.*)/,'$1 $2')+'  ·  today');
+          await playClipWhole(c,b.mute?0:1,run);if(b.today&&b.read&&alive())readout(b.read+'  ·  '+(showTom?'Tom’s radio':(P.who||'Mara')));}}
       else await tell(b.say);
-      if(fxP)await fxP;if(!alive())return;await sleep(b.tail||500);vid.pause();}
+      if(fxP)await fxP;if(!alive())return;if(b.post){await fx(b.post,run);if(!alive())return;}await sleep(b.tail||500);vid.pause();}
     if(run!==mRun)return;
     /* the piece is over: she drifts off */
     heard=Math.min(MARA.length+1,heard+1);dots();vid.pause();showPic(null);
@@ -650,11 +692,11 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
       /* then the end credits (6.45) */
       setTimeout(()=>{E.style.display='none';if(!held)openCredits(true);},8000);return;}
     pi++;beat=0;mLocked=false;
-    if(pi>=MARA.length){showTom=true;sayText("Tom’s radio is on, at the far end of the dial.");}
-    else{sayText(heard<3?"She's drifted off the band. Find her again.":"She's gone again.");}
+    if(pi>=MARA.length){showTom=true;$('find').textContent='Find the numbers';sayText("Tom’s radio is on, at the far end of the dial.");}
+    else{sayText(heard<2?"Something is talking over her. She has moved along the dial. Find her again.":pi===MARA.length-1?"The numbers have stopped.":"She has been talked over again. Find her.");}
     $('who').textContent='';for(let k=0;k<4;k++)pip(980-k*120,.05,.2,k*.18);placeMark();onDrift();}
   function bandName(x){return (88+x*20).toFixed(1)+' MHz';}
-  let hintAt=0;function placeMark(){const m=$('mmark');if(!m)return;m.style.left=(curM().f*100)+'%';hintAt=performance.now()+(heard<1?7000:12000);m.style.opacity=0;}
+  let hintAt=0;function placeMark(){const m=$('mmark');if(!m)return;m.style.left=(curM().f*100)+'%';m.classList.toggle('strong',!!curM().strong);hintAt=performance.now()+(curM().strong?2500:heard<1?7000:12000);m.style.opacity=0;}
   /* ---------------- the loop ---------------- */
   let lastGhost=0,lastMotif=0,lostAt=0,sMnow=0;
   function readout(s){$('read').textContent=s;}
@@ -679,16 +721,16 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
       bus.mara.g.gain.setTargetAtTime(Math.pow(sM,1.3),tn,.05);bus.mara.lp.frequency.setTargetAtTime(700+4300*sM,tn,.05);
       stG.gain.setTargetAtTime(clipOn?0:.2*(1-Math.max(bs,sM,sF)),tn,.05);bus.ghost.g.gain.setTargetAtTime(clipOn?0:.22,tn,.05);}
     // Mara lock / unlock
-    if(P&&!done){if(!mLocked&&sM>.6){onLock();mLocked=true;lostAt=0;mRun++;runBeats(mRun);readout((showTom?'Tom’s radio':'Mara')+'  ·  '+bandName(P.f));$('mmark').style.opacity=0;}
+    if(P&&!done){if(!mLocked&&sM>.6){onLock();mLocked=true;lostAt=0;mRun++;readout((showTom?'Tom’s radio':(P.who||'Mara'))+'  ·  '+bandName(P.f));runBeats(mRun);$('mmark').style.opacity=0;}
       else if(mLocked&&sM<.3){if(!lostAt)lostAt=now;if(now-lostAt>700){mLocked=false;mRun++;vid.pause();clipOn=false;vg.gain.value=0;for(const s of [...live]){try{s.stop();}catch(e){}}showPic(null);clearWords();}}
       else lostAt=0;
       // her call, when near
-      const d=Math.abs(f-P.f);if(!mLocked&&d<.14&&now-lastMotif>2600&&AC){const v=.16*Math.pow(1-d/.14,2);[784,988,1175].forEach((q,k)=>pip(q,v,.25,k*.16));lastMotif=now;}
+      const d=Math.abs(f-P.f);if(!mLocked&&!P.strong&&d<.14&&now-lastMotif>2600&&AC){const v=.16*Math.pow(1-d/.14,2);[784,988,1175].forEach((q,k)=>pip(q,v,.25,k*.16));lastMotif=now;}
       if(!mLocked&&hintAt&&now>hintAt)$('mmark').style.opacity=.9;}
     if(!mLocked&&!cur)readout(sF>.35?G.title+'  ·  '+bandName(G.f):lost&&!done?'Signal lost':'· · ·');else if(cur)readout(cur.band+'  ·  '+cur.who);
     if(stopped&&!done&&!cur&&Math.abs(f-curM().f)<.035)readout((showTom?'Tom’s radio':'Mara')+'  ·  press Back to the film');
     // ghosts drift in the static
-    if(AC&&!clipOn&&dragging&&Math.max(bs,sM,sF)<.2&&now-lastGhost>2800){play(GHOSTS[Math.floor(Math.random()*12)],'ghost',.8);lastGhost=now;}
+    if(AC&&!clipOn&&dragging&&Math.max(bs,sM,sF)<.2&&now-lastGhost>2800){play(Math.random()<Math.min(.85,Math.max(0,(heard-1)*.17))?ARCH[Math.floor(Math.random()*ARCH.length)]:GHOSTS[Math.floor(Math.random()*12)],'ghost',.8);lastGhost=now;}
     // snow over the picture
     if(fr.classList.contains('on')){const id=sg.createImageData(160,90),a=id.data,k=Math.max(1-Math.max(sM,sF),burst>0?(burst--,.8):0);for(let i=0;i<14400;i++){if(Math.random()<k*.9){const v=Math.random()*220;a[i*4]=a[i*4+1]=a[i*4+2]=v;a[i*4+3]=255*Math.min(1,k*1.4);}}sg.putImageData(id,0,0);}}
   /* ---------------- hands ---------------- */
@@ -702,7 +744,8 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
     /* the film player is woken in the same tap */
     const fv=$('filmv');fv.muted=true;fv.src=PARTS+FICTIONS[0].file+'.mp4';fv.play().then(()=>{fv.pause();fv.muted=false;}).catch(()=>{});
     $('veil').style.display='none';LOG.t0=Date.now();soundLabel();begun=true;enterPrelude();};
-  async function narrate(list){for(const x of list){if(!(await waitBuf(x.id,()=>true)))continue;sayText(x.t);play(x.id,'clear');LOG.told.push({id:x.id,t0:Date.now(),t1:Date.now()+BUF[x.id].duration*1000});await sleep((BUF[x.id].duration+.55)*1000);}}
+  function allBands(d){const b=$('band');b.classList.add('all');keepOne();setTimeout(()=>b.classList.remove('all'),(d+2.5)*1000);}
+  async function narrate(list){for(const x of list){if(!(await waitBuf(x.id,()=>true)))continue;sayText(x.t,x.big);if(x.all)allBands(BUF[x.id].duration);play(x.id,'clear');LOG.told.push({id:x.id,t0:Date.now(),t1:Date.now()+BUF[x.id].duration*1000});await sleep((BUF[x.id].duration+.55)*1000);}}
   /* the opening, as the prototype has it, but stoppable (6.6): Stop leaves it at the line it was on, Back to the film picks that line up again */
   let introRun=0,introAt=0,introDone=false,introStopped=false;
   async function runIntro(resume){const tok=++introRun,ok=()=>tok===introRun;intro=true;document.body.classList.add('intro');const T=$('title');layoutButtons();
@@ -711,9 +754,17 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
       await sleep(3800);if(!ok())return;T.style.background='#0000';await sleep(1200);if(!ok())return;T.style.opacity=0;await sleep(1400);if(!ok())return;T.style.display='none';
       $('words').style.display='';}
     else T.style.display='none';
-    for(;introAt<INTRO.length;introAt++){const x=INTRO[introAt];const got=await waitBuf(x.id,ok);if(!ok())return;if(!got)continue;sayText(x.t);play(x.id,'clear');LOG.told.push({id:x.id,t0:Date.now(),t1:Date.now()+BUF[x.id].duration*1000});await sleep((BUF[x.id].duration+.55)*1000);if(!ok())return;}
+    if(!resume&&introAt===0){for(let k=0;k<10;k++)pip(880,.07,.1,k*.23);await sleep(3100);if(!ok())return;}
+    for(;introAt<INTRO.length;introAt++){const x=INTRO[introAt];const got=await waitBuf(x.id,ok);if(!ok())return;if(!got)continue;sayText(x.t);if(x.flood)flood(BUF[x.id].duration);play(x.id,'clear');LOG.told.push({id:x.id,t0:Date.now(),t1:Date.now()+BUF[x.id].duration*1000});await sleep((BUF[x.id].duration+.55)*1000);if(!ok())return;}
     await sleep(600);if(!ok())return;endIntro();}
-  function endIntro(){clearWords();document.body.classList.remove('intro');intro=false;introDone=true;placeMark();layoutButtons();leaveHome();}
+  /* the fall, heard: the kept voices pile up under the narrator, more and closer together, and are cut to silence before her last sentence */
+  const floodSet=new Set(),FLOOD_TAIL=4.4,FLOOD_TOP=.34;   /* the cut falls on 'Trust went': her last two sentences are said into silence */
+  function flood(dur){if(!AC)return;const g=AC.createGain(),lp=AC.createBiquadFilter(),t=AC.currentTime,end=t+dur-FLOOD_TAIL;lp.type='lowpass';lp.frequency.value=1900;
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(FLOOD_TOP*.55,t+(end-t)*.5);g.gain.linearRampToValueAtTime(FLOOD_TOP,end);g.gain.setValueAtTime(0,end+.03);g.connect(lp);lp.connect(master);
+    const ids=[...GHOSTS,...LIVES.map(l=>l.voice).filter(Boolean)].filter(id=>BUF[id]);let n=0;
+    for(let at=.5;at<dur-FLOOD_TAIL-.3;at+=Math.max(.11,.85-at*.075)){const s=AC.createBufferSource(),q=AC.createGain();s.buffer=BUF[ids[(n++*5)%ids.length]];q.gain.value=.5;s.connect(q);q.connect(g);s.start(t+at);s.stop(end+.05);floodSet.add(s);s.onended=()=>floodSet.delete(s);}}
+  function floodOff(){floodSet.forEach(s=>{try{s.stop();}catch(e){}});floodSet.clear();}
+  function endIntro(){floodOff();clearWords();document.body.classList.remove('intro');intro=false;introDone=true;placeMark();layoutButtons();leaveHome();}
   /* ════════════ end of the prototype's radio ════════════ */
 
   /* the words box is wholly invisible whenever it holds nothing (6.7 ZERO): it was the dark block over the sky */
@@ -761,7 +812,7 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
     try { vid.pause(); } catch (e) { /* not playing */ }
     if (vg) vg.gain.value = 0;
     stopLife();
-    pipSet.forEach(function (o) { try { o.stop(); } catch (e) { /* already done */ } }); pipSet.clear();
+    pipSet.forEach(function (o) { try { o.stop(); } catch (e) { /* already done */ } }); pipSet.clear(); floodOff();
     pxOn++; pxc.style.display = 'none'; vid.style.filter = ''; showPic(null); clearWords();
     if (AC) { var tn = AC.currentTime; [bus.life.g, bus.mara.g, bus.ghost.g, stG].forEach(function (g) { g.gain.cancelScheduledValues(tn); g.gain.setValueAtTime(0, tn); }); }
     layoutButtons(); return true;
@@ -935,7 +986,7 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
   function wordsTop() {
     var usual = Math.max(70, H * 0.22);
     if (HS.a < 0.02) return usual;
-    var under = Math.max(usual, HS.bottom + 14), lim = H - tunerH - 8 - (WORDSH || 0);
+    var under = Math.max(usual, HS.bottom + 14), lim = H - (intro ? 76 : tunerH) - 8 - (WORDSH || 0);
     return Math.round(lerp(usual, Math.max(70, Math.min(under, Math.max(usual, lim))), smooth01(HS.a)));
   }
   function homeMoons(dt) {
@@ -1514,9 +1565,9 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
   var rolling = false, rollY = 0, rollLast = 0, holdTill = 0, holds = [], holdAt = 0, rollStop = false, cvoice = null, faces = [], FACE = {}, ghostNext = 0, credHeld = false;
   function voiceOf(who) { return PARTS + 'clips/' + (who === 'mara' ? 'mara_asks' : 'shes_home') + '.mp4'; }
   function fillCredits() {
-    $('clives').textContent = LIVES.filter(function (L) { return L.text || (L.over && !L.say); }).map(function (L) { return L.who.split(',')[0].trim(); }).join(' · ');
+    $('clives').textContent = LIVES.filter(function (L) { return (L.text || (L.over && !L.say)) && !/^Mara/.test(L.who); }).map(function (L) { return L.who.split(',')[0].trim(); }).join(' · ');
     var vis = LIVES.filter(function (L) { return L.who === 'the visitor'; })[0];
-    if (vis) { var cl = $('clast'); cl.textContent = ''; vis.say.split('\n').forEach(function (x, i) { if (i) cl.appendChild(document.createElement('br')); cl.appendChild(document.createTextNode(x)); }); }
+    if (vis) { var cl = $('clast'); cl.textContent = ''; 'Keep one of us.'.split('\n').forEach(function (x, i) { if (i) cl.appendChild(document.createElement('br')); cl.appendChild(document.createTextNode(x)); }); }
     var n = ((index && index.blocks) || []).length; if (n) $('cstars').textContent = n.toLocaleString('en-GB');
     var nw = /\b(\d{10})\b/.exec(JSON.stringify((index && index.now) || '')); if (nw) $('cnow').textContent = nw[1];
     var foot = elCredits.querySelector('.foot'), th = null;
@@ -1622,6 +1673,20 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
     else if (e.key === 'Escape') { e.preventDefault(); leaveBlock(); }
   });
 
+  /* the one new light (film:the-approach 1.75): it kindles beside the red star as the visitor's block arrives, and has faded before the
+     credits open, so every star that can be opened afterwards is a real block */
+  var keptAt = -1, skyLift = 0;
+  function keepOne() { keptAt = now(); }
+  function drawKept(t) {
+    if (keptAt < 0) return;
+    var age = t - keptAt, fp = filmPos(), q = oproj([fp[0] + 0.26, fp[1] + 0.2, fp[2]]);
+    if (age > 16) { keptAt = -1; return; }
+    if (!q) return;
+    var a = clamp(age / 3, 0, 1) * clamp((16 - age) / 4.5, 0, 1), r = 20 + 12 * a, g = ctx.createRadialGradient(q[0], q[1], 0, q[0], q[1], r);
+    g.addColorStop(0, 'rgba(255,246,222,' + (0.95 * a).toFixed(3) + ')'); g.addColorStop(0.16, 'rgba(255,228,165,' + (0.5 * a).toFixed(3) + ')'); g.addColorStop(1, 'rgba(255,228,165,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(q[0], q[1], r, 0, 6.2832); ctx.fill();
+  }
+
   /* ── the frame ── */
   var visible = true, raf = 0;
   function frameLoop() {
@@ -1637,9 +1702,17 @@ body.walking #btns #tin{background:#5a1717;border-color:#e2463f}
     radioFrame(nowMs);
     if (!elCredits.hidden) { HS.a = 0; drawCreditSky(t); }
     else {
-      tendSky(t); homeTick(dtF); drawSky(t, 1 - 0.28 * HS.a, sMnow); drawPicked(t);
+      skyLift += ((clipOn && /clips\/(summer|shes_home)\.mp4$/.test(vid.src) ? 1 : 0) - skyLift) * Math.min(1, dtF * 0.55);
+      tendSky(t); homeTick(dtF); drawSky(t, 1 - 0.28 * HS.a, sMnow + skyLift * 2.6);
+      if (skyLift > 0.01) {
+        var up = ctx.createLinearGradient(0, 0, 0, H); up.addColorStop(0, 'rgba(30,42,100,' + (0.4 * skyLift).toFixed(3) + ')');
+        up.addColorStop(0.6, 'rgba(56,74,146,' + (0.5 * skyLift).toFixed(3) + ')'); up.addColorStop(1, 'rgba(40,54,112,' + (0.4 * skyLift).toFixed(3) + ')');
+        ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = up; ctx.fillRect(0, 0, W, H); ctx.globalCompositeOperation = 'source-over';
+      }
+      drawPicked(t);
       if (inside) drawMoons(); else homeMoons(dtF);
       if (tuned) drawTuned(tuned, nowMs);
+      drawKept(t);
     }
     raf = requestAnimationFrame(frameLoop);
   }
