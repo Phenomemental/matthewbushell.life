@@ -513,6 +513,8 @@ class TheUniversePage(Base):
         for gone in ('<video', 'id="band"', 'id="needle"', 'id="veil"', 'data-parts', '.mp4', '.mp3', 'site.css'):
             self.assertNotIn(gone, h)
         self.assertIn('?block=presence', h)
+        self.assertIn('PRES_S = 30', h)   # present means a heartbeat in the last half minute, the beach's own rule
+        self.assertNotIn('PRES_H', h)
         self.assertIn('data-show="threads"', h)
         for arr in ('galaxy', 'kin'):
             self.assertIn('data-arr="%s"' % arr, h)
