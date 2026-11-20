@@ -48,6 +48,14 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 .ufind li button.grp{color:#e8c98a;font:600 18px 'Cormorant Garamond',Georgia,serif;letter-spacing:.03em}
 .ufind .unone{margin:8px 4px 2px;font-style:italic;font-size:18px;color:var(--dim)}
 .ustar .uall{margin-top:12px;margin-left:6px;min-height:48px}
+.uthreads{display:flex;flex-wrap:nowrap;align-items:center;gap:6px;margin-top:10px;padding-bottom:4px;overflow-x:auto;overflow-y:hidden;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#6f6a8e transparent}
+.ustar.threaded .uline{max-height:5.3em}
+.uthreads .ulab{flex:none;font:500 12px ui-monospace,Menlo,Consolas,monospace;letter-spacing:.08em;color:var(--dim)}
+.uni .uthr{box-sizing:border-box;flex:none;min-height:40px;max-width:100%;padding:0 12px;border:1.5px solid #8f7fd6;border-radius:999px;background:rgba(24,18,52,.94);color:#e9e3ff;font:500 13px ui-monospace,Menlo,Consolas,monospace;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.uni .uthr:hover{background:rgba(52,40,104,.96)}
+.uni .uthr.uback{border-color:#6f6a8e;color:#cfc9e6}
+.uplace .uthreads{margin-top:8px;pointer-events:auto}
+.uplace .uthreads .ulab{color:var(--gold);text-shadow:0 0 8px #000}
 .ushow{position:absolute;z-index:9;top:calc(64px + env(safe-area-inset-top));right:calc(12px + env(safe-area-inset-right));width:min(340px,calc(100% - 24px));box-sizing:border-box;padding:8px 10px 10px;border-radius:18px;background:rgba(6,9,22,.96);border:1px solid rgba(238,242,255,.3);box-shadow:0 10px 40px rgba(0,0,0,.6)}
 .ushow h2{margin:6px 6px 4px;font-size:13px;font-weight:500;letter-spacing:.3em;color:#cdbf9f}
 .ushow label{display:flex;align-items:center;gap:12px;min-height:48px;padding:0 6px;border-radius:8px;font-size:19px;line-height:1.15;color:#f1ebdd;cursor:pointer}
@@ -101,7 +109,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 .uways .ubtn.go{flex:1.7}
 .uhint{position:absolute;z-index:5;left:16px;right:16px;bottom:calc(28px + env(safe-area-inset-bottom));margin:0;text-align:center;font-style:italic;font-size:20px;line-height:1.3;color:var(--ink);text-shadow:0 0 10px #000,0 0 4px #000;pointer-events:none;opacity:0;transition:opacity 1.2s}
 .uhint.on{opacity:1}
-.uni.walking .uhint{bottom:calc(250px + env(safe-area-inset-bottom))}
+.uni.walking .uhint{bottom:calc(300px + env(safe-area-inset-bottom))}
 .unotice{position:absolute;z-index:8;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom));margin:0;width:max-content;max-width:calc(100% - 28px);padding:4px 8px 4px 18px;box-sizing:border-box;display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center;
   border:1px solid rgba(238,242,255,.25);border-radius:26px;background:rgba(3,5,12,.86);font-size:19px;font-style:italic}
 .unojs{position:absolute;left:16px;right:16px;top:45%;margin:0;text-align:center;font-style:italic;font-size:21px;color:rgba(238,242,255,.8)}
@@ -141,6 +149,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   <label><input type="checkbox" role="switch" data-show="glow"><span class="udot" style="background:#ffc478;box-shadow:0 0 8px #ffc478"></span><span>Recently written<small>a glow on stars written in the last three days</small></span></label>
   <label><input type="checkbox" role="switch" data-show="born"><span class="udot" style="background:linear-gradient(#fff,#fff) center/100% 1.5px no-repeat,linear-gradient(#fff,#fff) center/1.5px 100% no-repeat;border-radius:0"></span><span>Newly born<small>a spark on stars that arrived in the last day</small></span></label>
   <label><input type="checkbox" role="switch" data-show="present"><span class="udot" style="border:2px solid #78ebe1"></span><span>Who is present<small>anyone who has said they are here</small></span></label>
+  <label><input type="checkbox" role="switch" data-show="threads"><span class="udot" style="background:#b7a4ff;height:2px;border-radius:1px"></span><span>Threads<small>lines from a block you have opened to the blocks its words name</small></span></label>
   <label><input type="checkbox" role="switch" data-show="names"><span class="udot" style="background:#cdbf9f;border-radius:2px;height:3px"></span><span>Names<small>on the stars nearest you</small></span></label>
   <label><input type="checkbox" role="switch" data-show="compass"><span class="udot" style="border:1px solid #8fa2e8"></span><span>Compass<small>rings of time and names round the rim, in Time and kin</small></span></label>
   <label><input type="checkbox" role="switch" data-show="dust"><span class="udot" style="background:#b8c8ff;width:4px;height:4px;margin:0 4px"></span><span>Far dust<small>the faint points behind the stars</small></span></label>
@@ -158,6 +167,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   <p class="uname" id="sname"></p>
   <p class="umeta" id="smeta"></p>
   <p class="uline" id="sline"></p>
+  <div class="uthreads" id="sthreads" hidden></div>
   <button type="button" class="ubtn go" id="swalk" hidden>Go in</button>
   <button type="button" class="ubtn uall" id="sall" hidden></button>
 </aside>
@@ -165,6 +175,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 <div class="uplace" id="place" hidden>
   <p id="paddr" aria-live="polite"></p>
   <p id="pline" aria-live="polite" tabindex="0"></p>
+  <div class="uthreads" id="pthreads" hidden></div>
   <div class="uways"><button type="button" class="ubtn" id="tup">Up</button><button type="button" class="ubtn go" id="tin">Go in</button></div>
 </div>
 <p class="uhint" id="hint" aria-live="polite"></p>
@@ -233,7 +244,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     if (old) { var tc = j.touched || {}; for (n in tc) if (tc[n] !== old[n]) changed.push(n); }
     beachStars();
     if (had) B3.forEach(function (s1) { if (!had[s1.name]) { ARRIVED[s1.name] = s1.arrived = now(); fresh.push(s1.name); } });
-    changed.forEach(function (nm) { if (!(wb && wb.name === nm)) delete BLOCKS[nm]; delete LINES_READ[nm]; });
+    changed.forEach(function (nm) { if (!(wb && wb.name === nm)) { delete BLOCKS[nm]; delete REFS[nm]; } delete LINES_READ[nm]; });
     if (picked) picked = starOf(picked.name) || picked;
     placePresence();
     if (fresh.length) { LOG.born = LOG.born.concat(fresh).slice(-40); if (!inside && !RP && SHOW.born) showHint((fresh.length === 1 ? 'A new star: ' : 'New stars: ') + fresh.slice(0, 3).join(', ') + (fresh.length > 3 ? ' and ' + (fresh.length - 3) + ' more' : '')); }
@@ -306,6 +317,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
       return { name: name, size: size, pg: [r * Math.cos(ang), y, r * Math.sin(ang)], dl: hh(name, 7) * 0.3, br: 0.25 + 1.6 * Math.min(1, Math.max(0, Math.log(Math.max(size, 50)) / Math.LN10 - 1.6)) / 3.2,
         tint: u < 0.2 ? 2 : u < 0.62 ? 0 : 1, ph: hh(name, 5) * TAU, sp: 0.25 + u * 0.5 };
     });
+    BYNAME = Object.create(null); B3.forEach(function (s) { BYNAME[s.name] = s; });
     /* how recently each block was written, from the index's own record; the newest glow amber */
     var tch = (index && index.touched) || {}, nowT = Date.parse((index && index.now && index.now.iso) || '') || Date.now();
     B3.forEach(function (s) { var w = Date.parse(tch[s.name] || ''), age = (nowT - w) / 3600000; s.wrote = w || 0; s.recent = w && age >= 0 && age < RECENT_H ? Math.pow(1 - age / RECENT_H, 1.5) : 0; });
@@ -324,7 +336,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     B3.forEach(function (s) { var o = prev && prev[s.name]; if (o && o.p) { s.p = o.p; s.p0 = o.p0 || null; } else s.p = dest(s).slice(); });
     if (LIT) light(LIT.key, true);
   }
-  var SHOW = { ripples: true, glow: true, born: true, present: true, names: true, compass: true, dust: true, turn: true };
+  var SHOW = { ripples: true, glow: true, born: true, present: true, threads: true, names: true, compass: true, dust: true, turn: true };
   /* stars being born: the index records when each block first arrived (those from before the stamp existed have none, and stand
      in the sky from the start). RP is the replay: while it is open the sky is drawn as it stood at RP.T. */
   var RP = null, RP_S = 45, BORN = [], BSTARS = [], NEWBORN = [], ARRIVED = {};
@@ -486,7 +498,8 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     if (z <= 0.01) return null;
     return [b.cx + (d0 * b.r[0] + d1 * b.r[1] + d2 * b.r[2]) * b.S / z, b.cy - (d0 * b.u[0] + d1 * b.u[1] + d2 * b.u[2]) * b.S / z, z];
   }
-  function starOf(name) { for (var i = 0; i < B3.length; i++) if (B3[i].name === name) return B3[i]; return null; }
+  var BYNAME = Object.create(null);
+  function starOf(name) { return BYNAME[name] || null; }
   function glideTo(to, dur, fn, done) { glide = { from: { yaw: orb.yaw, pitch: orb.pitch, dist: orb.dist, tgt: orb.tgt.slice() }, to: to, t0: now(), dur: CALM ? 0.01 : dur, fn: fn || ease, done: done }; }
   function stepGlide(t) {
     if (!glide) return;
@@ -515,6 +528,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = '#b8c8ff';
     if (SHOW.dust) for (i = 0; i < dust.length; i++) { q = oproj(dust[i]); if (!q || q[0] < 0 || q[0] > W || q[1] < 0 || q[1] > H) continue; ctx.globalAlpha = Math.min(1, alpha * dust[i][3] * (1 - 0.7 * KB)); ctx.fillRect(q[0], q[1], 1.2, 1.2); }
     compassRings(alpha);
+    drawThreads(alpha);
     NAMED.length = 0;
     if (LIT && LIT.lines.length) {
       ctx.strokeStyle = '#e8c98a'; ctx.lineWidth = 1; ctx.globalAlpha = alpha * 0.34; ctx.beginPath();
@@ -575,6 +589,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
       ctx.shadowBlur = 0;
     }
     compassLabels(alpha);
+    threadMarks(alpha);
     /* close to, the nearest stars wear their names */
     if (NAMED.length && SHOW.names && !inside) {
       NAMED.sort(function (u, w) { return u[0] - w[0]; });
@@ -814,6 +829,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     var w = within(p);
     $('paddr').textContent = wb.name + (p.length ? ' · ' + address(p) : '') + (w ? '  ·  ' + w + ' within' : '');
     typeOut(story(nodeOf(p)) || (p.length ? 'Nothing is written here.' : wb.name));
+    chipsInto($('pthreads'), placeRefs(p), 12);
   }
   function mnearest(val) { var best = null, bd = 99; kids(path).forEach(function (k) { var d = Math.abs(k - val); if (d < bd) { bd = d; best = k; } }); return best; }
   function msetV(val) { M.v = M.vT = val; var k = mnearest(val); if (k != null && k !== sel) { sel = k; M.cardFocus = false; pip(MNOTE[k - 1] || 440, 0.05, 0.16); mcard(); } }
@@ -826,25 +842,28 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   /* coming close to a star: its places open round it as moons */
   function enterBlock(name, json) {
     if (inside) return;
+    var arrive = ARRIVE && ARRIVE.name === name ? ARRIVE.addr : '';   /* a thread followed here may name a place: taken before the card closes */
     closeStar(); hideHint(); closeFind(); closeShow();
+    if (!REFS[name]) REFS[name] = scanRefs(name, json);
     var s = starOf(name), at = s ? dest(s) : orb.tgt.slice();
     inside = true; wb = { name: name, root: json, floor: floorOf(json) }; path = []; KC = {}; M.nodes = {}; M.cardKey = ''; M.lastD = null; M.hits.length = 0;
     flying = true; stage.classList.add('walking');
     glideTo({ tgt: at.slice(), dist: Math.min(orb.dist, 0.55), pitch: 0.5 }, 2.3, ease);
     var ks = kids([]); sel = ks.length ? (ks.indexOf(1) >= 0 ? 1 : ks[0]) : heart([]) ? 0 : null; M.v = M.vT = sel || 1; M.rotT = Math.PI / 2 - (M.v - 1) * MSTEP; M.rot = M.rotT + 2.6;
-    M.tr = { A: 'sky', B: [], t0: performance.now(), dur: CALM ? 10 : 2300, dir: 1, swirl: true, done: function () { flying = false; M.cardKey = ''; mcard(); if (!M.seenDive) showHint(opens([]) ? (coarse ? 'Drag to turn the moons. Tap one to read it, tap it again to go in.' : 'Drag to turn the moons. Click one to read it, click it again to go in.') : 'This block is a single line.'); } };
+    M.tr = { A: 'sky', B: [], t0: performance.now(), dur: CALM ? 10 : 2300, dir: 1, swirl: true, done: function () { flying = false; M.cardKey = ''; mcard(); var P = arrive ? pathIn(json, arrive) : null; if (P) { AUTO = P; autoStep(); } else if (!M.seenDive) showHint(opens([]) ? (coarse ? 'Drag to turn the moons. Tap one to read it, tap it again to go in.' : 'Drag to turn the moons. Click one to read it, click it again to go in.') : 'This block is a single line.'); } };
     M.cardFocus = true; SK.to = DIMIN;
     $('place').hidden = false; mcard();
     pip(392, 0.05, 0.5); pip(587, 0.05, 0.6, 0.25); pip(784, 0.04, 0.8, 0.5);
   }
   /* from a star's top, Up folds the moons back into the star and returns to the sky */
-  function leaveBlock() {
+  function leaveBlock(then) {
     if (!inside) return;
-    var name = wb.name;
+    var name = wb.name; AUTO = null;
     function finish() {
       inside = false; wb = null; path = []; sel = null; flying = false; M.tr = null; M.hits.length = 0; SK.to = 1; KC = {};
       $('place').hidden = true; stage.classList.remove('walking'); hideHint(); touchT = now();
       var s = starOf(name); glideTo({ tgt: (s ? dest(s) : orb.tgt).slice(), dist: 1.2, pitch: 0.6 }, 1.6, easeOut);
+      if (typeof then === 'function') then();
     }
     if (CALM) { finish(); return; }
     if (M.tr) return;
@@ -853,16 +872,26 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     SK.to = 1; mcard();
   }
   /* Go in: the view falls toward the moon (or into the heart) until it is the body in the centre, its own moons standing round it */
-  function goIn() {
+  function goIn(fast) {
     if (!inside || M.tr || sel == null) return;
     var X = path.concat([sel]); if (!opens(X)) { mpick(sel); return; }
     M.seenDive = true; hideHint(); pip(784, 0.05, 0.3); pip(587, 0.05, 0.4, 0.14); pip(392, 0.05, 0.6, 0.28);
     var F = path.slice();
-    M.tr = { A: F, B: X, t0: performance.now(), dur: CALM ? 10 : 1500, dir: 1, done: function () { mnode(F).rot = M.rot; var nx = mnode(X), r = nx.ph + performance.now() * 0.001 * nx.om; path = X; msetLevel(r); } };
+    M.tr = { A: F, B: X, t0: performance.now(), dur: CALM ? 10 : fast === true ? 850 : 1500, dir: 1, done: function () { mnode(F).rot = M.rot; var nx = mnode(X), r = nx.ph + performance.now() * 0.001 * nx.om; path = X; msetLevel(r); autoStep(); } };
     mcard();
+  }
+  /* a thread that names a place: once inside, the view goes on down a digit at a time until it stands at that place */
+  function autoStep() {
+    if (!AUTO || !inside || M.tr) return;
+    if (!AUTO.length) { AUTO = null; return; }
+    var d = AUTO.shift(), X = path.concat([d]);
+    if (nodeOf(X) === undefined) { AUTO = null; return; }
+    sel = d; if (d) M.v = M.vT = d; M.cardFocus = false; M.cardKey = '';
+    if (opens(X)) goIn(true); else { AUTO = null; mcard(); }
   }
   function goUp() {
     if (!inside || M.tr) return;
+    AUTO = null;
     if (!path.length) { leaveBlock(); return; }
     pip(392, 0.05, 0.3); pip(587, 0.05, 0.4, 0.14);
     var X = path.slice(), Fp = X.slice(0, -1), nx = mnode(X), d = X[X.length - 1];
@@ -897,7 +926,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 
   /* ── exploring the sky (6.42): a finger turns it, a pinch or the wheel zooms, a tap opens a star's card ── */
   var elStar = $('starcard'), elSName = $('sname'), elSMeta = $('smeta'), elSLine = $('sline'), elSWalk = $('swalk'), cardWake = 0;
-  var touchT = -99, pts = {}, gest = null, picked = null, LINES_READ = {}, BLOCKS = {}, READING = {}, HEAVY = 600000, lastSky = 0;
+  var touchT = -99, pts = {}, gest = null, picked = null, LINES_READ = Object.create(null), BLOCKS = Object.create(null), READING = Object.create(null), HEAVY = 600000, lastSky = 0;
   function at(e) { var r = stage.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
   function two() { var k = Object.keys(pts); return k.length >= 2 ? [pts[k[0]], pts[k[1]]] : null; }
   canvas.addEventListener('pointerdown', function (e) {
@@ -1029,41 +1058,184 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
   $('tclose').addEventListener('click', closeReplay);
   elTR.addEventListener('input', function () { if (!RP) return; RP.playing = false; rpSet(Number(elTR.value) / 1000); $('tplay').textContent = RP.x >= 1 ? 'Again' : 'Play'; });
   elShow.addEventListener('keydown', function (e) { if (e.key === 'Escape') { e.preventDefault(); closeShow(); $('showb').focus(); } });
-  function openStar(s) {
+  /* ── threads: a block points at another by writing its name, sometimes with the address of a place in it ('pool:welcome',
+        'exemplars:6', 'ahead:weft:2.7'). When a block has been read whole, every name in its words that is a block here becomes a
+        thread from its star to that one. Threads are found only for blocks that have been opened: what points AT a block cannot be
+        known without reading every block there is. ── */
+  var REFS = Object.create(null), PENDING = Object.create(null), THREAD_AUTO = 150000, CAME = null, ARRIVE = null, AUTO = null;
+  var RTOK = /[A-Za-z0-9_][A-Za-z0-9_.\-]*(?::[A-Za-z0-9_][A-Za-z0-9_.\-]*)*/g, RADDR = /^[0-9][0-9.]*$/;
+  function isAddr(x) { return RADDR.test(x); }
+  function refIn(token, me) {
+    var t = token.replace(/[.\-]+$/, ''), parts, k, c, rest;
+    if (t.indexOf(':') < 0) return t.length >= 6 && t.indexOf('-') > 0 && t !== me && BYNAME[t] ? [t, ''] : null;   /* a bare word counts only if it is hyphened: 'tree' and 'now' are blocks, and also plain English */
+    parts = t.split(':');
+    for (k = parts.length; k >= 1; k--) {
+      c = parts.slice(0, k).join(':'); if (!BYNAME[c]) continue;
+      rest = parts.slice(k);
+      if (k === 1 && !(rest.length && rest.every(isAddr))) return null;
+      return c === me ? null : [c, rest.length && rest.every(isAddr) ? rest[0] : ''];
+    }
+    return null;
+  }
+  function scanRefs(name, root) {
+    var by = Object.create(null), list = [], places = Object.create(null);
+    (function walk(n, p, depth) {
+      if (n == null || depth > 60) return;
+      if (typeof n === 'string') {
+        var m, seen = Object.create(null), pk = p.join('.'); RTOK.lastIndex = 0;
+        while ((m = RTOK.exec(n))) {
+          var r = refIn(m[0], name); if (!r) continue;
+          var o = by[r[0]]; if (!o) { o = by[r[0]] = { to: r[0], n: 0, addr: r[1] }; list.push(o); }
+          o.n++; if (!o.addr && r[1]) o.addr = r[1];
+          if (!seen[r[0]]) { seen[r[0]] = 1; (places[pk] = places[pk] || []).push({ to: r[0], addr: r[1] }); }
+        }
+        return;
+      }
+      if (typeof n !== 'object' || sealed(n)) return;
+      for (var d = 0; d <= 9; d++) { var c = n[keyOf(d)]; if (c != null) walk(c, d === 0 && typeof c === 'string' ? p : p.concat([d]), depth + 1); }   /* a place's own line belongs to the place */
+    })(root, [], 0);
+    list.sort(function (a, b) { return b.n - a.n || (a.to < b.to ? -1 : 1); });
+    return { out: list, places: places };
+  }
+  function keepBlock(name, j) {
+    if (j == null || typeof j !== 'object') j = { _: j == null ? '' : String(j) };
+    BLOCKS[name] = j; REFS[name] = scanRefs(name, j); return j;
+  }
+  function fetchBlock(name) {   /* a block read whole, once, however many ask for it at the same time */
+    if (BLOCKS[name]) { if (!REFS[name]) REFS[name] = scanRefs(name, BLOCKS[name]); return Promise.resolve(BLOCKS[name]); }
+    if (!PENDING[name]) PENDING[name] = get(WIRE + '?block=' + encodeURIComponent(name), 90000).then(function (j) { delete PENDING[name]; return sealed(j) ? j : keepBlock(name, j); }, function (e) { delete PENDING[name]; throw e; });
+    return PENDING[name];
+  }
+  /* an address as Pscale writes it, turned into the walk from the block's top: the point falls after as many digits as the block has
+     floors, a short whole number is filled out with noughts in front, and a nought is a step into a place's own line. Null if there
+     is no such place. */
+  function pathIn(root, addr) {
+    var parts = String(addr).split('.'), ip = parts[0].replace(/\D/g, ''), fp = parts.slice(1).join('').replace(/\D/g, ''), F = floorOf(root), ds, n = root, i;
+    if (!ip && !fp) return null;
+    if (ip.length <= F) while (ip.length < F) ip = '0' + ip;
+    ds = (ip + fp).split('').map(Number);
+    if (!fp) while (ds.length && ds[ds.length - 1] === 0) ds.pop();
+    if (!ds.length || ds.length > 40) return null;
+    for (i = 0; i < ds.length; i++) {
+      if (!n || typeof n !== 'object' || sealed(n)) return null;
+      n = n[keyOf(ds[i])];
+      if (n == null || (ds[i] === 0 && typeof n !== 'object')) return null;
+    }
+    return ds;
+  }
+  /* the names in the words shown for a place: its own line, wherever down its hearts that line is kept */
+  function placeRefs(p) {
+    var r = wb && REFS[wb.name], q = p.slice(), g = 0; if (!r) return [];
+    while (g++ < 24) { var hit = r.places[q.join('.')]; if (hit) return hit; var n = nodeOf(q); if (!n || typeof n !== 'object' || !n._ || typeof n._ !== 'object') return []; q.push(0); }
+    return [];
+  }
+  function chipsInto(el, list, max, back) {
+    el.textContent = '';
+    if ((!list || !list.length) && !back) { el.hidden = true; return; }
+    function chip(text, title, cls, go) { var b = document.createElement('button'); b.type = 'button'; b.className = cls; b.textContent = text; b.title = title; b.addEventListener('click', go); el.appendChild(b); }
+    function word(text) { var w = document.createElement('span'); w.className = 'ulab'; w.textContent = text; el.appendChild(w); }
+    if (back) chip('\u2190 ' + back, 'Back along the thread to ' + back, 'uthr uback', function () { follow(back, ''); });
+    if (list && list.length) {
+      word('Names');
+      list.slice(0, max).forEach(function (o) { chip(o.to + (o.addr ? '  ' + o.addr : ''), 'Go to ' + o.to + (o.addr ? ', place ' + o.addr : ''), 'uthr', function () { follow(o.to, o.addr); }); });
+      if (list.length > max) word('and ' + (list.length - max) + ' more');
+    }
+    el.hidden = false; el.scrollLeft = 0;
+  }
+  ['sthreads', 'pthreads'].forEach(function (id) {   /* a mouse wheel over the row of names moves it sideways */
+    $(id).addEventListener('wheel', function (e) { if (Math.abs(e.deltaY) > Math.abs(e.deltaX) && this.scrollWidth > this.clientWidth) { this.scrollLeft += e.deltaY; e.preventDefault(); } }, { passive: false });
+  });
+  function threadChips(name) { var r = REFS[name]; chipsInto($('sthreads'), r ? r.out : null, 40, CAME && CAME.to === name && starOf(CAME.from) ? CAME.from : ''); elStar.classList.toggle('threaded', !$('sthreads').hidden); }
+  /* following a thread: to the star it names; and where the thread gives an address, Go in carries on down to that very place */
+  function follow(to, addr) {
+    var s = starOf(to); if (!s || flying) return;
+    var from = inside && wb ? wb.name : picked ? picked.name : '';
+    function go() {
+      var st = starOf(to) || s;
+      CAME = from && from !== to ? { from: from, to: to } : null;
+      if (LIT && !st.lit) unlight();
+      if (RP && unborn(st)) closeReplay();
+      openStar(st, addr ? String(addr) : '', true);
+    }
+    if (inside) { if (M.tr) return; AUTO = null; path = []; M.cardKey = ''; leaveBlock(go); } else go();
+  }
+  function drawThreads(alpha) {   /* drawn with the stars: faint for every thread found this visit, brighter for those of the star in hand and those that reach it */
+    var a = alpha * clamp((SK.dim - DIMIN) / (1 - DIMIN), 0, 1); if (!SHOW.threads || a < 0.01) return;
+    var hand = picked ? picked.name : '', name, r, s, t, i, qa, qb, n = 0, inc = [];
+    ctx.lineWidth = 1; ctx.strokeStyle = '#b7a4ff'; ctx.globalAlpha = a * 0.11; ctx.beginPath();
+    for (name in REFS) {
+      r = REFS[name]; s = BYNAME[name]; if (name === hand || !s || !r.out.length || unborn(s)) continue;
+      qa = oproj(s.p); if (!qa) continue;
+      for (i = 0; i < r.out.length && n < 2000; i++) {
+        t = BYNAME[r.out[i].to]; if (!t || unborn(t)) continue; qb = oproj(t.p); if (!qb) continue;
+        if (r.out[i].to === hand) { inc.push(qa, qb); continue; }
+        ctx.moveTo(qa[0], qa[1]); ctx.lineTo(qb[0], qb[1]); n++;
+      }
+    }
+    ctx.stroke();
+    if (inc.length) { ctx.globalAlpha = a * 0.42; ctx.beginPath(); for (i = 0; i < inc.length; i += 2) { ctx.moveTo(inc[i][0], inc[i][1]); ctx.lineTo(inc[i + 1][0], inc[i + 1][1]); } ctx.stroke(); }
+    r = hand && REFS[hand]; s = hand && BYNAME[hand];
+    if (r && s && !unborn(s) && (qa = oproj(s.p))) {
+      ctx.globalAlpha = a * 0.62; ctx.lineWidth = 1.3; ctx.beginPath();
+      for (i = 0; i < r.out.length; i++) { t = BYNAME[r.out[i].to]; if (!t || unborn(t)) continue; qb = oproj(t.p); if (!qb) continue; ctx.moveTo(qa[0], qa[1]); ctx.lineTo(qb[0], qb[1]); }
+      ctx.stroke();
+    }
+  }
+  function threadMarks(alpha) {   /* the far ends of the threads of the star in hand: a small ring on each, and the names of the first dozen in sight */
+    var a = alpha * clamp((SK.dim - DIMIN) / (1 - DIMIN), 0, 1), hand = picked ? picked.name : '', r = hand && REFS[hand]; if (!SHOW.threads || !r || inside || a < 0.02) return;
+    var i, t, q, shown = 0;
+    ctx.font = '500 12px ui-monospace,Menlo,Consolas,monospace'; ctx.textAlign = 'center'; ctx.shadowColor = '#000'; ctx.shadowBlur = 5; ctx.strokeStyle = '#b7a4ff'; ctx.lineWidth = 1.5; ctx.fillStyle = '#ddd3ff';
+    for (i = 0; i < r.out.length; i++) {
+      t = BYNAME[r.out[i].to]; if (!t || unborn(t)) continue; q = oproj(t.p); if (!q || q[0] < -10 || q[0] > W + 10 || q[1] < -10 || q[1] > H + 10) continue;
+      ctx.globalAlpha = a * 0.85; ctx.beginPath(); ctx.arc(q[0], q[1], 7, 0, TAU); ctx.stroke();
+      if (shown < 12 && SHOW.names) { ctx.globalAlpha = a * 0.9; ctx.fillText(t.name.length > 30 ? t.name.slice(0, 29) + '\u2026' : t.name, q[0], q[1] - 12); shown++; }
+    }
+    ctx.shadowBlur = 0;
+  }
+  function openStar(s, addr, far) {
     picked = s; hideHint();
-    glideTo({ tgt: dest(s).slice(), dist: Math.min(orb.dist, wide ? 1.4 : 1.2) }, 1.4, ease);
+    glideTo({ tgt: dest(s).slice(), dist: far ? (wide ? 1.4 : 1.2) : Math.min(orb.dist, wide ? 1.4 : 1.2) }, 1.4, ease);
     var name = s.name, size = bytesOf(name);
-    elSName.textContent = name; elSMeta.textContent = metaOf(name); elStar.hidden = false; allButton(s);
+    ARRIVE = addr ? { name: name, addr: addr } : null;
+    elSName.textContent = name; elSMeta.textContent = metaOf(name); elStar.hidden = false; allButton(s); threadChips(name);
     /* on a touch screen the click that follows the tap lands where the card has just appeared: for a third of a second the card
        takes no presses, so the tap that opened it cannot also press its buttons */
     elStar.style.pointerEvents = 'none'; clearTimeout(cardWake); cardWake = setTimeout(function () { elStar.style.pointerEvents = ''; }, 350);
-    elSWalk.textContent = size > HEAVY ? 'Go in (' + kb(size) + ' to read)' : 'Go in'; elSWalk.hidden = true;
-    function show(text, walkable) { if (picked && picked.name === name) { elSLine.textContent = text; elSWalk.hidden = !walkable; } }
-    if (LINES_READ[name] != null) { show(LINES_READ[name][0], LINES_READ[name][1]); return; }
-    show('Reading…', false);
-    get(WIRE + '?block=' + encodeURIComponent(name) + '&spindle=0').then(function (j) {
+    elSWalk.hidden = true; walkLabel();
+    function mine() { return picked && picked.name === name; }
+    function walkLabel() {
+      var to = '';
+      if (ARRIVE && ARRIVE.name === name && BLOCKS[name]) { if (pathIn(BLOCKS[name], ARRIVE.addr)) to = ARRIVE.addr; else ARRIVE = null; }   /* an address that is not in the block is let go */
+      elSWalk.textContent = to ? 'Go in to ' + to : size > HEAVY ? 'Go in (' + kb(size) + ' to read)' : 'Go in';
+    }
+    function show(text, walkable) { if (mine()) { elSLine.textContent = text; elSWalk.hidden = !walkable; } }
+    function top(j) {
       var line = tidy(sealed(j) ? '' : lineOf(j)).replace(/\s+/g, ' ').trim(), ok = !sealed(j);
-      if (sealed(j)) line = 'This block is sealed.'; else if (!line) line = 'Nothing is written at the top of this block.'; else if (line.length > 320) line = line.slice(0, 320).replace(/\s+\S*$/, '') + '…';
+      if (sealed(j)) line = 'This block is sealed.'; else if (!line) line = 'Nothing is written at the top of this block.'; else if (line.length > 320) line = line.slice(0, 320).replace(/\s+\S*$/, '') + '\u2026';
       LINES_READ[name] = [line, ok]; show(line, ok);
-    }).catch(function () { show('Pscale could not be reached.', false); });
+    }
+    function readTop() { get(WIRE + '?block=' + encodeURIComponent(name) + '&spindle=0').then(top).catch(function () { show('Pscale could not be reached.', false); }); }
+    /* a block that is not heavy is read whole at the tap: its first line for the card, and the names in its words for its threads */
+    function whole(first) { fetchBlock(name).then(function (j) { if (first || LINES_READ[name] == null) top(j); if (mine()) { threadChips(name); walkLabel(); } }).catch(function () { if (first) readTop(); }); }
+    if (LINES_READ[name] != null) { show(LINES_READ[name][0], LINES_READ[name][1]); if (!REFS[name] && LINES_READ[name][1] && size <= THREAD_AUTO) whole(false); return; }
+    show('Reading\u2026', false);
+    if (size <= THREAD_AUTO) whole(true); else readTop();
   }
-  function closeStar() { picked = null; elStar.hidden = true; }
+  function closeStar() { picked = null; elStar.hidden = true; ARRIVE = null; }
   /* coming very close to a star by your own zoom opens it, unless it is a heavy one, which waits to be asked */
   var MOON_NEAR = 0.3;
   function nearestToCentre() { basis(); var best = null, bd = 70; B3.forEach(function (s) { var q = oproj(s.p); if (!q) return; var d = Math.hypot(q[0] - BAS.cx, q[1] - BAS.cy); if (d < bd) { bd = d; best = s; } }); return best; }
   function maybeMoons() { if (inside || flying || orb.dist > MOON_NEAR) return; var s = picked || nearestToCentre(); if (s && bytesOf(s.name) <= HEAVY) walkBlock(s.name); }
   /* every block is read whole, whatever its size, so that every place in it can be reached */
   function walkBlock(name) {
-    function go(j) { if (!inside) enterBlock(name, j); }
     function say(text) { if (picked && picked.name === name) { elSLine.textContent = text; elSWalk.hidden = true; } }
+    if (BLOCKS[name]) { if (!inside) enterBlock(name, BLOCKS[name]); return; }
     if (READING[name]) return;
-    if (BLOCKS[name]) { go(BLOCKS[name]); return; }
-    READING[name] = true; say(bytesOf(name) > HEAVY ? 'Reading the whole block, ' + kb(bytesOf(name)) + '…' : 'Reading the block…');
-    get(WIRE + '?block=' + encodeURIComponent(name), 90000).then(function (j) {
+    READING[name] = true; say(bytesOf(name) > HEAVY ? 'Reading the whole block, ' + kb(bytesOf(name)) + '\u2026' : 'Reading the block\u2026');
+    fetchBlock(name).then(function (j) {
       delete READING[name];
       if (sealed(j)) { say('This block is sealed.'); return; }
-      if (j == null || typeof j !== 'object') j = { _: j == null ? '' : String(j) };
-      BLOCKS[name] = j; go(j);
+      if (!inside) enterBlock(name, j);
     }).catch(function () { delete READING[name]; if (picked && picked.name === name) { elSLine.textContent = 'Pscale could not be reached.'; elSWalk.hidden = false; } });
   }
   $('sclose').addEventListener('click', closeStar);
@@ -1131,6 +1303,9 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
     names: function () { return { someone: Object.keys(SOMEONE).length, groups: Object.keys(GROUP).length, keyed: B3.filter(function (s) { return s.key; }).length, lit: LIT ? { key: LIT.key, n: LIT.n, lines: LIT.lines.length } : null, chip: $('chip').hidden ? '' : $('chip').textContent, all: $('sall').hidden ? '' : $('sall').textContent, findOpen: !elFind.hidden }; },
     search: function (t) { return search(t).map(function (f) { return f.group ? '[' + f.group + ' ' + f.n + ']' : f.star.name; }); },
     keyFor: keyFor,
+    threads: function () { var total = 0, k; for (k in REFS) total += REFS[k].out.length; function texts(id) { return $(id).hidden ? [] : [].map.call($(id).querySelectorAll('button'), function (b) { return b.textContent; }); } return { read: Object.keys(REFS).length, lines: total, card: texts('sthreads'), place: texts('pthreads'), came: CAME, arrive: ARRIVE, auto: AUTO ? AUTO.slice() : null, walk: elSWalk.hidden ? '' : elSWalk.textContent }; },
+    refs: function (name) { var r = REFS[name]; return r ? r.out.map(function (o) { return o.to + (o.addr ? ' @ ' + o.addr : '') + ' x' + o.n; }) : null; },
+    follow: function (to, addr) { follow(to, addr); },
     arrange: function (a) { if (a) setArrangement(a); return { arr: ARR, morph: !!MORPH, kb: +KB.toFixed(2), rim: +KIN.rim.toFixed(3), rings: KIN.rings.map(function (r) { return r.label + ' ' + r.r.toFixed(2); }), sectors: KIN.sectors.map(function (c) { return c.label + ' ' + Math.round(c.a0 * 180 / Math.PI) + '-' + Math.round(c.a1 * 180 / Math.PI) + ' deg, ' + c.n + ' stars in ' + c.groups; }), names: KIN.names.map(function (n) { return n.text; }), dist: +orb.dist.toFixed(2), pitch: +orb.pitch.toFixed(2), checked: [].map.call(arrBtns, function (b) { return b.getAttribute('data-arr') + ':' + b.getAttribute('aria-checked'); }) }; },
     where: function (name) { var s = starOf(name); if (!s) return null; var d = s.pk || [0, 0, 0]; return { key: s.key, born: s.born ? new Date(s.born).toISOString().slice(0, 10) : '', kinR: +Math.hypot(d[0], d[2]).toFixed(3), kinDeg: +((Math.atan2(d[2], d[0]) * 180 / Math.PI + 360) % 360).toFixed(1), at: s.p.map(function (v) { return +v.toFixed(3); }), galaxy: s.pg.map(function (v) { return +v.toFixed(3); }) }; },
     born: function () { return { stamped: BORN.length, first: BORN.length ? new Date(BORN[0]).toISOString() : '', newborn: NEWBORN.length, arrived: LOG.born.slice(), replay: RP ? { x: +RP.x.toFixed(3), playing: RP.playing, label: $('twhen').textContent, btn: $('tplay').textContent, drawn: B3.filter(function (s) { return !unborn(s); }).length } : null }; },
