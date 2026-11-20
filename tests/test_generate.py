@@ -513,6 +513,7 @@ class TheUniversePage(Base):
         for gone in ('<video', 'id="band"', 'id="needle"', 'id="veil"', 'data-parts', '.mp4', '.mp3', 'site.css'):
             self.assertNotIn(gone, h)
         self.assertIn('?block=presence', h)
+        self.assertIn('data-show="threads"', h)
         for arr in ('galaxy', 'kin'):
             self.assertIn('data-arr="%s"' % arr, h)
         ids = re.findall(r'id="([^"]+)"', h)
